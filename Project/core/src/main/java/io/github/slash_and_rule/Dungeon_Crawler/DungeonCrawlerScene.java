@@ -7,13 +7,18 @@ import io.github.slash_and_rule.Bases.PhysicsScreen;
 public class DungeonCrawlerScene extends PhysicsScreen {
 
     public DungeonCrawlerScene() {
-        // Initialize the Box2D world and debug renderer
         super(true);
+
+        this.viewport = new ExtendViewport(16, 9, camera);
 
         // Add player and other game objects here
         new Player(this, inputManager, world);
+    }
 
-        this.viewport = new ExtendViewport(16, 9, camera);
+    @Override
+    public void init() {
+        // Initialize game objects, load assets, etc.
+        // This method can be used to set up the initial state of the scene.
     }
 
     @Override

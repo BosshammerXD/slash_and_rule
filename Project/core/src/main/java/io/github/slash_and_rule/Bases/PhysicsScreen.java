@@ -9,6 +9,7 @@ public abstract class PhysicsScreen extends BaseScreen {
     protected Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
     public PhysicsScreen(boolean debug) {
+        super();
         // Initialize the Box2D world and debug renderer
         debugRenderer.setDrawBodies(debug);
     }

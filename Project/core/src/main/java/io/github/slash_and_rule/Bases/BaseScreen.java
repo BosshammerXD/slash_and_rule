@@ -30,6 +30,8 @@ public abstract class BaseScreen implements Screen {
         Gdx.input.setInputProcessor(inputManager);
     }
 
+    public abstract void init();
+
     @Override
     public abstract void show();
     // Prepare your screen here.

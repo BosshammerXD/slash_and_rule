@@ -24,7 +24,7 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
     public Player(PhysicsScreen screen, InputManager inputManager, World world) {
         super(screen, inputManager, world, 1f, 0.5f, 0.2f, 4, 3, BodyType.DynamicBody);
 
-        screen.drawableObjects.add(this);
+        screen.drawableSprites.add(this);
         screen.updatableObjects.add(this);
         screen.pausableObjects.add(this);
 
@@ -67,7 +67,7 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
 
         movDir.nor();
 
-        movDir.scl(5f);
+        movDir.scl(1f);
 
         body.applyLinearImpulse(movDir, pos, true);
 
@@ -76,6 +76,8 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
             currentVelocity.nor().scl(max_speed);
             body.setLinearVelocity(currentVelocity);
         }
+
+        screen.camera.position.set(pos.x, pos.y, 0);
     }
 
     @Override

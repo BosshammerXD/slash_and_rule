@@ -17,17 +17,28 @@ public abstract class BasePhysicsObject extends BaseGameObject {
 
     public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
             float density,
-            float friction, float restitution, int start_x, int start_y, BodyType BodyType) {
+            float friction, float restitution, float start_x, float start_y, BodyType BodyType) {
         super(screen, inputManager);
 
+        this.setup(world, density, friction, restitution, start_x, start_y, BodyType, this.getHitboxShape());
+    }
+
+    public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
+            float density,
+            float friction, float restitution, float start_x, float start_y, BodyType BodyType, Shape hitboxShape) {
+        super(screen, inputManager);
+
+        this.setup(world, density, friction, restitution, start_x, start_y, BodyType, hitboxShape);
+    }
+
+    private void setup(World world,
+            float density,
+            float friction, float restitution, float start_x, float start_y, BodyType BodyType, Shape hitboxShape) {
         this.bodyDef.type = BodyType;
         this.bodyDef.position.set(start_x, start_y); // Set initial position of the physics object
 
         this.body = world.createBody(bodyDef);
         this.body.setLinearDamping(7.5f);
-
-        Shape hitboxShape = this.getHitboxShape(); // Get the shape for the hitbox, this should be overridden in
-                                                   // subclasses
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = hitboxShape;

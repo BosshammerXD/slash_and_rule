@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="6">
+ <tileset firstgid="1" source="TestTiles(16x16).tsx"/>
+ <layer id="1" name="Kachelebene 1" width="11" height="11">
+  <data encoding="csv">
+36,14,14,14,14,14,14,14,14,14,37,
+38,1,2,3,1,2,3,1,2,3,38,
+38,23,24,25,23,24,25,23,24,25,38,
+38,45,46,47,45,46,47,45,46,47,38,
+38,1,2,3,1,2,3,1,2,3,38,
+38,23,24,25,23,24,25,23,24,25,38,
+38,45,46,47,45,46,47,45,46,47,38,
+38,1,2,3,1,2,3,1,2,3,38,
+38,23,24,25,23,24,25,23,24,25,38,
+38,45,46,47,45,46,47,45,46,47,38,
+58,14,14,14,14,14,14,14,14,14,59
+</data>
+ </layer>
+ <objectgroup id="2" name="Collision">
+  <object id="1" x="160" y="0" width="16" height="176"/>
+  <object id="2" x="0" y="0" width="160" height="16"/>
+  <object id="3" x="0" y="16" width="16" height="160"/>
+  <object id="4" x="16" y="160" width="144" height="16"/>
+ </objectgroup>
+</map>

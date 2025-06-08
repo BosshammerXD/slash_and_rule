@@ -11,7 +11,7 @@ import io.github.slash_and_rule.Dungeon_Crawler.DungeonCrawlerScene;
 /**
  * aaaaa
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
- * platforms. ello
+ * platforms. ellos
  */
 public class Main extends Game {
     public AssetManager assetManager = new AssetManager();

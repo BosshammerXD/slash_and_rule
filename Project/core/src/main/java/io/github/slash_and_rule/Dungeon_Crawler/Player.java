@@ -54,7 +54,7 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
 
         Vector2 movDir = new Vector2(0, 0);
 
-        if (Gdx.input.isKeyPressed(Keys.D)) {
+        if (Gdx.input.isKeyPressed(Keys.W)) {
             movDir.y += 1;
             // hello
         }

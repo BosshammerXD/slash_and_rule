@@ -1,6 +1,7 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
 
 import io.github.slash_and_rule.Interfaces.Displayable;
@@ -22,7 +23,8 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
     private float max_speed = 10f; // Maximum speed of the player
 
     public Player(PhysicsScreen screen, InputManager inputManager, World world) {
-        super(screen, inputManager, world, 1f, 0.5f, 0.2f, 4, 3, BodyType.DynamicBody);
+        super(screen, inputManager, world, 1f, 0f, 0f, 4, 3, Globals.PlayerCategory, Globals.PlayerMask,
+                BodyType.DynamicBody);
 
         screen.drawableSprites.add(this);
         screen.updatableObjects.add(this);

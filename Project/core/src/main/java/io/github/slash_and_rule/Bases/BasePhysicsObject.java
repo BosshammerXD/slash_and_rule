@@ -17,23 +17,27 @@ public abstract class BasePhysicsObject extends BaseGameObject {
 
     public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
             float density,
-            float friction, float restitution, float start_x, float start_y, BodyType BodyType) {
+            float friction, float restitution, float start_x, float start_y, short category, short mask,
+            BodyType BodyType) {
         super(screen, inputManager);
 
-        this.setup(world, density, friction, restitution, start_x, start_y, BodyType, this.getHitboxShape());
+        this.setup(world, density, friction, restitution, start_x, start_y, category, mask, BodyType,
+                this.getHitboxShape());
     }
 
     public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
             float density,
-            float friction, float restitution, float start_x, float start_y, BodyType BodyType, Shape hitboxShape) {
+            float friction, float restitution, float start_x, float start_y, short category, short mask,
+            BodyType BodyType, Shape hitboxShape) {
         super(screen, inputManager);
 
-        this.setup(world, density, friction, restitution, start_x, start_y, BodyType, hitboxShape);
+        this.setup(world, density, friction, restitution, start_x, start_y, category, mask, BodyType, hitboxShape);
     }
 
     private void setup(World world,
             float density,
-            float friction, float restitution, float start_x, float start_y, BodyType BodyType, Shape hitboxShape) {
+            float friction, float restitution, float start_x, float start_y, short category, short mask,
+            BodyType BodyType, Shape hitboxShape) {
         this.bodyDef.type = BodyType;
         this.bodyDef.position.set(start_x, start_y); // Set initial position of the physics object
 
@@ -45,6 +49,8 @@ public abstract class BasePhysicsObject extends BaseGameObject {
         fixtureDef.density = density; // Set the density of the physics object
         fixtureDef.friction = friction; // Set the friction of the physics object
         fixtureDef.restitution = restitution; // Set the restitution (bounciness) of the physics object
+        fixtureDef.filter.categoryBits = category;
+        fixtureDef.filter.maskBits = mask;
         this.fixture = body.createFixture(fixtureDef);
 
         hitboxShape.dispose(); // Dispose of the shape after creating the fixture

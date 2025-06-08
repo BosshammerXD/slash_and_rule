@@ -17,10 +17,11 @@ public abstract class CollidableTileMapObject extends TileMapObject {
     private World world;
     protected PhysicsScreen screen;
 
-    public CollidableTileMapObject(InputManager inputManager, PhysicsScreen screen, World world, String name,
+    public CollidableTileMapObject(PhysicsScreen screen, InputManager inputManager, World world, String name,
             float scale) {
         super(screen, inputManager, name, scale);
         this.world = world;
+        this.screen = screen;
     }
 
     @Override

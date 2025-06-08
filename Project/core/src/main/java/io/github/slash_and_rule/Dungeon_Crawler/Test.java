@@ -11,6 +11,6 @@ public class Test extends CollidableTileMapObject {
     private static final float SCALE = 1 / 16f;
 
     public Test(PhysicsScreen screen, InputManager inputManager, World world) {
-        super(inputManager, screen, world, MAP_FILE_PATH, SCALE);
+        super(screen, inputManager, world, MAP_FILE_PATH, SCALE);
     }
 }

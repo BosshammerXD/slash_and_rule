@@ -52,6 +52,10 @@ public class DungeonDoor {
             width /= 2;
 
         }
+        x += 1 / 16f;
+        y += 1 / 16f;
+        width -= 1 / 16f;
+        height -= 1 / 16f;
 
         makeSensor(screen, inputManager, world, x, y, width, height, type);
     }
@@ -65,8 +69,6 @@ public class DungeonDoor {
         this.blocker = new ColliderObject(screen, inputManager, world, 0, 0, 0, x + width, y + height,
                 Globals.WallCategory,
                 Globals.WallMask, shape, BodyType.StaticBody);
-
-        open();
     }
 
     private void makeSensor(PhysicsScreen screen, InputManager inputManager, World world, float x, float y,

@@ -15,6 +15,7 @@ import io.github.slash_and_rule.InputManager;
 
 public abstract class CollidableTileMapObject extends TileMapObject {
     private World world;
+    protected PhysicsScreen screen;
 
     public CollidableTileMapObject(InputManager inputManager, PhysicsScreen screen, World world, String name,
             float scale) {
@@ -46,7 +47,7 @@ public abstract class CollidableTileMapObject extends TileMapObject {
                 shape.setAsBox(width / 2f, height / 2f);
 
                 // Create a collider object for the rectangle
-                new ColliderObject((PhysicsScreen) screen, inputManager, world, 0f, 0f, 0f, x + width / 2f,
+                new ColliderObject(screen, inputManager, world, 0f, 0f, 0f, x + width / 2f,
                         y + height / 2f,
                         shape, BodyType.StaticBody);
             }

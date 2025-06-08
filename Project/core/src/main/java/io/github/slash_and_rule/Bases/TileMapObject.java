@@ -17,7 +17,7 @@ public abstract class TileMapObject extends BaseGameObject implements Displayabl
     private String mapFilePath;
     protected float scale;
 
-    public TileMapObject(PhysicsScreen screen, InputManager inputManager, String mapFilePath, float scale) {
+    public TileMapObject(BaseScreen screen, InputManager inputManager, String mapFilePath, float scale) {
         super(screen, inputManager);
         // Constructor logic here
 

@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Bases;
 import java.util.Stack;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -11,10 +12,11 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import io.github.slash_and_rule.ColliderObject;
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
 
 public abstract class CollidableTileMapObject extends TileMapObject {
-    private World world;
+    protected World world;
     protected PhysicsScreen screen;
 
     public CollidableTileMapObject(PhysicsScreen screen, InputManager inputManager, World world, String name,
@@ -30,11 +32,12 @@ public abstract class CollidableTileMapObject extends TileMapObject {
         super.init(assetManager, todo);
     };
 
-    private void loadCollisionObjects(AssetManager assetManager) {
+    protected MapLayers loadCollisionObjects(AssetManager assetManager) {
         // Load collision objects from the map if necessary
         // This method should be implemented in subclasses to handle specific collision
         // logic
-        MapObjects objects = map.getLayers().get("Collision").getObjects();
+        MapLayers layers = map.getLayers();
+        MapObjects objects = layers.get("Collision").getObjects();
 
         for (MapObject object : objects) {
             if (object instanceof RectangleMapObject) {
@@ -49,9 +52,10 @@ public abstract class CollidableTileMapObject extends TileMapObject {
 
                 // Create a collider object for the rectangle
                 new ColliderObject(screen, inputManager, world, 0f, 0f, 0f, x + width / 2f,
-                        y + height / 2f,
+                        y + height / 2f, Globals.WallCategory, Globals.WallMask,
                         shape, BodyType.StaticBody);
             }
         }
+        return layers;
     }
 }

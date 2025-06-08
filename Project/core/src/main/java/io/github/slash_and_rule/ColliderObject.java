@@ -9,8 +9,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class ColliderObject extends BasePhysicsObject {
 
     public ColliderObject(PhysicsScreen screen, InputManager inputManager, World world,
-            float density, float friction, float restitution, float x, float y, Shape shape, BodyType type) {
-        super(screen, inputManager, world, density, friction, restitution, x, y, type, shape);
+            float density, float friction, float restitution, float x, float y, short category, short mask, Shape shape,
+            BodyType type) {
+        super(screen, inputManager, world, density, friction, restitution, x, y, category, mask, type, shape);
 
     }
 

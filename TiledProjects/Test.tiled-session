@@ -25,11 +25,11 @@
             "scaleInEditor": 1
         },
         "test.tmx": {
-            "scale": 2,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 66,
-                "y": 115.5
+                "x": 73.66666666666666,
+                "y": 80.33333333333333
             }
         }
     },
@@ -40,13 +40,12 @@
     "map.tileWidth": 16,
     "map.width": 11,
     "openFiles": [
-        "test.tmx",
-        "TestTiles(16x16).tsx"
+        "test.tmx"
     ],
     "project": "Test.tiled-project",
     "recentFiles": [
-        "TestTiles(16x16).tsx",
         "test.tmx",
+        "TestTiles(16x16).tsx",
         "C:/Users/Admin/OneDrive/Desktop/Programmierzeugs/Java/libgdx/slash_and_rule/Project/assets/test.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",

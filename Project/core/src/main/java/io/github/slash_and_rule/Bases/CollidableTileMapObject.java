@@ -11,9 +11,9 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-import io.github.slash_and_rule.ColliderObject;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
+import io.github.slash_and_rule.Utils.ColliderObject;
 
 public abstract class CollidableTileMapObject extends TileMapObject {
     protected World world;

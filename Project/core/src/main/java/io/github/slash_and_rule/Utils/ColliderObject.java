@@ -31,4 +31,5 @@ public class ColliderObject extends BasePhysicsObject {
     public Body getBody() {
         return body;
     }
+
 }

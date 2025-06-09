@@ -1,5 +1,6 @@
 package io.github.slash_and_rule.Bases;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -18,6 +19,7 @@ import io.github.slash_and_rule.Utils.ColliderObject;
 public abstract class CollidableTileMapObject extends TileMapObject {
     protected World world;
     protected PhysicsScreen screen;
+    protected ArrayList<ColliderObject> colliders = new ArrayList<>();
 
     public CollidableTileMapObject(PhysicsScreen screen, InputManager inputManager, World world, String name,
             float scale) {
@@ -51,9 +53,10 @@ public abstract class CollidableTileMapObject extends TileMapObject {
                 shape.setAsBox(width / 2f, height / 2f);
 
                 // Create a collider object for the rectangle
-                new ColliderObject(screen, inputManager, world, 0f, 0f, 0f, x + width / 2f,
+                this.colliders.add(new ColliderObject(screen, inputManager, world, 0f, 0f, 0f, x + width / 2f,
                         y + height / 2f, Globals.WallCategory, Globals.WallMask,
-                        shape, BodyType.StaticBody);
+                        shape, BodyType.StaticBody));
+
             }
         }
         return layers;

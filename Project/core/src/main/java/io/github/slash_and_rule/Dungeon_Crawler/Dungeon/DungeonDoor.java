@@ -4,9 +4,6 @@ import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Utils.ColliderObject;
 
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.Fixture;
-
-import java.util.function.Consumer;
 
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -20,6 +17,8 @@ import io.github.slash_and_rule.Utils.SensorObject;
 public class DungeonDoor {
     private boolean isOpen = false;
     private ColliderObject blocker;
+    public DungeonDoor boundDoor;
+    private boolean isActive = false;
     private SensorObject sensor;
 
     public DungeonDoor(PhysicsScreen screen, InputManager inputManager, World world, RectangleMapObject object,
@@ -78,12 +77,8 @@ public class DungeonDoor {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width, height);
 
-        Consumer<Fixture> contactHandler = fixture -> {
-            System.out.println("Sensor " + type + " triggered by: " + fixture.getUserData());
-        };
-
         this.sensor = new SensorObject(screen, inputManager, world, 0, 0, 0, x + width, y + height,
-                Globals.PlayerSensorCategory, Globals.PlayerCategory, shape, type, contactHandler);
+                Globals.PlayerSensorCategory, Globals.PlayerCategory, shape, type, fixture -> this.teleport());
     }
 
     public void open() {
@@ -106,4 +101,38 @@ public class DungeonDoor {
         blocker.getBody().getFixtureList().first().setFilterData(filter);
     }
 
+    public void bindDoor(DungeonDoor door) {
+        this.boundDoor = door;
+        door.boundDoor = this;
+    }
+
+    private void teleport() {
+
+    }
+
+    public void setOpen(boolean open) {
+        if (open) {
+            open();
+        } else {
+            close();
+        }
+    }
+
+    public void activate() {
+        if (isActive) {
+            return; // Already active, no need to activate again
+        }
+        isActive = true;
+        blocker.getBody().setActive(true);
+        sensor.getBody().setActive(true);
+    }
+
+    public void deactivate() {
+        if (!isActive) {
+            return; // Already inactive, no need to deactivate again
+        }
+        isActive = false;
+        blocker.getBody().setActive(false);
+        sensor.getBody().setActive(false);
+    }
 }

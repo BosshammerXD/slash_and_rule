@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import java.util.function.Consumer;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -48,5 +49,13 @@ public class SensorObject extends BasePhysicsObject {
         if (contactHandler != null) {
             contactHandler.accept(other);
         }
+    }
+
+    public void setContactHandler(Consumer<Fixture> contactHandler) {
+        this.contactHandler = contactHandler;
+    }
+
+    public Body getBody() {
+        return body;
     }
 }

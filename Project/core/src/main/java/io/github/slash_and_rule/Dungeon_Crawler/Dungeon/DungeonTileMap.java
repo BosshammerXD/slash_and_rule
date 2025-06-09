@@ -1,5 +1,7 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
+import java.util.Stack;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
@@ -21,7 +23,6 @@ public class DungeonTileMap extends CollidableTileMapObject {
 
     public DungeonTileMap(PhysicsScreen screen, InputManager inputManager, World world, String mapPath) {
         super(screen, inputManager, world, mapPath, 1 / 16f);
-        deactivate();
     }
 
     @Override
@@ -51,6 +52,13 @@ public class DungeonTileMap extends CollidableTileMapObject {
 
         return layers;
 
+    }
+
+    @Override
+    public void init(AssetManager assetManager, Stack<Runnable> todo) {
+        // TODO Auto-generated method stub
+        todo.push(() -> deactivate());
+        super.init(assetManager, todo);
     }
 
     public DungeonDoor getLeftDoor() {
@@ -101,6 +109,7 @@ public class DungeonTileMap extends CollidableTileMapObject {
             collider.getBody().setActive(false);
         }
         if (leftDoor != null) {
+            System.out.println("Deactivating left door");
             leftDoor.deactivate();
         }
         if (rightDoor != null) {

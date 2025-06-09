@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonTileMap;
 
 public class DungeonCrawlerScene extends PhysicsScreen {
@@ -16,6 +17,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         // Add player and other game objects here
         new Player(this, inputManager, world);
         new DungeonTileMap(this, inputManager, world, "test.tmx");
+        new DungeonManager(this, "", 3, 6);
     }
 
     @Override

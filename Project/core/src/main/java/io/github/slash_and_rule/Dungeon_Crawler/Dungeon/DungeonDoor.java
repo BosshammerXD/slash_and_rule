@@ -18,7 +18,7 @@ public class DungeonDoor {
     private boolean isOpen = false;
     private ColliderObject blocker;
     public DungeonDoor boundDoor;
-    private boolean isActive = false;
+    private boolean isActive = true;
     private SensorObject sensor;
 
     public DungeonDoor(PhysicsScreen screen, InputManager inputManager, World world, RectangleMapObject object,

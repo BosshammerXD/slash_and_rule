@@ -1,6 +1,9 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Random;
 import java.util.Stack;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -9,13 +12,38 @@ import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 
 public class DungeonManager implements Initalizable {
+    public static class LevelData {
+        public String startRoom;
+        public String[] fillerRooms;
+        public String[] leafRooms;
+        public String endRoom;
+
+        public LevelData(String location, String startRoom, String[] fillerRooms, String[] leafRooms, String endRoom) {
+            this.startRoom = location + startRoom;
+            this.fillerRooms = Arrays.stream(fillerRooms)
+                    .map(room -> location + room)
+                    .toArray(String[]::new);
+            this.leafRooms = Arrays.stream(leafRooms)
+                    .map(room -> location + room)
+                    .toArray(String[]::new);
+            this.endRoom = location + endRoom;
+
+        }
+    }
+
     private String AssetFolder;
     private ArrayList<DungeonTileMap> rooms;
     private int depth;
+    private int maxDifficulty;
 
-    public DungeonManager(BaseScreen screen, String assetFolder, int depth) {
+    private LevelData[] levels;
+
+    public DungeonManager(BaseScreen screen, String assetFolder, int depth, int maxDifficulty) {
         this.AssetFolder = assetFolder;
         this.depth = depth;
+        this.maxDifficulty = maxDifficulty;
+        this.levels = new LevelData[] {
+                new LevelData(assetFolder, "start", new String[] { "filler" }, new String[] { "leaf" }, "end"), };
 
         screen.loadableObjects.add(this);
     }
@@ -26,7 +54,9 @@ public class DungeonManager implements Initalizable {
         // The implementation details will depend on the specific requirements of the
         // game
         // For now, we can leave it empty or add a simple placeholder implementation
-
+        BitSet roomStructure = new BitSet((depth * 2) * (depth * 2 + 1));
+        DungeonRoom dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
+                new Random());
     }
 
     // Split up dungeon into Levels
@@ -56,6 +86,5 @@ public class DungeonManager implements Initalizable {
     @Override
     public void show(AssetManager assetManager) {
         // TODO Auto-generated method stub
-
     }
 }

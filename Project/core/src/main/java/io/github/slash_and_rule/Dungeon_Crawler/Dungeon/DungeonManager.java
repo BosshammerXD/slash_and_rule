@@ -34,13 +34,18 @@ public class DungeonManager implements Initalizable {
     private String AssetFolder;
     private ArrayList<DungeonTileMap> rooms;
     private int depth;
+    private int branchcap;
+    private float branchmul;
     private int maxDifficulty;
 
     private LevelData[] levels;
 
-    public DungeonManager(BaseScreen screen, String assetFolder, int depth, int maxDifficulty) {
+    public DungeonManager(BaseScreen screen, String assetFolder, int depth, int maxDifficulty, int branchcap,
+            float branchmul) {
         this.AssetFolder = assetFolder;
         this.depth = depth;
+        this.branchcap = branchcap;
+        this.branchmul = branchmul;
         this.maxDifficulty = maxDifficulty;
         this.levels = new LevelData[] {
                 new LevelData(assetFolder, "start", new String[] { "filler" }, new String[] { "leaf" }, "end"), };
@@ -54,9 +59,10 @@ public class DungeonManager implements Initalizable {
         // The implementation details will depend on the specific requirements of the
         // game
         // For now, we can leave it empty or add a simple placeholder implementation
-        BitSet roomStructure = new BitSet((depth * 2) * (depth * 2 + 1));
+        BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
         DungeonRoom dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
-                new Random());
+                new Random(), branchcap, branchmul);
+        dungeon.print();
     }
 
     // Split up dungeon into Levels

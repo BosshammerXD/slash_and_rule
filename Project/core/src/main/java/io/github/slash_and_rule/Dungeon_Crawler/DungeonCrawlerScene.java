@@ -17,7 +17,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         // Add player and other game objects here
         new Player(this, inputManager, world);
         new DungeonTileMap(this, inputManager, world, "test.tmx");
-        new DungeonManager(this, "", 3, 6);
+        new DungeonManager(this, "", 6, 16, 3, 1.5f);
     }
 
     @Override

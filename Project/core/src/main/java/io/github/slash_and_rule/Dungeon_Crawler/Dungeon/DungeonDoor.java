@@ -1,6 +1,7 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Dungeon_Crawler.Player;
 import io.github.slash_and_rule.Utils.ColliderObject;
 
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -20,15 +21,16 @@ public class DungeonDoor {
     public DungeonDoor boundDoor;
     private boolean isActive = true;
     private SensorObject sensor;
+    private float[] spawnPos;
 
     public DungeonDoor(PhysicsScreen screen, InputManager inputManager, World world, RectangleMapObject object,
-            float scale, String type) {
+            float scale, String type, Player player) {
 
-        makeDoor(screen, inputManager, world, object, scale, type);
+        makeDoor(screen, inputManager, world, object, scale, type, player);
     }
 
     private void makeDoor(PhysicsScreen screen, InputManager inputManager, World world, RectangleMapObject object,
-            float scale, String type) {
+            float scale, String type, Player player) {
         float x = object.getRectangle().x * scale;
         float y = object.getRectangle().y * scale;
         float width = object.getRectangle().width / 2 * scale;
@@ -56,7 +58,7 @@ public class DungeonDoor {
         width -= 1 / 16f;
         height -= 1 / 16f;
 
-        makeSensor(screen, inputManager, world, x, y, width, height, type);
+        makeSensor(screen, inputManager, world, x, y, width, height, type, player);
     }
 
     private void makeBlocker(PhysicsScreen screen, InputManager inputManager, World world, float x, float y,
@@ -72,13 +74,13 @@ public class DungeonDoor {
 
     private void makeSensor(PhysicsScreen screen, InputManager inputManager, World world, float x, float y,
             float width,
-            float height, String type) {
+            float height, String type, Player player) {
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width, height);
 
         this.sensor = new SensorObject(screen, inputManager, world, 0, 0, 0, x + width, y + height,
-                Globals.PlayerSensorCategory, Globals.PlayerCategory, shape, type, fixture -> this.teleport());
+                Globals.PlayerSensorCategory, Globals.PlayerCategory, shape, type, fixture -> this.teleport(player));
     }
 
     public void open() {
@@ -106,8 +108,8 @@ public class DungeonDoor {
         door.boundDoor = this;
     }
 
-    private void teleport() {
-
+    private void teleport(Player player) {
+        player.setPosition(spawnPos[0], spawnPos[1]);
     }
 
     public void setOpen(boolean open) {

@@ -9,10 +9,59 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import io.github.slash_and_rule.Bases.BaseScreen;
 
 public class LoadingScreen extends BaseScreen {
-    public class LoadingSchedule {
+    public static class MsgRunnable implements Runnable {
+        public String msg;
+        private Runnable runnable;
+
+        public MsgRunnable(String msg, Runnable runnable) {
+            this.msg = msg;
+            this.runnable = runnable;
+        }
+
+        @Override
+        public void run() {
+            runnable.run();
+        }
+    }
+
+    public static class ThreadData implements Runnable {
+        private Runnable runnable;
+        public Thread thread;
+
+        public ThreadData(Runnable runnable, Runnable after) {
+            this.runnable = after;
+            this.thread = new Thread(runnable);
+            this.thread.start();
+        }
+
+        public ThreadData(Thread thread, Runnable after) {
+            this.thread = thread;
+            this.runnable = after;
+        }
+
+        public ThreadData(Runnable runnable) {
+            this.runnable = null;
+            this.thread = new Thread(runnable);
+            this.thread.start();
+        }
+
+        public ThreadData(Thread thread) {
+            this.thread = thread;
+            this.runnable = null;
+        }
+
+        @Override
+        public void run() {
+            if (runnable != null) {
+                runnable.run();
+            }
+        }
+    }
+
+    public static class LoadingSchedule {
         public AssetManager assetManager;
-        public ArrayDeque<Runnable> todo;
-        public Stack<Thread> threads;
+        public ArrayDeque<MsgRunnable> todo;
+        public Stack<ThreadData> threads;
 
         public LoadingSchedule(AssetManager assetManager) {
             this.assetManager = assetManager;
@@ -24,6 +73,7 @@ public class LoadingScreen extends BaseScreen {
     public BaseScreen nextScreen;
     private BaseScreen defaultScreen;
     private Main game;
+    private String msg = "";
 
     private LoadingSchedule loadingSchedule;
 
@@ -60,18 +110,23 @@ public class LoadingScreen extends BaseScreen {
         if (!loadingSchedule.assetManager.update()) {
             // If the asset manager is still loading assets, we can display a loading
             // message or animation.
+            msg = "Loading assets: " + (int) (loadingSchedule.assetManager.getProgress() * 100) + "%";
             return;
         }
         if (loadingSchedule.todo != null && !loadingSchedule.todo.isEmpty()) {
             loadingSchedule.todo.pop().run();
+            if (!loadingSchedule.todo.isEmpty()) {
+                msg = loadingSchedule.todo.peek().msg;
+            }
             return;
         }
+        msg = "waiting for threads to finish...";
         if (!loadingSchedule.threads.isEmpty()) {
-            if (loadingSchedule.threads.peek().isAlive()) {
+            if (loadingSchedule.threads.peek().thread.isAlive()) {
                 // If there are still threads running, we wait for them to finish.
                 return;
             } else {
-                loadingSchedule.threads.pop();
+                loadingSchedule.threads.pop().run();
             }
         }
         game.setScreen(nextScreen);

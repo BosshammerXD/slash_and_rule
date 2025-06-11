@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
+import io.github.slash_and_rule.LoadingScreen.ThreadData;
 
 public class DungeonManager implements Initalizable {
     public static class LevelData {
@@ -49,7 +50,8 @@ public class DungeonManager implements Initalizable {
         this.branchmul = branchmul;
         this.maxDifficulty = maxDifficulty;
         this.levels = new LevelData[] {
-                new LevelData(assetFolder, "start", new String[] { "filler" }, new String[] { "leaf" }, "end"), };
+                new LevelData(assetFolder + "/testlevel", "start", new String[] { "filler" }, new String[] { "leaf" },
+                        "end"), };
 
         screen.loadableObjects.add(this);
     }
@@ -64,8 +66,8 @@ public class DungeonManager implements Initalizable {
 
     // Split up dungeon into Levels
     // Level x has Boss at end
-    // rooms get more dificult as you go deeper
-    // Lootrooms as endpoints (with Loot increasing with depth)
+    // rooms get more dificult as you go deeper [done]
+    // Lootrooms as endpoints (with Loot increasing with depth) [done]
     // arrays with possible rooms per Level (Store the Paths)
 
     private void getRooms() {
@@ -77,13 +79,12 @@ public class DungeonManager implements Initalizable {
 
     @Override
     public void init(LoadingSchedule loader) {
-        loader.todo.add(() -> getRooms());
+
         BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
-        dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
+        dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
                 new Random(), branchcap, branchmul);
-        Thread t = new Thread(dungeon);
-        t.start();
-        loader.threads.add(t);
+
+        loader.threads.add(new ThreadData(dungeon));
     }
 
     @Override

@@ -11,6 +11,8 @@ DungeonCrawler:
   - implement enemy class
   - implement enemy Spawn System
     - note try to decouple Spawn System and enemys so that we have creative lberty, when creating the enemies
+    - Give all rooms a balance (maybe difficutly * 100) and all the monsters a cost, then randomly select monsters, that are cheap enough and subtract their cost from the balance
+    - figure out, when to stop picking (probably define balance that it needs to undershoot and modify it a bit with random value (maybe +-difficulty * 5))
   later:
   - make Dungeon Rooms
   - play with lights
@@ -22,4 +24,8 @@ LoadingScreen:
 CityBuilder:
   - make grid for citybuilder
   - make ressourcecounter for city builder
-  - mke citybuilder screen
+  - make citybuilder screen
+
+zu klären:
+    - was für eine Art von grid für citybuilder
+    - monsterspawning via spawnpoints defined in Tilemap okay?

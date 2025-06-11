@@ -104,4 +104,8 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
         // Implement resume logic for the player
         isPaused = false;
     }
+
+    public void setPosition(float x, float y) {
+        body.setTransform(x, y, 0); // Set the player's position in the world
+    }
 }

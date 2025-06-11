@@ -10,7 +10,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Bases.CollidableTileMapObject;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Dungeon_Crawler.Player;
 import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
+import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 
 public class DungeonTileMap extends CollidableTileMapObject {
@@ -19,9 +21,11 @@ public class DungeonTileMap extends CollidableTileMapObject {
     private DungeonDoor topDoor = null;
     private DungeonDoor bottomDoor = null;
     private boolean isActive = true;
+    private Player player;
 
-    public DungeonTileMap(PhysicsScreen screen, InputManager inputManager, World world, String mapPath) {
+    public DungeonTileMap(PhysicsScreen screen, InputManager inputManager, World world, String mapPath, Player player) {
         super(screen, inputManager, world, mapPath, 1 / 16f);
+        this.player = player;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class DungeonTileMap extends CollidableTileMapObject {
                 String type = object.getProperties().get("type", String.class);
 
                 DungeonDoor door = new DungeonDoor(screen, inputManager, world, (RectangleMapObject) object, scale,
-                        type);
+                        type, player);
 
                 if (type.startsWith("l")) {
                     leftDoor = door;
@@ -57,7 +61,8 @@ public class DungeonTileMap extends CollidableTileMapObject {
     public void init(LoadingSchedule loader) {
         // TODO Auto-generated method stub
         super.init(loader);
-        loader.todo.add(() -> deactivate());
+
+        loader.todo.add(new MsgRunnable("", () -> deactivate()));
     }
 
     public DungeonDoor getLeftDoor() {

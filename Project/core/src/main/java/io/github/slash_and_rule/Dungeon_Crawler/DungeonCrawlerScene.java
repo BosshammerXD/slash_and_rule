@@ -15,8 +15,8 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         this.viewport = new ExtendViewport(16, 9, camera);
 
         // Add player and other game objects here
-        new Player(this, inputManager, world);
-        new DungeonTileMap(this, inputManager, world, "test.tmx");
-        new DungeonManager(this, "", 6, 16, 1, 3f);
+        Player player = new Player(this, inputManager, world);
+        new DungeonTileMap(this, inputManager, world, "test.tmx", player);
+        new DungeonManager(this, "levels", 6, 16, 1, 3f);
     }
 }

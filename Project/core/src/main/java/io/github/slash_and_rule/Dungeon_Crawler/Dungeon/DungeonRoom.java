@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 
-import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.LevelData;
-
 // implement generation on initialization by pushing the generation to the todo Stack
 public class DungeonRoom implements Runnable {
     public static int numRooms = 0;
@@ -14,20 +12,18 @@ public class DungeonRoom implements Runnable {
     public byte type;
     public int difficulty;
     public DungeonRoom[] neighbors = new DungeonRoom[4]; // 0: left, 1: right, 2: top, 3: bottom
-    public String path;
     private boolean stuck = false;
     private boolean visited = false;
     private String[][][] representation;
     private Runnable runFunc;
 
-    public DungeonRoom(LevelData level, int depth, int maxDifficulty, BitSet roomStructure, Random random,
+    public DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int branchDepthCap, float branchmul) {
         int[] xy = getStartXY(depth, branchDepthCap);
         int x = xy[0];
         int y = xy[1];
         this.isMain = true;
         this.type = 0;
-        this.path = level.startRoom;
         this.difficulty = 0;
         numRooms++;
 
@@ -41,25 +37,25 @@ public class DungeonRoom implements Runnable {
         int arrayLen = 2 * depth;
         flagRoom(roomStructure, x, y, arrayLen);
         flagRoom(roomStructure, x, y + 1, arrayLen);
-        this.runFunc = () -> neighbors[1] = new DungeonRoom(level, depth, maxDifficulty, roomStructure, random, x,
+        this.runFunc = () -> neighbors[1] = new DungeonRoom(depth, maxDifficulty, roomStructure, random, x,
                 y + 1, true, arrayLen,
                 this, 3, branchDepthCap, branchmul);
     }
 
-    private DungeonRoom(LevelData level, int depth, int maxDifficulty, BitSet roomStructure, Random random, int x,
+    private DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random, int x,
             int y, boolean isMain, int arrayLen, DungeonRoom origin, int origin_dir, int branchDepthCap,
             float branchmul) {
         this.isMain = isMain;
         numRooms++;
 
-        this.type = getType(isMain, depth, random, level);
+        this.type = getType(isMain, depth, random);
         this.neighbors[origin_dir] = origin; // Set the neighbor in the direction of the origin
         this.difficulty = calcDifficulty(depth, maxDifficulty);
-        generateNeighbors(level, depth, maxDifficulty, roomStructure, random, x, y, isMain, arrayLen, origin,
+        generateNeighbors(depth, maxDifficulty, roomStructure, random, x, y, isMain, arrayLen, origin,
                 branchDepthCap, branchmul);
     }
 
-    private void generateNeighbors(LevelData level, int depth, int maxDifficulty, BitSet roomStructure, Random random,
+    private void generateNeighbors(int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int x, int y, boolean isMain, int arrayLen, DungeonRoom origin, int branchDepthCap, float branchmul) {
         if (this.type == 2 || this.type == 3) {
             return; // Leaf or boss rooms do not generate further neighbors
@@ -93,7 +89,7 @@ public class DungeonRoom implements Runnable {
         int count = 0;
         do {
             stuck = false;
-            count = genMain(emptyNeighbours, level, depth, maxDifficulty, roomStructure, random, x, y, arrayLen,
+            count = genMain(emptyNeighbours, depth, maxDifficulty, roomStructure, random, x, y, arrayLen,
                     count, branchDepthCap, branchmul, numNewRooms);
         } while (count < numNeighbours && stuck);
         if (stuck && isMain) {
@@ -112,14 +108,14 @@ public class DungeonRoom implements Runnable {
         for (int i = count; i < numNewRooms; i++) {
             int neighbourDir = emptyNeighbours[i];
             int[] coords = dirToXY(neighbourDir, x, y);
-            this.neighbors[neighbourDir] = new DungeonRoom(level, depth, maxDifficulty, roomStructure, random,
+            this.neighbors[neighbourDir] = new DungeonRoom(depth, maxDifficulty, roomStructure, random,
                     coords[0],
                     coords[1], false,
                     arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
         }
     }
 
-    private int genMain(int[] Neighbours, LevelData level, int depth, int maxDifficulty, BitSet roomStructure,
+    private int genMain(int[] Neighbours, int depth, int maxDifficulty, BitSet roomStructure,
             Random random,
             int x, int y, int arrayLen, int count, int branchDepthCap, float branchmul, int numNewRooms) {
         if (!isMain) {
@@ -134,7 +130,7 @@ public class DungeonRoom implements Runnable {
         if (count >= numNewRooms) {
             flagRoom(roomStructure, coords[0], coords[1], arrayLen);
         }
-        this.neighbors[neighbourDir] = new DungeonRoom(level, depth - 1, maxDifficulty, roomStructure, random,
+        this.neighbors[neighbourDir] = new DungeonRoom(depth - 1, maxDifficulty, roomStructure, random,
                 coords[0],
                 coords[1], true,
                 arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
@@ -186,25 +182,16 @@ public class DungeonRoom implements Runnable {
         this.stuck = true;
     }
 
-    private byte getType(boolean isMain, int depth, Random random, LevelData level) {
+    private byte getType(boolean isMain, int depth, Random random) {
         if (isMain && depth == 0) {
-            this.path = level.endRoom;
             return 3;
         } else if (isMain) {
-            this.path = level.fillerRooms[random.nextInt(level.fillerRooms.length)];
             return 1;
         }
         if (depth == 0) {
-            this.path = level.leafRooms[random.nextInt(level.leafRooms.length)];
             return 2; // Leaf room
         }
-        byte val = (byte) ((random.nextInt(depth * 2) == 0) ? 2 : 1);
-        if (val == 2) {
-            this.path = level.leafRooms[random.nextInt(level.leafRooms.length)];
-        } else {
-            this.path = level.fillerRooms[random.nextInt(level.fillerRooms.length)];
-        }
-        return val; // Randomly choose between 1 and 2 for non-main rooms
+        return (byte) ((random.nextInt(depth * 2) == 0) ? 2 : 1); // Randomly choose between 1 and 2 for non-main rooms
     }
 
     private int[] getEmptyNeighbours(BitSet roomStructure, int x, int y, int arrayLen) {

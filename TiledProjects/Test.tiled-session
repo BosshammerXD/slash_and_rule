@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "test.tmx",
+    "activeFile": "end.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -24,6 +24,46 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "end.tmx": {
+            "scale": 7.8374999999999995,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 39.936204146730475,
+                "y": 39.93620414673046
+            }
+        },
+        "filler.tmx": {
+            "expandedObjectLayers": [
+                2,
+                3
+            ],
+            "scale": 5.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 34.36363636363636,
+                "y": 39.45454545454546
+            }
+        },
+        "leaf.tmx": {
+            "scale": 7.8374999999999995,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 39.936204146730475,
+                "y": 39.93620414673046
+            }
+        },
+        "start.tmx": {
+            "expandedObjectLayers": [
+                2,
+                3
+            ],
+            "scale": 4,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 44.25,
+                "y": 52
+            }
+        },
         "test.tmx": {
             "scale": 3,
             "selectedLayer": 2,
@@ -33,19 +73,25 @@
             }
         }
     },
-    "last.imagePath": "C:/Users/Admin/OneDrive/Desktop/Programmierzeugs/Java/libgdx/slash_and_rule/Project/assets",
-    "map.height": 11,
+    "last.imagePath": "C:/Users/Admin/OneDrive/Desktop/Programmierzeugs/Java/libgdx/slash_and_rule/TiledProjects",
+    "map.height": 5,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
-    "map.width": 11,
+    "map.width": 5,
     "openFiles": [
-        "test.tmx"
+        "start.tmx",
+        "filler.tmx",
+        "end.tmx"
     ],
     "project": "Test.tiled-project",
     "recentFiles": [
-        "test.tmx",
+        "start.tmx",
+        "filler.tmx",
+        "end.tmx",
+        "leaf.tmx",
         "TestTiles(16x16).tsx",
+        "test.tmx",
         "C:/Users/Admin/OneDrive/Desktop/Programmierzeugs/Java/libgdx/slash_and_rule/Project/assets/test.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",

@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
+import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 
 public abstract class CollidableTileMapObject extends TileMapObject {
@@ -31,7 +32,7 @@ public abstract class CollidableTileMapObject extends TileMapObject {
     @Override
     public void init(LoadingSchedule loader) {
         super.init(loader);
-        loader.todo.add(() -> loadCollisionObjects(loader.assetManager));
+        loader.todo.add(new MsgRunnable("Placing Collisions", () -> loadCollisionObjects(loader.assetManager)));
     };
 
     protected MapLayers loadCollisionObjects(AssetManager assetManager) {

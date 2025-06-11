@@ -6,7 +6,9 @@ import java.util.Random;
 
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.LevelData;
 
+// implement generation on initialization by pushing the generation to the todo Stack
 public class DungeonRoom {
+    public static int numRooms = 0;
     public boolean isMain;
     // start = 0; filler = 1; leaf = 2; boss = 3
     public byte type;
@@ -21,12 +23,13 @@ public class DungeonRoom {
     public DungeonRoom(LevelData level, int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int branchDepthCap, float branchmul) {
         int x = depth + branchDepthCap;
-        int y = depth + branchDepthCap - 2;
+        int y = depth + branchDepthCap - 3;
         this.x = x;
         this.y = y;
         this.isMain = true;
         this.type = 0;
         this.difficulty = 0;
+        numRooms++;
 
         this.representation = new String[(depth + branchDepthCap) * 2 - 1][3][(depth + branchDepthCap) * 2 + 1];
         for (int i = 0; i < representation.length; i++) {
@@ -51,6 +54,7 @@ public class DungeonRoom {
         this.isMain = isMain;
         this.x = x;
         this.y = y;
+        numRooms++;
         // printRoomStructure(roomStructure, arrayLen);
         this.type = getType(isMain, depth, random, level);
         this.neighbors[origin_dir] = origin; // Set the neighbor in the direction of the origin
@@ -75,8 +79,9 @@ public class DungeonRoom {
         }
         int numNeighbours = emptyNeighbours.length;
         shuffleArray(emptyNeighbours, random);
-
-        int numNewRooms = random.nextInt(numNeighbours) + 1 + ((isMain) ? 1 : 0);
+        // Math.min(depth, 4)
+        // numNeighbours
+        int numNewRooms = random.nextInt((isMain) ? numNeighbours + 1 : Math.min(depth + 1, 4)) + ((isMain) ? 1 : 0);
         if (numNewRooms > numNeighbours) {
             numNewRooms = numNeighbours; // Ensure we don't exceed the number of available empty neighbours
         } else if (numNewRooms == 0) {
@@ -98,16 +103,17 @@ public class DungeonRoom {
                     count, branchDepthCap, branchmul);
         } while (count < numNeighbours && stuck);
 
+        if (isMain) {
+            depth = (int) Math.max(0, depth - branchDepthCap * branchmul) + branchDepthCap;
+            maxDifficulty = this.difficulty + 1 + depth;
+        } else {
+            depth -= 1;
+        }
+
         for (int i = count; i < numNewRooms; i++) {
             int neighbourDir = emptyNeighbours[i];
             int[] coords = dirToXY(neighbourDir, x, y);
-            int tempDepth;
-            if (isMain) {
-                tempDepth = (int) Math.max(0, depth - branchDepthCap * branchmul) + branchDepthCap;
-            } else {
-                tempDepth = depth - 1;
-            }
-            this.neighbors[neighbourDir] = new DungeonRoom(level, tempDepth, maxDifficulty, roomStructure, random,
+            this.neighbors[neighbourDir] = new DungeonRoom(level, depth, maxDifficulty, roomStructure, random,
                     coords[0],
                     coords[1], false,
                     arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
@@ -151,9 +157,9 @@ public class DungeonRoom {
         }
         if (indexOf1 != -1) {
             // if this is the Main path andd we can move down we want a higher chance to
-            // move down (50%), with the main path, so that it is more likely for the
+            // move down (75%), with the main path, so that it is more likely for the
             // endroom to be down
-            float a = (0.5f * mylen - 0.5f) / mylen;
+            float a = (0.625f * mylen - 0.375f) / mylen;
             if (random.nextFloat() < a) {
                 int temp = array[indexOf1];
                 array[indexOf1] = array[0];
@@ -162,7 +168,7 @@ public class DungeonRoom {
         } else if (array[0] == 3) {
             // here we decrease the cahnce of the main path goining up if it would go up and
             // can't go down
-            if (random.nextFloat() < 0.5f) {
+            if (random.nextFloat() < 0.25f) {
                 int otherIndex = (mylen == 2) ? 1 : random.nextInt(mylen - 1) + 1; // Random index from 1 to len-1
                 int temp = array[0];
                 array[0] = array[otherIndex];
@@ -187,7 +193,7 @@ public class DungeonRoom {
             this.path = level.leafRooms[random.nextInt(level.leafRooms.length)];
             return 2; // Leaf room
         }
-        byte val = (byte) ((random.nextInt(depth) == 0) ? 2 : 1);
+        byte val = (byte) ((random.nextInt(depth * 2) == 0) ? 2 : 1);
         if (val == 2) {
             this.path = level.leafRooms[random.nextInt(level.leafRooms.length)];
         } else {

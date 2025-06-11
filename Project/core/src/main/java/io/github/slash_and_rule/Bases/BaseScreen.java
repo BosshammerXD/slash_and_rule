@@ -6,8 +6,8 @@ import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -37,7 +37,7 @@ public abstract class BaseScreen implements Screen {
         Gdx.input.setInputProcessor(inputManager);
     }
 
-    public void init(Stack<Runnable> todo) {
+    public void init(ArrayDeque<Runnable> todo) {
         for (Initalizable data : loadableObjects) {
             data.init(assetManager, todo);
         }

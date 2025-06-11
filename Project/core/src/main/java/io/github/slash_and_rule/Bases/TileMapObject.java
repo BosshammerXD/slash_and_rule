@@ -4,7 +4,7 @@ import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,10 +29,10 @@ public abstract class TileMapObject extends BaseGameObject implements Displayabl
     }
 
     @Override
-    public void init(AssetManager assetManager, Stack<Runnable> todo) {
+    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
         // Initialize the map and renderer when the object is initialized
         assetManager.load(mapFilePath, TiledMap.class);
-        todo.push(() -> loadMap(assetManager));
+        todo.add(() -> loadMap(assetManager));
     }
 
     private void loadMap(AssetManager assetManager) {

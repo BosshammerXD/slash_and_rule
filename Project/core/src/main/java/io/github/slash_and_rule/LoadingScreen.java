@@ -1,6 +1,6 @@
 package io.github.slash_and_rule;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -10,7 +10,7 @@ public class LoadingScreen extends BaseScreen {
     public BaseScreen nextScreen;
     private BaseScreen defaultScreen;
     private Main game;
-    private Stack<Runnable> todo;
+    private ArrayDeque<Runnable> todo;
 
     public LoadingScreen(Main game, BaseScreen defaultScreen) {
         super();
@@ -23,7 +23,7 @@ public class LoadingScreen extends BaseScreen {
     @Override
     public void show() {
         // Prepare the loading screen for display.
-        todo = new Stack<>();
+        todo = new ArrayDeque<>();
         if (nextScreen != null) {
             nextScreen.setAssetManager(game.assetManager);
             nextScreen.init(this.todo);

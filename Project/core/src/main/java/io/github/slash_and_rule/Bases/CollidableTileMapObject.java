@@ -1,7 +1,7 @@
 package io.github.slash_and_rule.Bases;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayers;
@@ -29,9 +29,9 @@ public abstract class CollidableTileMapObject extends TileMapObject {
     }
 
     @Override
-    public void init(AssetManager assetManager, Stack<Runnable> todo) {
-        todo.push(() -> loadCollisionObjects(assetManager));
+    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
         super.init(assetManager, todo);
+        todo.add(() -> loadCollisionObjects(assetManager));
     };
 
     protected MapLayers loadCollisionObjects(AssetManager assetManager) {

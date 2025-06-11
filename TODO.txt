@@ -1,0 +1,21 @@
+- decide wether or not to use a Queue or a stack in the todo list
+- research how to do ui layer
+- find out how to implement pause menu
+
+DungeonCrawler:
+  - Spawnpoint for doors
+  - give character its sprite
+  - store set inputs somewhere
+  - implement controller inputs
+  - implement enemy class
+  - implement enemy Spawn System
+    - note try to decouple Spawn System and enemys so that we have creative lberty, when creating the enemies
+  later:
+  - make Dungeon Rooms
+  - play with lights
+  
+
+CityBuilder:
+  - make grid for citybuilder
+  - make ressourcecounter for city builder
+  - mke citybuilder screen

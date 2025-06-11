@@ -1,10 +1,10 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
-import java.util.Stack;
 
 import com.badlogic.gdx.assets.AssetManager;
 
@@ -63,6 +63,7 @@ public class DungeonManager implements Initalizable {
         DungeonRoom dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
                 new Random(), branchcap, branchmul);
         dungeon.print();
+        System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
     }
 
     // Split up dungeon into Levels
@@ -79,9 +80,10 @@ public class DungeonManager implements Initalizable {
     }
 
     @Override
-    public void init(AssetManager assetManager, Stack<Runnable> todo) {
-        todo.push(() -> generateDungeon()); // Example depth, can be adjusted);
-        todo.push(() -> getRooms());
+    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
+        todo.add(() -> getRooms());
+        todo.add(() -> generateDungeon()); // Example depth, can be adjusted);
+
     }
 
     @Override

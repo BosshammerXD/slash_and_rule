@@ -1,6 +1,6 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayers;
@@ -55,10 +55,10 @@ public class DungeonTileMap extends CollidableTileMapObject {
     }
 
     @Override
-    public void init(AssetManager assetManager, Stack<Runnable> todo) {
+    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
         // TODO Auto-generated method stub
-        todo.push(() -> deactivate());
         super.init(assetManager, todo);
+        todo.add(() -> deactivate());
     }
 
     public DungeonDoor getLeftDoor() {

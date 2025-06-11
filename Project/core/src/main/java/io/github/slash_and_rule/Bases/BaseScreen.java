@@ -2,11 +2,11 @@ package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Interfaces.Updatetable;
+import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -37,9 +37,9 @@ public abstract class BaseScreen implements Screen {
         Gdx.input.setInputProcessor(inputManager);
     }
 
-    public void init(ArrayDeque<Runnable> todo) {
+    public void init(LoadingSchedule loader) {
         for (Initalizable data : loadableObjects) {
-            data.init(assetManager, todo);
+            data.init(loader);
         }
     };
 

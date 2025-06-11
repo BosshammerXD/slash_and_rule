@@ -19,10 +19,4 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         new DungeonTileMap(this, inputManager, world, "test.tmx");
         new DungeonManager(this, "", 6, 16, 1, 3f);
     }
-
-    @Override
-    public void show() {
-        // Initialize the scene, load assets, etc.
-    }
-
 }

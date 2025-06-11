@@ -1,7 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
-import java.util.ArrayDeque;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObject;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Bases.CollidableTileMapObject;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
 import io.github.slash_and_rule.Utils.ColliderObject;
 
 public class DungeonTileMap extends CollidableTileMapObject {
@@ -55,10 +54,10 @@ public class DungeonTileMap extends CollidableTileMapObject {
     }
 
     @Override
-    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
+    public void init(LoadingSchedule loader) {
         // TODO Auto-generated method stub
-        super.init(assetManager, todo);
-        todo.add(() -> deactivate());
+        super.init(loader);
+        loader.todo.add(() -> deactivate());
     }
 
     public DungeonDoor getLeftDoor() {

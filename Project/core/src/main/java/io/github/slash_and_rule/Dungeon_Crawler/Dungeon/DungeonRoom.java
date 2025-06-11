@@ -7,7 +7,7 @@ import java.util.Random;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.LevelData;
 
 // implement generation on initialization by pushing the generation to the todo Stack
-public class DungeonRoom {
+public class DungeonRoom implements Runnable {
     public static int numRooms = 0;
     public boolean isMain;
     // start = 0; filler = 1; leaf = 2; boss = 3
@@ -16,18 +16,18 @@ public class DungeonRoom {
     public DungeonRoom[] neighbors = new DungeonRoom[4]; // 0: left, 1: right, 2: top, 3: bottom
     public String path;
     private boolean stuck = false;
-    private int x, y;
     private boolean visited = false;
     private String[][][] representation;
+    private Runnable runFunc;
 
     public DungeonRoom(LevelData level, int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int branchDepthCap, float branchmul) {
-        int x = depth + branchDepthCap;
-        int y = depth + branchDepthCap - 3;
-        this.x = x;
-        this.y = y;
+        int[] xy = getStartXY(depth, branchDepthCap);
+        int x = xy[0];
+        int y = xy[1];
         this.isMain = true;
         this.type = 0;
+        this.path = level.startRoom;
         this.difficulty = 0;
         numRooms++;
 
@@ -40,11 +40,9 @@ public class DungeonRoom {
 
         int arrayLen = 2 * depth;
         flagRoom(roomStructure, x, y, arrayLen);
-        // printRoomStructure(roomStructure, arrayLen);
         flagRoom(roomStructure, x, y + 1, arrayLen);
-        this.path = level.startRoom;
-        this.difficulty = 0;
-        neighbors[1] = new DungeonRoom(level, depth, maxDifficulty, roomStructure, random, x, y + 1, true, arrayLen,
+        this.runFunc = () -> neighbors[1] = new DungeonRoom(level, depth, maxDifficulty, roomStructure, random, x,
+                y + 1, true, arrayLen,
                 this, 3, branchDepthCap, branchmul);
     }
 
@@ -52,13 +50,11 @@ public class DungeonRoom {
             int y, boolean isMain, int arrayLen, DungeonRoom origin, int origin_dir, int branchDepthCap,
             float branchmul) {
         this.isMain = isMain;
-        this.x = x;
-        this.y = y;
         numRooms++;
-        // printRoomStructure(roomStructure, arrayLen);
+
         this.type = getType(isMain, depth, random, level);
         this.neighbors[origin_dir] = origin; // Set the neighbor in the direction of the origin
-        setDifficulty(depth, maxDifficulty);
+        this.difficulty = calcDifficulty(depth, maxDifficulty);
         generateNeighbors(level, depth, maxDifficulty, roomStructure, random, x, y, isMain, arrayLen, origin,
                 branchDepthCap, branchmul);
     }
@@ -93,15 +89,18 @@ public class DungeonRoom {
             int[] coords = dirToXY(roomDir, x, y);
             flagRoom(roomStructure, coords[0], coords[1], arrayLen);
         }
-        // int[] temp = new int[numNewRooms];
-        // System.arraycopy(emptyNeighbours, 0, temp, 0, temp.length);
-        // System.out.println("Room: (" + x + "," + y + ") " + Arrays.toString(temp));
 
         int count = 0;
         do {
+            stuck = false;
             count = genMain(emptyNeighbours, level, depth, maxDifficulty, roomStructure, random, x, y, arrayLen,
-                    count, branchDepthCap, branchmul);
+                    count, branchDepthCap, branchmul, numNewRooms);
         } while (count < numNeighbours && stuck);
+        if (stuck && isMain) {
+            this.isMain = false;
+            origin.mainIsStuck();
+            return;
+        }
 
         if (isMain) {
             depth = (int) Math.max(0, depth - branchDepthCap * branchmul) + branchDepthCap;
@@ -122,13 +121,19 @@ public class DungeonRoom {
 
     private int genMain(int[] Neighbours, LevelData level, int depth, int maxDifficulty, BitSet roomStructure,
             Random random,
-            int x, int y, int arrayLen, int count, int branchDepthCap, float branchmul) {
+            int x, int y, int arrayLen, int count, int branchDepthCap, float branchmul, int numNewRooms) {
         if (!isMain) {
             return count; // Only generate main rooms
         }
-
         int neighbourDir = Neighbours[count];
         int[] coords = dirToXY(neighbourDir, x, y);
+        if (count >= numNewRooms && isFlagged(coords[0], coords[1], arrayLen, roomStructure)) {
+            stuck = true; // If the room is already flagged, mark as stuck
+            return count; // If the room is already flagged, skip it
+        }
+        if (count >= numNewRooms) {
+            flagRoom(roomStructure, coords[0], coords[1], arrayLen);
+        }
         this.neighbors[neighbourDir] = new DungeonRoom(level, depth - 1, maxDifficulty, roomStructure, random,
                 coords[0],
                 coords[1], true,
@@ -206,16 +211,16 @@ public class DungeonRoom {
         int[] emptyNeighbours = new int[4];
         int count = 0;
 
-        if (!roomStructure.get(y * arrayLen + (x - 1))) { // Left
+        if (!isFlagged(x - 1, y, arrayLen, roomStructure)) { // Left
             emptyNeighbours[count++] = 0;
         }
-        if (!roomStructure.get((y + 1) * arrayLen + x)) { // Right
+        if (!isFlagged(x, y + 1, arrayLen, roomStructure)) { // Bottom
             emptyNeighbours[count++] = 1;
         }
-        if (!roomStructure.get(y * arrayLen + (x + 1))) { // Top
+        if (!isFlagged(x + 1, y, arrayLen, roomStructure)) { // Right
             emptyNeighbours[count++] = 2;
         }
-        if (!roomStructure.get((y - 1) * arrayLen + x)) { // Bottom
+        if (!isFlagged(x, y - 1, arrayLen, roomStructure)) { // Top
             emptyNeighbours[count++] = 3;
         }
 
@@ -225,13 +230,18 @@ public class DungeonRoom {
         return result;
     }
 
-    private void setDifficulty(int depth, int maxDifficulty) {
-        this.difficulty = maxDifficulty - depth;
+    private static int calcDifficulty(int depth, int maxDifficulty) {
+        return maxDifficulty - depth;
     }
 
-    private void flagRoom(BitSet roomStructure, int x, int y, int arrayLen) {
+    private static void flagRoom(BitSet roomStructure, int x, int y, int arrayLen) {
         int index = y * arrayLen + x;
         roomStructure.set(index);
+    }
+
+    private static boolean isFlagged(int x, int y, int arrayLen, BitSet roomStructure) {
+        int index = y * arrayLen + x;
+        return roomStructure.get(index);
     }
 
     private int getOriginDir(int outDir) {
@@ -242,40 +252,38 @@ public class DungeonRoom {
         switch (dir) {
             case 0: // Left
                 return new int[] { x - 1, y };
-            case 1: // Right
+            case 1: // Bottom
                 return new int[] { x, y + 1 };
-            case 2: // Top
+            case 2: // Right
                 return new int[] { x + 1, y };
-            case 3: // Bottom
+            case 3: // Top
                 return new int[] { x, y - 1 };
             default:
                 throw new IllegalArgumentException("Invalid direction: " + dir);
         }
     }
 
-    public void printRoomStructure(BitSet roomStructure, int arrayLen) {
-        for (int y = 0; y < arrayLen + 1; y++) {
-            for (int x = 0; x < arrayLen; x++) {
-                System.out.print(roomStructure.get(y * arrayLen + x) ? "1 " : "0 ");
-            }
-            System.out.println();
-        }
-        System.out.println("-----");
-    }
-
     public void print() {
         if (this.type != 0) {
             return; // Only print the start room
         }
-        this.getString(representation);
+        int x = (representation[0][0].length - 1) / 2; // Center x-coordinate
+        int y = (representation.length - 5) / 2; // Center y-coordinate
+
+        this.getString(representation, x, y);
+        String[] dummy = new String[representation[0][0].length];
+        Arrays.fill(dummy, "   ");
         for (String[][] row : representation) {
-            System.out.println(String.join("", row[0]));
-            System.out.println(String.join("", row[1]));
-            System.out.println(String.join("", row[2]));
+            if (!Arrays.equals(row[0], dummy)) {
+                System.out.println(String.join("", row[0]));
+                System.out.println(String.join("", row[1]));
+                System.out.println(String.join("", row[2]));
+            }
+
         }
     }
 
-    private void getString(String[][][] rooms) {
+    private void getString(String[][][] rooms, int x, int y) {
         if (this.visited) {
             return; // If already visited, do not process again
         }
@@ -284,11 +292,28 @@ public class DungeonRoom {
         rooms[y][1][x] = ((neighbors[0] == null) ? "\u2502" : "d") + this.type
                 + ((neighbors[2] == null) ? "\u2502" : "d");
         rooms[y][2][x] = "\u2514" + ((neighbors[1] == null) ? "\u2500" : "d") + "\u2518";
+        int index = 0;
         for (DungeonRoom neighbor : neighbors) {
             if (neighbor != null) {
-                neighbor.getString(rooms);
+                int[] coords = dirToXY(index, x, y);
+                neighbor.getString(rooms, coords[0], coords[1]);
             }
+            index++;
         }
         this.visited = false; // Reset visited status for future calls
+    }
+
+    private static int[] getStartXY(int depth, int branchDepthCap) {
+        int x = depth + branchDepthCap;
+        int y = depth + branchDepthCap - 3;
+        return new int[] { x, y };
+    }
+
+    public void run() {
+        if (this.runFunc != null) {
+            this.runFunc.run();
+        } else {
+            System.out.println("No run function defined for this room.");
+        }
     }
 }

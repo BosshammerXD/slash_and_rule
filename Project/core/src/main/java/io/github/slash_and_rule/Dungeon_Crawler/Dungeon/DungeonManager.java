@@ -1,6 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Interfaces.Initalizable;
+import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
 
 public class DungeonManager implements Initalizable {
     public static class LevelData {
@@ -37,6 +37,7 @@ public class DungeonManager implements Initalizable {
     private int branchcap;
     private float branchmul;
     private int maxDifficulty;
+    private DungeonRoom dungeon;
 
     private LevelData[] levels;
 
@@ -59,11 +60,6 @@ public class DungeonManager implements Initalizable {
         // The implementation details will depend on the specific requirements of the
         // game
         // For now, we can leave it empty or add a simple placeholder implementation
-        BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
-        DungeonRoom dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
-                new Random(), branchcap, branchmul);
-        dungeon.print();
-        System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
     }
 
     // Split up dungeon into Levels
@@ -80,10 +76,14 @@ public class DungeonManager implements Initalizable {
     }
 
     @Override
-    public void init(AssetManager assetManager, ArrayDeque<Runnable> todo) {
-        todo.add(() -> getRooms());
-        todo.add(() -> generateDungeon()); // Example depth, can be adjusted);
-
+    public void init(LoadingSchedule loader) {
+        loader.todo.add(() -> getRooms());
+        BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
+        dungeon = new DungeonRoom(this.levels[0], depth, maxDifficulty, roomStructure,
+                new Random(), branchcap, branchmul);
+        Thread t = new Thread(dungeon);
+        t.start();
+        loader.threads.add(t);
     }
 
     @Override
@@ -94,5 +94,7 @@ public class DungeonManager implements Initalizable {
     @Override
     public void show(AssetManager assetManager) {
         // TODO Auto-generated method stub
+        dungeon.print();
+        System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
     }
 }

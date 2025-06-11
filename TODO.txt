@@ -7,13 +7,17 @@ DungeonCrawler:
   - give character its sprite
   - store set inputs somewhere
   - implement controller inputs
+  - make temporary Levels to test out the System (ingame)
   - implement enemy class
   - implement enemy Spawn System
     - note try to decouple Spawn System and enemys so that we have creative lberty, when creating the enemies
   later:
   - make Dungeon Rooms
   - play with lights
-  
+
+LoadingScreen:
+  -add loading bar
+
 
 CityBuilder:
   - make grid for citybuilder

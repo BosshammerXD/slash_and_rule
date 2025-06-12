@@ -61,14 +61,14 @@ public class RoomData implements AsyncLoadable, Disposable {
                 x = rect.x + rect.width * 2 + 1f;
                 y = rect.y + rect.height;
             } else if (type.equals("right")) {
-                x = rect.x - rect.width * 2 - 1f;
+                x = rect.x - rect.width * 2;
                 y = rect.y + rect.height;
             } else if (type.equals("top")) {
                 x = rect.x + rect.width;
-                y = rect.y + rect.height * 2 + 1f;
+                y = rect.y - rect.height * 2;
             } else if (type.equals("bottom")) {
                 x = rect.x + rect.width;
-                y = rect.y - rect.height * 2 - 1f;
+                y = rect.y + rect.height * 2 + 1f;
             } else {
                 x = 0;
                 y = 0;

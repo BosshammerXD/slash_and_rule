@@ -51,6 +51,10 @@ public class RoomDataHandler implements Disposable {
             filter.maskBits = open ? Globals.ProjectileCategory | Globals.ItemCategory : Globals.WallMask;
             this.blocker.getBody().getFixtureList().get(0).setFilterData(filter);
         }
+
+        public float[] getSpawnPos() {
+            return spawnPos;
+        }
     }
 
     public TiledMap map = null;
@@ -97,9 +101,6 @@ public class RoomDataHandler implements Disposable {
         for (DungeonDoor door : doors) {
             if (door != null) {
                 door.setActive(active);
-                if (active) {
-                    System.out.println(door.isOpen + ", " + door.isActive);
-                }
             }
         }
     }
@@ -201,14 +202,11 @@ public class RoomDataHandler implements Disposable {
             screen.schedule.add(() -> {
                 PolygonShape shape = new PolygonShape();
                 shape.setAsBox(data.collider.width, data.collider.height);
-                wallPool.add(new ColliderObject(screen, 0, 0, 0, data.collider.x, data.collider.y, Globals.WallMask,
-                        Globals.WallCategory, shape, BodyType.StaticBody));
-                System.out.println("No room to load, adding wall to pool: " + data.type + " at " + data.collider.x
-                        + ", " + data.collider.y);
+                wallPool.add(new ColliderObject(screen, 0, 0, 0, data.collider.x, data.collider.y, Globals.WallCategory,
+                        Globals.WallMask, shape, BodyType.StaticBody));
             });
             return;
         }
-        System.out.println("Loading door: " + data.type + " at " + data.collider.x + ", " + data.collider.y);
         screen.schedule.add(() -> {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(data.collider.width, data.collider.height);

@@ -108,7 +108,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     @Override
     public void init(LoadingSchedule loader) {
         this.renderer = new OrthogonalTiledMapRenderer(null, 1 / 16f);
-        System.out.println(this.renderer);
         BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
         dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
                 random, branchcap, branchmul);
@@ -146,11 +145,15 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
 
         this.screen.schedule.add(() -> {
             this.room.setActive(false);
+            RoomDataHandler holder = this.neighbours[(originDir + 2) % 4];
             this.neighbours[(originDir + 2) % 4] = this.room;
             this.room = this.neighbours[originDir];
+            this.neighbours[originDir] = holder;
             this.dungeon = this.dungeon.neighbours[originDir];
             this.renderer.setMap(this.room.map);
-            player.setPosition(2.5f, 2.5f);
+            float[] spawnPos = this.room.doors[(originDir + 2) % 4].getSpawnPos();
+            System.out.println("Spawn position: " + Arrays.toString(spawnPos));
+            player.setPosition(spawnPos[0], spawnPos[1]);
             this.room.setActive(true);
             this.room.setOpen(true);
             loadRoom(this.neighbours[originDir], dungeon.neighbours[originDir]);

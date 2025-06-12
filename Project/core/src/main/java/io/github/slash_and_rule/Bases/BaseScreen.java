@@ -10,11 +10,9 @@ import io.github.slash_and_rule.Interfaces.Pausable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -85,7 +83,7 @@ public abstract class BaseScreen implements Screen {
             }
         }
 
-        while (!schedule.isEmpty()) {
+        if (!schedule.isEmpty()) {
             Runnable task = schedule.pop();
             if (task != null) {
                 task.run();

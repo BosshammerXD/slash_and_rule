@@ -1,0 +1,188 @@
+package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
+
+import java.util.ArrayDeque;
+import java.util.Stack;
+import java.util.function.Consumer;
+
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
+import com.badlogic.gdx.utils.async.AsyncResult;
+
+import io.github.slash_and_rule.Bases.BaseScreen;
+import io.github.slash_and_rule.Interfaces.AsyncLoadable;
+
+public class RoomData implements AsyncLoadable, Disposable {
+    public static class ColliderData {
+        public float x, y, width, height;
+
+        public ColliderData(Rectangle rect) {
+            this.width = rect.width;
+            this.height = rect.height;
+            this.x = rect.x + rect.width;
+            this.y = rect.y + rect.height;
+
+        }
+    }
+
+    public static class DoorData {
+        public ColliderData collider;
+        public ColliderData sensor;
+        public float[] spawnPoint = new float[2]; // x, y
+        public String type;
+
+        public DoorData(Rectangle rect, String type) {
+            this.collider = new ColliderData(rect);
+            modifySensorRect(rect, type);
+            this.sensor = new ColliderData(rect);
+            setSpawnPoint(rect, type);
+            this.type = type;
+        }
+
+        private void modifySensorRect(Rectangle rect, String type) {
+            if (type.equals("left")) {
+                rect.x -= rect.width;
+            } else if (type.equals("right")) {
+                rect.x += rect.width;
+            } else if (type.equals("top")) {
+                rect.y += rect.height;
+            } else if (type.equals("bottom")) {
+                rect.y -= rect.height;
+            }
+        }
+
+        private void setSpawnPoint(Rectangle rect, String type) {
+            float x, y;
+            if (type.equals("left")) {
+                x = rect.x + rect.width * 2 + 1f;
+                y = rect.y + rect.height;
+            } else if (type.equals("right")) {
+                x = rect.x - rect.width * 2 - 1f;
+                y = rect.y + rect.height;
+            } else if (type.equals("top")) {
+                x = rect.x + rect.width;
+                y = rect.y + rect.height * 2 + 1f;
+            } else if (type.equals("bottom")) {
+                x = rect.x + rect.width;
+                y = rect.y - rect.height * 2 - 1f;
+            } else {
+                x = 0;
+                y = 0;
+            }
+            spawnPoint[0] = x;
+            spawnPoint[1] = y;
+        }
+    }
+
+    public static float scale = 1f;
+
+    private boolean done = false;
+
+    public TiledMap map;
+    public ColliderData[] walls;
+
+    public DoorData[] doors;
+
+    private BaseScreen screen;
+    private String mapFilePath;
+
+    private ArrayDeque<Consumer<RoomData>> callBack = new ArrayDeque<>();
+
+    public RoomData(BaseScreen screen, String mapFilePath) {
+        BaseConstructor(screen, mapFilePath);
+    }
+
+    public RoomData(BaseScreen screen, String mapFilePath, Consumer<RoomData> callback) {
+        this.callBack.add(callback);
+        BaseConstructor(screen, mapFilePath);
+    }
+
+    private void BaseConstructor(BaseScreen screen, String mapFilePath) {
+        this.mapFilePath = mapFilePath;
+        this.screen = screen;
+        screen.loadAsset(mapFilePath, TiledMap.class);
+
+        screen.asyncLoadableObjects.add(this);
+        screen.disposableObjects.add(this);
+    }
+
+    @Override
+    public AsyncResult<AsyncLoadable> schedule(AsyncExecutor asyncExecutor) {
+        return asyncExecutor.submit(() -> {
+            map = screen.getAssetManager().get(mapFilePath, TiledMap.class);
+            genWallData();
+            genDoorData();
+            return this;
+        });
+    }
+
+    @Override
+    public void loadDone() {
+        this.done = true;
+        while (!callBack.isEmpty()) {
+            Consumer<RoomData> callback = callBack.poll();
+            if (callback != null) {
+                callback.accept(this);
+            }
+        }
+    }
+
+    public void addCallback(Consumer<RoomData> callback) {
+        if (done) {
+            callback.accept(this);
+        } else {
+            callBack.add(callback);
+        }
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    private void genWallData() {
+        MapObjects objects = map.getLayers().get("Collision").getObjects();
+        Stack<ColliderData> wallStack = new Stack<>();
+
+        for (MapObject object : objects) {
+            if (object instanceof RectangleMapObject rectangleObject) {
+                wallStack.push(new ColliderData(getRect(rectangleObject)));
+            }
+        }
+
+        walls = wallStack.toArray(new ColliderData[0]);
+    }
+
+    private void genDoorData() {
+        MapObjects objects = map.getLayers().get("door").getObjects();
+        Stack<DoorData> doorColliderStack = new Stack<>();
+
+        for (MapObject object : objects) {
+            String type = object.getProperties().get("type", String.class);
+            if (object instanceof RectangleMapObject rectangleObject && type != null) {
+                doorColliderStack.push(new DoorData(getRect(rectangleObject), type));
+            }
+        }
+
+        doors = doorColliderStack.toArray(new DoorData[0]);
+    }
+
+    private Rectangle getRect(RectangleMapObject rectObject) {
+        Rectangle rect = rectObject.getRectangle();
+        rect.x *= scale;
+        rect.y *= scale;
+        rect.width *= scale / 2f;
+        rect.height *= scale / 2f;
+        return rect;
+    }
+
+    @Override
+    public void dispose() {
+        if (map != null) {
+            map.dispose();
+        }
+    }
+}

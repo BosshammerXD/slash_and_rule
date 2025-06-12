@@ -11,11 +11,13 @@ public class DungeonRoom implements Runnable {
     // start = 0; filler = 1; leaf = 2; boss = 3
     public byte type;
     public int difficulty;
-    public DungeonRoom[] neighbors = new DungeonRoom[4]; // 0: left, 1: right, 2: top, 3: bottom
+    public DungeonRoom[] neighbours = new DungeonRoom[4]; // 0: left, 1: right, 2: top, 3: bottom
     private boolean stuck = false;
     private boolean visited = false;
     private String[][][] representation;
     private Runnable runFunc;
+    public String path = null;
+    public boolean cleared = false;
 
     public DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int branchDepthCap, float branchmul) {
@@ -26,6 +28,7 @@ public class DungeonRoom implements Runnable {
         this.type = 0;
         this.difficulty = 0;
         numRooms++;
+        this.cleared = true; // Start room is considered cleared
 
         this.representation = new String[(depth + branchDepthCap) * 2 - 1][3][(depth + branchDepthCap) * 2 + 1];
         for (int i = 0; i < representation.length; i++) {
@@ -37,7 +40,7 @@ public class DungeonRoom implements Runnable {
         int arrayLen = 2 * depth;
         flagRoom(roomStructure, x, y, arrayLen);
         flagRoom(roomStructure, x, y + 1, arrayLen);
-        this.runFunc = () -> neighbors[1] = new DungeonRoom(depth, maxDifficulty, roomStructure, random, x,
+        this.runFunc = () -> neighbours[1] = new DungeonRoom(depth, maxDifficulty, roomStructure, random, x,
                 y + 1, true, arrayLen,
                 this, 3, branchDepthCap, branchmul);
     }
@@ -49,7 +52,7 @@ public class DungeonRoom implements Runnable {
         numRooms++;
 
         this.type = getType(isMain, depth, random);
-        this.neighbors[origin_dir] = origin; // Set the neighbor in the direction of the origin
+        this.neighbours[origin_dir] = origin; // Set the neighbor in the direction of the origin
         this.difficulty = calcDifficulty(depth, maxDifficulty);
         generateNeighbors(depth, maxDifficulty, roomStructure, random, x, y, isMain, arrayLen, origin,
                 branchDepthCap, branchmul);
@@ -108,7 +111,7 @@ public class DungeonRoom implements Runnable {
         for (int i = count; i < numNewRooms; i++) {
             int neighbourDir = emptyNeighbours[i];
             int[] coords = dirToXY(neighbourDir, x, y);
-            this.neighbors[neighbourDir] = new DungeonRoom(depth, maxDifficulty, roomStructure, random,
+            this.neighbours[neighbourDir] = new DungeonRoom(depth, maxDifficulty, roomStructure, random,
                     coords[0],
                     coords[1], false,
                     arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
@@ -130,7 +133,7 @@ public class DungeonRoom implements Runnable {
         if (count >= numNewRooms) {
             flagRoom(roomStructure, coords[0], coords[1], arrayLen);
         }
-        this.neighbors[neighbourDir] = new DungeonRoom(depth - 1, maxDifficulty, roomStructure, random,
+        this.neighbours[neighbourDir] = new DungeonRoom(depth - 1, maxDifficulty, roomStructure, random,
                 coords[0],
                 coords[1], true,
                 arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
@@ -275,12 +278,12 @@ public class DungeonRoom implements Runnable {
             return; // If already visited, do not process again
         }
         this.visited = true;
-        rooms[y][0][x] = "\u250C" + ((neighbors[3] == null) ? "\u2500" : "d") + "\u2510";
-        rooms[y][1][x] = ((neighbors[0] == null) ? "\u2502" : "d") + this.type
-                + ((neighbors[2] == null) ? "\u2502" : "d");
-        rooms[y][2][x] = "\u2514" + ((neighbors[1] == null) ? "\u2500" : "d") + "\u2518";
+        rooms[y][0][x] = "\u250C" + ((neighbours[3] == null) ? "\u2500" : "d") + "\u2510";
+        rooms[y][1][x] = ((neighbours[0] == null) ? "\u2502" : "d") + this.type
+                + ((neighbours[2] == null) ? "\u2502" : "d");
+        rooms[y][2][x] = "\u2514" + ((neighbours[1] == null) ? "\u2500" : "d") + "\u2518";
         int index = 0;
-        for (DungeonRoom neighbor : neighbors) {
+        for (DungeonRoom neighbor : neighbours) {
             if (neighbor != null) {
                 int[] coords = dirToXY(index, x, y);
                 neighbor.getString(rooms, coords[0], coords[1]);

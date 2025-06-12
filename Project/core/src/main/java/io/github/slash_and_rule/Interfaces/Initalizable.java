@@ -8,6 +8,4 @@ public interface Initalizable {
     void init(LoadingSchedule loader); // Method to initialize the object
 
     void show(AssetManager assetManager); // Method to show the object on the screen
-
-    void dispose(); // Method to dispose of the object when no longer needed
 }

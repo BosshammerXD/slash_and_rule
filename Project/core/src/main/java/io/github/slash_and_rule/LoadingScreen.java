@@ -129,6 +129,11 @@ public class LoadingScreen extends BaseScreen {
                 loadingSchedule.threads.pop().run();
             }
         }
+
+        if (!this.processingQueue.isEmpty()) {
+            return;
+        }
+
         game.setScreen(nextScreen);
     }
 }

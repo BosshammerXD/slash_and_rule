@@ -23,7 +23,7 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
     private float max_speed = 10f; // Maximum speed of the player
 
     public Player(PhysicsScreen screen, InputManager inputManager, World world) {
-        super(screen, inputManager, world, 1f, 0f, 0f, 4, 3, Globals.PlayerCategory, Globals.PlayerMask,
+        super(screen, 1f, 0f, 0f, 4, 3, Globals.PlayerCategory, Globals.PlayerMask,
                 BodyType.DynamicBody);
 
         screen.drawableSprites.add(this);
@@ -37,11 +37,6 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
         CircleShape shape = new CircleShape();
         shape.setRadius(0.5f); // Set the radius of the player's hitbox
         return shape;
-    }
-
-    @Override
-    public void dispose() {
-        // Dispose of player resources if necessary
     }
 
     @Override

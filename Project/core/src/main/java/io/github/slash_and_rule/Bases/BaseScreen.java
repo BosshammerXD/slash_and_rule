@@ -3,21 +3,32 @@ package io.github.slash_and_rule.Bases;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
+import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
+import com.badlogic.gdx.utils.async.AsyncResult;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class BaseScreen implements Screen {
+    public AsyncExecutor asyncExecutor = new AsyncExecutor(1);
+
+    protected ArrayDeque<AsyncResult<AsyncLoadable>> processingQueue = new ArrayDeque<>();
+
     private AssetManager assetManager = null;
 
     public ArrayList<Initalizable> loadableObjects = new ArrayList<>();
@@ -27,11 +38,17 @@ public abstract class BaseScreen implements Screen {
     public ArrayList<Updatetable> updatableObjects = new ArrayList<>();
     public ArrayList<Pausable> pausableObjects = new ArrayList<>();
 
+    public ArrayList<Disposable> disposableObjects = new ArrayList<>();
+
+    public ArrayDeque<AsyncLoadable> asyncLoadableObjects = new ArrayDeque<>();
+
     protected InputManager inputManager = new InputManager();
     protected SpriteBatch batch = new SpriteBatch();
 
     public OrthographicCamera camera = new OrthographicCamera();
     protected Viewport viewport;
+
+    public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
 
     public BaseScreen() {
         Gdx.input.setInputProcessor(inputManager);
@@ -52,12 +69,43 @@ public abstract class BaseScreen implements Screen {
         }
         this.viewport.apply();
         camera.update();
+
     }
     // Prepare your screen here.
 
     @Override
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
+        if (assetManager != null && assetManager.update()) {
+            while (!asyncLoadableObjects.isEmpty()) {
+                AsyncResult<AsyncLoadable> v = asyncLoadableObjects.pop().schedule(asyncExecutor);
+                if (v != null) {
+                    processingQueue.add(v);
+                }
+            }
+        }
+
+        while (!schedule.isEmpty()) {
+            Runnable task = schedule.pop();
+            if (task != null) {
+                task.run();
+            }
+        }
+
+        for (int i = 0; i < processingQueue.size(); i++) {
+            AsyncResult<AsyncLoadable> result = processingQueue.poll();
+            if (result != null) {
+                if (result.isDone()) {
+                    AsyncLoadable obj = result.get();
+                    if (obj != null) {
+                        obj.loadDone();
+                    }
+                } else {
+                    processingQueue.add(result);
+                }
+            }
+        }
+
         for (Updatetable obj : updatableObjects) {
             obj.update(delta);
         }
@@ -115,7 +163,7 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void dispose() {
-        for (Initalizable obj : loadableObjects) {
+        for (Disposable obj : disposableObjects) {
             obj.dispose();
         }
     };
@@ -124,4 +172,18 @@ public abstract class BaseScreen implements Screen {
         this.assetManager = assetManager;
     }
 
+    public void loadAsset(String assetPath, Class<?> assetType) {
+        if (assetManager != null) {
+            assetManager.load(assetPath, assetType);
+        } else {
+            Gdx.app.error("BaseScreen", "AssetManager is not initialized.");
+        }
+    }
+
+    public AssetManager getAssetManager() {
+        if (assetManager == null) {
+            assetManager = new AssetManager();
+        }
+        return assetManager;
+    }
 }

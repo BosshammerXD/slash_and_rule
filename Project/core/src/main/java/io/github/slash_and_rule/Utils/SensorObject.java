@@ -7,21 +7,19 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.slash_and_rule.Bases.BasePhysicsObject;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
-import io.github.slash_and_rule.InputManager;
 
 public class SensorObject extends BasePhysicsObject {
     public String name;
     private Consumer<Fixture> contactHandler;
 
-    public SensorObject(PhysicsScreen screen, InputManager inputManager, World world,
+    public SensorObject(PhysicsScreen screen,
             float density, float friction, float restitution, float x, float y,
             short category, short mask, Shape shape, String name, Consumer<Fixture> contactHandler) {
 
-        super(screen, inputManager, world, density, friction, restitution, x, y, category, mask,
+        super(screen, density, friction, restitution, x, y, category, mask,
                 BodyType.StaticBody, shape);
 
         this.name = name;
@@ -36,11 +34,6 @@ public class SensorObject extends BasePhysicsObject {
     @Override
     protected Shape getHitboxShape() {
         return null; // Sensors typically do not have a hitbox shape
-    }
-
-    @Override
-    public void dispose() {
-        // Dispose of sensor resources if necessary
     }
 
     public void onContact(Fixture other) {

@@ -1,18 +1,26 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Disposable;
 
-import io.github.slash_and_rule.Bases.BaseScreen;
+import io.github.slash_and_rule.InputManager;
+import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Dungeon_Crawler.Player;
+import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
 import io.github.slash_and_rule.LoadingScreen.ThreadData;
+import io.github.slash_and_rule.Utils.LRUCache;
 
-public class DungeonManager implements Initalizable {
+public class DungeonManager implements Initalizable, Disposable, Displayable {
     public static class LevelData {
         public String startRoom;
         public String[] fillerRooms;
@@ -20,48 +28,75 @@ public class DungeonManager implements Initalizable {
         public String endRoom;
 
         public LevelData(String location, String startRoom, String[] fillerRooms, String[] leafRooms, String endRoom) {
-            this.startRoom = location + startRoom;
+            this.startRoom = location + startRoom + ".tmx";
             this.fillerRooms = Arrays.stream(fillerRooms)
-                    .map(room -> location + room)
+                    .map(room -> location + room + ".tmx")
                     .toArray(String[]::new);
             this.leafRooms = Arrays.stream(leafRooms)
-                    .map(room -> location + room)
+                    .map(room -> location + room + ".tmx")
                     .toArray(String[]::new);
-            this.endRoom = location + endRoom;
+            this.endRoom = location + endRoom + ".tmx";
 
         }
     }
 
-    private String AssetFolder;
-    private ArrayList<DungeonTileMap> rooms;
+    private LRUCache<String, RoomData> roomCache = new LRUCache<>(10);
+
+    public int currentLevel;
     private int depth;
     private int branchcap;
     private float branchmul;
     private int maxDifficulty;
     private DungeonRoom dungeon;
+    private Player player;
+
+    private PhysicsScreen screen;
+
+    private RoomDataHandler room;
+    private RoomDataHandler[] neighbours = new RoomDataHandler[4]; // left, right, top, bottom
 
     private LevelData[] levels;
 
-    public DungeonManager(BaseScreen screen, String assetFolder, int depth, int maxDifficulty, int branchcap,
-            float branchmul) {
-        this.AssetFolder = assetFolder;
+    private Random random = new Random();
+    private OrthogonalTiledMapRenderer renderer;
+
+    private AssetManager assetManager;
+
+    public DungeonManager(PhysicsScreen screen, InputManager inputManager, AssetManager assetManager, World world,
+            Player player,
+            String assetFolder,
+            int depth, int maxDifficulty,
+            int branchcap,
+            float branchmul, int currentLevel) {
+
+        this.currentLevel = currentLevel;
         this.depth = depth;
         this.branchcap = branchcap;
         this.branchmul = branchmul;
         this.maxDifficulty = maxDifficulty;
+        this.player = player;
+
+        this.room = new RoomDataHandler(screen, this::changeRoom);
+        this.neighbours = new RoomDataHandler[] {
+                new RoomDataHandler(screen, this::changeRoom),
+                new RoomDataHandler(screen, this::changeRoom),
+                new RoomDataHandler(screen, this::changeRoom),
+                new RoomDataHandler(screen, this::changeRoom)
+        }; // left, right, top, bottom
+
+        this.assetManager = assetManager;
+
+        this.screen = screen;
+
         this.levels = new LevelData[] {
-                new LevelData(assetFolder + "/testlevel", "start", new String[] { "filler" }, new String[] { "leaf" },
+                new LevelData(assetFolder + "/testlevel/", "start", new String[] { "filler" }, new String[] { "leaf" },
                         "end"), };
 
-        screen.loadableObjects.add(this);
-    }
+        RoomData.scale = 1 / 16f;
 
-    public void generateDungeon() {
-        // This method will contain the logic to generate a dungeon layout
-        // It will create rooms, corridors, and other features of the dungeon
-        // The implementation details will depend on the specific requirements of the
-        // game
-        // For now, we can leave it empty or add a simple placeholder implementation
+        screen.loadableObjects.add(this);
+        screen.disposableObjects.add(this);
+        screen.drawableObjects.add(this);
     }
 
     // Split up dungeon into Levels
@@ -70,26 +105,113 @@ public class DungeonManager implements Initalizable {
     // Lootrooms as endpoints (with Loot increasing with depth) [done]
     // arrays with possible rooms per Level (Store the Paths)
 
-    private void getRooms() {
-        // This method will return a list of DungeonTileMap objects representing the
-        // rooms in the dungeon
-        // For now, we can return an empty list or add some placeholder rooms
-        this.rooms = new ArrayList<>();
-    }
-
     @Override
     public void init(LoadingSchedule loader) {
-
+        this.renderer = new OrthogonalTiledMapRenderer(null, 1 / 16f);
+        System.out.println(this.renderer);
         BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
         dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
-                new Random(), branchcap, branchmul);
+                random, branchcap, branchmul);
 
-        loader.threads.add(new ThreadData(dungeon));
+        loader.threads.add(new ThreadData(dungeon, this::loadRooms));
+        // loader.threads.add(new ThreadData(() -> this.setRendererWhenReady()));
+    }
+
+    private void loadRooms() {
+        loadRoom(this.room, dungeon);
+        this.room.setActive(true);
+
+        int count = 0;
+        for (DungeonRoom neighbour : dungeon.neighbours) {
+            if (neighbour != null) {
+                loadRoom(this.neighbours[count], neighbour);
+            } else {
+                this.neighbours[count].clear();
+            }
+            count++;
+        }
+    }
+
+    private boolean processing = false;
+
+    private void loadRooms(int originDir) {
+        if (processing) {
+            System.out.println("Already processing room change, ignoring request.");
+            return; // Prevent re-entrance
+        }
+        processing = true; // Set processing flag
+        if (originDir < 0 || originDir >= 4) {
+            throw new IllegalArgumentException("Invalid origin direction: " + originDir);
+        }
+
+        this.screen.schedule.add(() -> {
+            this.room.setActive(false);
+            this.neighbours[(originDir + 2) % 4] = this.room;
+            this.room = this.neighbours[originDir];
+            this.dungeon = this.dungeon.neighbours[originDir];
+            this.renderer.setMap(this.room.map);
+            player.setPosition(2.5f, 2.5f);
+            this.room.setActive(true);
+            this.room.setOpen(true);
+            loadRoom(this.neighbours[originDir], dungeon.neighbours[originDir]);
+            loadRoom(this.neighbours[(originDir + 1) % 4], dungeon.neighbours[(originDir + 1) % 4]);
+            loadRoom(this.neighbours[(originDir + 3) % 4], dungeon.neighbours[(originDir + 3) % 4]);
+            processing = false; // Reset processing flag
+        });
+    }
+
+    private void getData(RoomDataHandler handler, DungeonRoom room, Consumer<RoomData> callback) {
+        if (room == null) {
+            return; // No room to load
+        }
+        if (room.path == null) {
+            room.path = getPath(room.difficulty, room.type);
+        }
+        RoomData data = roomCache.get(room.path);
+        if (data == null) {
+            roomCache.put(room.path, new RoomData(screen, room.path, callback));
+        } else {
+            data.addCallback(callback);
+        }
+    }
+
+    private void loadRoom(RoomDataHandler handler, DungeonRoom room) {
+        handler.clear();
+        getData(handler, room, newData -> {
+            handler.loadRoomData(newData, room);
+            this.renderer.setMap(this.room.map);
+        });
+    }
+
+    private String getPath(int difficulty, byte type) {
+        if (type == 0) {
+            return levels[currentLevel].startRoom; // Placeholder for start room
+        } else if (type == 3) {
+            return levels[currentLevel].endRoom; // Placeholder for end room
+        }
+
+        return (type == 1) ? pickRandom(levels[currentLevel].fillerRooms) : pickRandom(levels[currentLevel].leafRooms); // Placeholder
+    }
+
+    private String pickRandom(String[] array) {
+        if (array.length == 0) {
+            return null; // No rooms available
+        }
+        return array[random.nextInt(array.length)];
+    }
+
+    private void changeRoom(Integer direction) {
+        System.out.println("Changing room in direction: " + direction);
+        loadRooms(direction);
     }
 
     @Override
     public void dispose() {
-
+        this.renderer.dispose();
+        for (RoomData room : roomCache.values()) {
+            room.dispose();
+        }
+        roomCache.clear();
     }
 
     @Override
@@ -97,5 +219,17 @@ public class DungeonManager implements Initalizable {
         // TODO Auto-generated method stub
         dungeon.print();
         System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
+    }
+
+    @Override
+    public void draw(SpriteBatch batch) {
+        if (renderer.getMap() != null) {
+            renderer.setView(screen.camera);
+            renderer.render();
+        }
+    }
+
+    @Override
+    public void hide() {
     }
 }

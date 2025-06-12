@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
-import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonTileMap;
 
 public class DungeonCrawlerScene extends PhysicsScreen {
 
@@ -16,7 +15,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         // Add player and other game objects here
         Player player = new Player(this, inputManager, world);
-        new DungeonTileMap(this, inputManager, world, "test.tmx", player);
-        new DungeonManager(this, "levels", 6, 16, 1, 3f);
+        new DungeonManager(this, inputManager, assetManager, world, player, "levels", 6, 16, 1, 3f, 0);
     }
 }

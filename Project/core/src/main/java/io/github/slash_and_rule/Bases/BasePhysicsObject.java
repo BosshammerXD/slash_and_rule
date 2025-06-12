@@ -8,30 +8,29 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-import io.github.slash_and_rule.InputManager;
-
 public abstract class BasePhysicsObject extends BaseGameObject {
     protected BodyDef bodyDef = new BodyDef();
     protected Body body;
     protected Fixture fixture;
 
-    public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
+    public BasePhysicsObject(PhysicsScreen screen,
             float density,
             float friction, float restitution, float start_x, float start_y, short category, short mask,
             BodyType BodyType) {
-        super(screen, inputManager);
+        super(screen);
 
-        this.setup(world, density, friction, restitution, start_x, start_y, category, mask, BodyType,
+        this.setup(screen.world, density, friction, restitution, start_x, start_y, category, mask, BodyType,
                 this.getHitboxShape());
     }
 
-    public BasePhysicsObject(PhysicsScreen screen, InputManager inputManager, World world,
+    public BasePhysicsObject(PhysicsScreen screen,
             float density,
             float friction, float restitution, float start_x, float start_y, short category, short mask,
             BodyType BodyType, Shape hitboxShape) {
-        super(screen, inputManager);
+        super(screen);
 
-        this.setup(world, density, friction, restitution, start_x, start_y, category, mask, BodyType, hitboxShape);
+        this.setup(screen.world, density, friction, restitution, start_x, start_y, category, mask, BodyType,
+                hitboxShape);
     }
 
     private void setup(World world,

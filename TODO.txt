@@ -2,6 +2,8 @@
 - research how to do ui layer
 - find out how to implement pause menu
 
+- change loadingscreen to use Async
+
 DungeonCrawler:
   - Spawnpoint for doors
   - give character its sprite

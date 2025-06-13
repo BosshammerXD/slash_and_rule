@@ -79,10 +79,10 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
 
         movDir.nor();
 
-        movDir.scl(1f);
+        movDir.scl(this.max_speed*10);
 
-        body.applyLinearImpulse(movDir, pos, true);
-
+        body.setLinearVelocity(movDir);
+        //body.applyLinearImpulse(movDir, pos, true);
         Vector2 currentVelocity = body.getLinearVelocity();
         if (currentVelocity.len() > max_speed) {
             currentVelocity.nor().scl(max_speed);
@@ -152,9 +152,9 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
         loader.schedule.add(new MsgRunnable("Loading Player", () -> {
             this.playerAtlas = loader.getAssetManager().get("entities/PlayerAtlas/PLayerAtlas.atlas",
                     TextureAtlas.class);
-            this.moveAnimations[0] = new Animation<>(0.1f, playerAtlas.findRegions("MoveLeft"),
+            this.moveAnimations[0] = new Animation<>(0.2f, playerAtlas.findRegions("MoveLeft"),
                     Animation.PlayMode.LOOP);
-            this.moveAnimations[2] = new Animation<>(0.1f, playerAtlas.findRegions("MoveRight"),
+            this.moveAnimations[2] = new Animation<>(0.2f, playerAtlas.findRegions("MoveRight"),
                     Animation.PlayMode.LOOP);
             this.moveAnimations[3] = new Animation<>(0.1f, playerAtlas.findRegions("MoveUp"), Animation.PlayMode.LOOP);
             this.moveAnimations[1] = new Animation<>(0.1f, playerAtlas.findRegions("MoveDown"),

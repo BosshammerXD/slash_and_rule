@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import io.github.slash_and_rule.InputManager;
@@ -60,9 +59,7 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     private Random random = new Random();
     private OrthogonalTiledMapRenderer renderer;
 
-    private AssetManager assetManager;
-
-    public DungeonManager(PhysicsScreen screen, InputManager inputManager, AssetManager assetManager, World world,
+    public DungeonManager(PhysicsScreen screen, InputManager inputManager,
             Player player,
             String assetFolder,
             int depth, int maxDifficulty,
@@ -83,8 +80,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
                 new RoomDataHandler(screen, this::changeRoom),
                 new RoomDataHandler(screen, this::changeRoom)
         }; // left, right, top, bottom
-
-        this.assetManager = assetManager;
 
         this.screen = screen;
 
@@ -117,8 +112,7 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     }
 
     private void loadRooms() {
-        loadRoom(this.room, dungeon);
-        this.room.setActive(true);
+        loadRoom(this.room, dungeon, true, true, () -> this.renderer.setMap(this.room.map));
 
         int count = 0;
         for (DungeonRoom neighbour : dungeon.neighbours) {
@@ -152,7 +146,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
             this.dungeon = this.dungeon.neighbours[originDir];
             this.renderer.setMap(this.room.map);
             float[] spawnPos = this.room.doors[(originDir + 2) % 4].getSpawnPos();
-            System.out.println("Spawn position: " + Arrays.toString(spawnPos));
             player.setPosition(spawnPos[0], spawnPos[1]);
             this.room.setActive(true);
             this.room.setOpen(true);
@@ -182,7 +175,15 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
         handler.clear();
         getData(handler, room, newData -> {
             handler.loadRoomData(newData, room);
-            this.renderer.setMap(this.room.map);
+        });
+    }
+
+    private void loadRoom(RoomDataHandler handler, DungeonRoom room, boolean isActive, boolean isOpen,
+            Runnable onLoad) {
+        handler.clear();
+        getData(handler, room, newData -> {
+            handler.loadRoomData(newData, room, isOpen, isActive);
+            onLoad.run();
         });
     }
 
@@ -211,6 +212,10 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     @Override
     public void dispose() {
         this.renderer.dispose();
+        for (RoomDataHandler neighbour : neighbours) {
+            neighbour.dispose();
+        }
+        room.dispose();
         for (RoomData room : roomCache.values()) {
             room.dispose();
         }

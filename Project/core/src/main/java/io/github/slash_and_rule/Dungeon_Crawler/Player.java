@@ -6,6 +6,7 @@ import io.github.slash_and_rule.InputManager;
 
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
+import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
 import io.github.slash_and_rule.Bases.BasePhysicsObject;
@@ -14,29 +15,29 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-public class Player extends BasePhysicsObject implements Displayable, Updatetable, Pausable {
+public class Player implements Displayable, Updatetable, Pausable {
     private boolean isPaused = false;
     private float max_speed = 10f; // Maximum speed of the player
 
-    public Player(PhysicsScreen screen, InputManager inputManager, World world) {
-        super(screen, 1f, 0f, 0f, 4, 3, Globals.PlayerCategory, Globals.PlayerMask,
-                BodyType.DynamicBody);
+    private PhysicsScreen screen;
+
+    private ColliderObject hitbox;
+
+    public Player(PhysicsScreen screen, InputManager inputManager) {
+        CircleShape hitboxShape = new CircleShape();
+        hitboxShape.setRadius(0.5f); // Set the radius of the player's hitbox
+        this.hitbox = new ColliderObject(screen, 1f, 7.5f, 0f, 2.5f, 2.5f, Globals.PlayerCategory, Globals.PlayerMask,
+                hitboxShape, BodyType.DynamicBody, true);
+
+        this.screen = screen;
 
         screen.drawableSprites.add(this);
         screen.updatableObjects.add(this);
         screen.pausableObjects.add(this);
-
-    }
-
-    @Override
-    protected CircleShape getHitboxShape() {
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.5f); // Set the radius of the player's hitbox
-        return shape;
     }
 
     @Override
@@ -45,6 +46,9 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
         if (isPaused) {
             return; // Skip updates if the game is paused
         }
+
+        Body body = hitbox.getBody();
+
         Vector2 pos = body.getPosition();
 
         Vector2 movDir = new Vector2(0, 0);
@@ -101,6 +105,6 @@ public class Player extends BasePhysicsObject implements Displayable, Updatetabl
     }
 
     public void setPosition(float x, float y) {
-        body.setTransform(x, y, 0); // Set the player's position in the world
+        hitbox.getBody().setTransform(x, y, 0); // Set the player's position in the world
     }
 }

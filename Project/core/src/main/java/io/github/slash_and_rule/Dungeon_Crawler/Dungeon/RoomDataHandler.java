@@ -75,12 +75,41 @@ public class RoomDataHandler implements Disposable {
     public RoomDataHandler(PhysicsScreen screen, Consumer<Integer> onRoomChange) {
         this.screen = screen;
         this.onRoomChange = onRoomChange;
+
+        screen.disposableObjects.add(this);
+    }
+
+    public RoomDataHandler(PhysicsScreen screen, Consumer<Integer> onRoomChange, boolean isActive, boolean isOpen) {
+        this.screen = screen;
+        this.onRoomChange = onRoomChange;
+        this.isActive = isActive;
+        this.isOpen = isOpen;
+
+        screen.disposableObjects.add(this);
     }
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
-
+        if (walls != null) {
+            for (ColliderObject wall : walls) {
+                if (wall != null) {
+                    wall.dispose();
+                }
+            }
+        }
+        if (doors != null) {
+            for (DungeonDoor door : doors) {
+                if (door != null) {
+                    door.blocker.dispose();
+                    door.sensor.dispose();
+                }
+            }
+        }
+        this.map = null;
+        this.walls = null;
+        this.doors = null;
+        this.isActive = false;
+        this.isOpen = false;
     }
 
     public void setActive(boolean active) {
@@ -103,6 +132,10 @@ public class RoomDataHandler implements Disposable {
                 door.setActive(active);
             }
         }
+    }
+
+    public void setOpenSide(boolean open, int direction) {
+
     }
 
     public void setOpen(boolean open) {
@@ -185,7 +218,7 @@ public class RoomDataHandler implements Disposable {
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(wallData.width, wallData.height);
         this.walls[index] = new ColliderObject(screen, 0, 0, 0, wallData.x, wallData.y, Globals.WallCategory,
-                Globals.WallMask, shape, BodyType.StaticBody);
+                Globals.WallMask, shape, BodyType.StaticBody, false);
     }
 
     private void loadDoors(RoomData data, DungeonRoom room) {
@@ -203,7 +236,7 @@ public class RoomDataHandler implements Disposable {
                 PolygonShape shape = new PolygonShape();
                 shape.setAsBox(data.collider.width, data.collider.height);
                 wallPool.add(new ColliderObject(screen, 0, 0, 0, data.collider.x, data.collider.y, Globals.WallCategory,
-                        Globals.WallMask, shape, BodyType.StaticBody));
+                        Globals.WallMask, shape, BodyType.StaticBody, false));
             });
             return;
         }
@@ -212,14 +245,14 @@ public class RoomDataHandler implements Disposable {
             shape.setAsBox(data.collider.width, data.collider.height);
             this.blockerHolder = new ColliderObject(screen, 0, 0, 0,
                     data.collider.x, data.collider.y, Globals.WallMask, Globals.WallCategory,
-                    shape, BodyType.StaticBody);
+                    shape, BodyType.StaticBody, false);
         });
         screen.schedule.add(() -> {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(data.sensor.width, data.sensor.height);
             this.sensorHolder = new SensorObject(screen, 0, 0, 0,
                     data.sensor.x, data.sensor.y, Globals.PlayerSensorCategory, Globals.PlayerCategory,
-                    shape, data.type, fixture -> notifyRoomChange(data.type));
+                    shape, data.type, false, fixture -> notifyRoomChange(data.type));
         });
         screen.schedule.add(() -> {
             this.doors[direction] = new DungeonDoor(this.blockerHolder, this.sensorHolder, data.spawnPoint);

@@ -75,4 +75,8 @@ public abstract class PhysicsScreen extends BaseScreen {
         debugRenderer.render(world, camera.combined);
         world.step(delta, 6, 2);
     }
+
+    public World getWorld() {
+        return world;
+    }
 }

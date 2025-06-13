@@ -5,14 +5,14 @@
 - change loadingscreen to use Async
 
 DungeonCrawler:
-  - Spawnpoint for doors
+  - make own animation class fo full controll
+  - close doors, when neighbour is not ready {implemet ready flag for that}
   - give character its sprite
   - store set inputs somewhere
   - implement controller inputs
-  - make temporary Levels to test out the System (ingame)
   - implement enemy class
   - implement enemy Spawn System
-    - note try to decouple Spawn System and enemys so that we have creative lberty, when creating the enemies
+    - note try to decouple Spawn System and enemys so that we have creative liberty, when creating the enemies
     - Give all rooms a balance (maybe difficutly * 100) and all the monsters a cost, then randomly select monsters, that are cheap enough and subtract their cost from the balance
     - figure out, when to stop picking (probably define balance that it needs to undershoot and modify it a bit with random value (maybe +-difficulty * 5))
   later:
@@ -20,14 +20,20 @@ DungeonCrawler:
   - play with lights
 
 LoadingScreen:
-  -add loading bar
+  -add loading bar {maybe}
+  -add msg display
 
 
 CityBuilder:
   - make grid for citybuilder
   - make ressourcecounter for city builder
   - make citybuilder screen
+  - buildings should be able to occupy multibple tiles
 
 zu klären:
-    - was für eine Art von grid für citybuilder
-    - monsterspawning via spawnpoints defined in Tilemap okay?
+    - was für eine Art von grid für citybuilder [Quadratisch]
+    - monsterspawning via spawnpoints defined in Tilemap okay? [ist okay]
+
+Done:
+  - Spawnpoint for doors
+  - make temporary Levels to test out the System (ingame)

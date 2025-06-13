@@ -8,10 +8,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import io.github.slash_and_rule.Bases.BasePhysicsObject;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 
-public class SensorObject extends BasePhysicsObject {
+public class SensorObject extends ColliderObject {
     public String name;
     private Consumer<Fixture> contactHandler;
 
@@ -19,8 +18,8 @@ public class SensorObject extends BasePhysicsObject {
             float density, float friction, float restitution, float x, float y,
             short category, short mask, Shape shape, String name, Consumer<Fixture> contactHandler) {
 
-        super(screen, density, friction, restitution, x, y, category, mask,
-                BodyType.StaticBody, shape);
+        super(screen, density, friction, restitution, x, y, category, mask, shape,
+                BodyType.StaticBody);
 
         this.name = name;
         this.contactHandler = contactHandler;
@@ -31,9 +30,20 @@ public class SensorObject extends BasePhysicsObject {
         screen.sensors.add(this); // Add this sensor to the screen's sensor list
     }
 
-    @Override
-    protected Shape getHitboxShape() {
-        return null; // Sensors typically do not have a hitbox shape
+    public SensorObject(PhysicsScreen screen,
+            float density, float friction, float restitution, float x, float y,
+            short category, short mask, Shape shape, String name, boolean isActive, Consumer<Fixture> contactHandler) {
+
+        super(screen, density, friction, restitution, x, y, category, mask, shape,
+                BodyType.StaticBody, isActive);
+
+        this.name = name;
+        this.contactHandler = contactHandler;
+
+        fixture.setSensor(true); // Set the fixture as a sensor
+        fixture.setUserData(name); // Set user data for identification
+
+        screen.sensors.add(this); // Add this sensor to the screen's sensor list
     }
 
     public void onContact(Fixture other) {

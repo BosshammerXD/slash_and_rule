@@ -9,8 +9,6 @@ import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
-import io.github.slash_and_rule.Bases.BasePhysicsObject;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

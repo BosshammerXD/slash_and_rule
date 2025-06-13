@@ -1,12 +1,15 @@
 package io.github.slash_and_rule;
 
-import java.util.ArrayDeque;
 import java.util.Stack;
+import java.util.function.Consumer;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
+import io.github.slash_and_rule.Interfaces.Initalizable;
 
 public class LoadingScreen extends BaseScreen {
     public static class MsgRunnable implements Runnable {
@@ -58,44 +61,38 @@ public class LoadingScreen extends BaseScreen {
         }
     }
 
-    public static class LoadingSchedule {
-        public AssetManager assetManager;
-        public ArrayDeque<MsgRunnable> todo;
-        public Stack<ThreadData> threads;
-
-        public LoadingSchedule(AssetManager assetManager) {
-            this.assetManager = assetManager;
-            todo = new ArrayDeque<>();
-            threads = new Stack<>();
-        }
-    }
+    public Stack<ThreadData> threads;
 
     public BaseScreen nextScreen;
     private BaseScreen defaultScreen;
-    private Main game;
     private String msg = "";
 
-    private LoadingSchedule loadingSchedule;
+    private Consumer<Screen> changeScreen;
 
-    public LoadingScreen(Main game, BaseScreen defaultScreen) {
-        super();
-        this.game = game;
+    public LoadingScreen(BaseScreen defaultScreen, AssetManager assetManager, Consumer<Screen> changeScreen) {
+        super(assetManager);
         this.nextScreen = null; // Initially, there is no next screen set.
         this.defaultScreen = defaultScreen;
+        this.changeScreen = changeScreen; // Set the consumer for changing screens.
         this.viewport = new ExtendViewport(16, 9);
     }
 
     @Override
     public void show() {
-        // Prepare the loading screen for display.
-        this.loadingSchedule = new LoadingSchedule(game.assetManager);
+        this.threads = new Stack<>();
         if (nextScreen != null) {
-            nextScreen.setAssetManager(game.assetManager);
-            nextScreen.init(this.loadingSchedule);
+            runInits(nextScreen);
+            System.out.println("loading AsyncList: " + this.asyncLoadableObjects.toString());
         } else {
-            defaultScreen.init(this.loadingSchedule);
+            runInits(defaultScreen);
             System.out.println("No next screen set, using default screen.");
             nextScreen = defaultScreen;
+        }
+    }
+
+    private void runInits(BaseScreen screen) {
+        for (Initalizable data : screen.loadableObjects) {
+            data.init(this);
         }
     }
 
@@ -107,33 +104,41 @@ public class LoadingScreen extends BaseScreen {
             System.out.println("No next screen set, cannot proceed with loading.");
             return;
         }
-        if (!loadingSchedule.assetManager.update()) {
+        if (!assetManager.update()) {
             // If the asset manager is still loading assets, we can display a loading
             // message or animation.
-            msg = "Loading assets: " + (int) (loadingSchedule.assetManager.getProgress() * 100) + "%";
+            msg = "Loading assets: " + (int) (assetManager.getProgress() * 100) + "%";
             return;
         }
-        if (loadingSchedule.todo != null && !loadingSchedule.todo.isEmpty()) {
-            loadingSchedule.todo.pop().run();
-            if (!loadingSchedule.todo.isEmpty()) {
-                msg = loadingSchedule.todo.peek().msg;
+        if (schedule != null && !schedule.isEmpty()) {
+            schedule.pop().run();
+            if (!schedule.isEmpty() && schedule.peek() instanceof MsgRunnable) {
+                msg = ((MsgRunnable) schedule.peek()).msg;
             }
             return;
         }
         msg = "waiting for threads to finish...";
-        if (!loadingSchedule.threads.isEmpty()) {
-            if (loadingSchedule.threads.peek().thread.isAlive()) {
+        if (!threads.isEmpty()) {
+            if (threads.peek().thread.isAlive()) {
                 // If there are still threads running, we wait for them to finish.
                 return;
             } else {
-                loadingSchedule.threads.pop().run();
+                threads.pop().run();
+                return;
             }
         }
 
         if (!this.processingQueue.isEmpty()) {
+            System.out.println("Processing queue is not empty, waiting for tasks to complete.");
             return;
         }
+        System.out.println("Loading complete, switching to next screen.");
+        changeScreen.accept(nextScreen);
+    }
 
-        game.setScreen(nextScreen);
+    @Override
+    public void hide() {
+        // TODO Auto-generated method stub
+        Gdx.input.setInputProcessor(null);
     }
 }

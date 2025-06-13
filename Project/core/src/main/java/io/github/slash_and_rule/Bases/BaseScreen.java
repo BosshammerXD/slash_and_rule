@@ -2,7 +2,7 @@ package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Interfaces.Updatetable;
-import io.github.slash_and_rule.LoadingScreen.LoadingSchedule;
+import io.github.slash_and_rule.Utils.Generation;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
@@ -25,9 +25,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public abstract class BaseScreen implements Screen {
     public AsyncExecutor asyncExecutor = new AsyncExecutor(1);
 
-    protected ArrayDeque<AsyncResult<AsyncLoadable>> processingQueue = new ArrayDeque<>();
+    public ArrayDeque<AsyncResult<AsyncLoadable>> processingQueue = new ArrayDeque<>();
 
-    private AssetManager assetManager = null;
+    protected AssetManager assetManager = null;
 
     public ArrayList<Initalizable> loadableObjects = new ArrayList<>();
 
@@ -40,6 +40,8 @@ public abstract class BaseScreen implements Screen {
 
     public ArrayDeque<AsyncLoadable> asyncLoadableObjects = new ArrayDeque<>();
 
+    public boolean halt = false;
+
     protected InputManager inputManager = new InputManager();
     protected SpriteBatch batch = new SpriteBatch();
 
@@ -48,15 +50,10 @@ public abstract class BaseScreen implements Screen {
 
     public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
 
-    public BaseScreen() {
+    public BaseScreen(AssetManager assetManager) {
         Gdx.input.setInputProcessor(inputManager);
+        this.assetManager = assetManager;
     }
-
-    public void init(LoadingSchedule loader) {
-        for (Initalizable data : loadableObjects) {
-            data.init(loader);
-        }
-    };
 
     @Override
     public void show() {
@@ -102,6 +99,10 @@ public abstract class BaseScreen implements Screen {
                     processingQueue.add(result);
                 }
             }
+        }
+
+        if (halt) {
+            return; // Skip rendering if the screen is halted
         }
 
         for (Updatetable obj : updatableObjects) {
@@ -153,10 +154,8 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void hide() {
-        // This method is called when another screen replaces this one.
-        for (Displayable obj : drawableSprites) {
-            obj.hide();
-        }
+        assetManager.clear();
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
@@ -165,10 +164,6 @@ public abstract class BaseScreen implements Screen {
             obj.dispose();
         }
     };
-
-    public void setAssetManager(AssetManager assetManager) {
-        this.assetManager = assetManager;
-    }
 
     public void loadAsset(String assetPath, Class<?> assetType) {
         if (assetManager != null) {
@@ -183,5 +178,14 @@ public abstract class BaseScreen implements Screen {
             assetManager = new AssetManager();
         }
         return assetManager;
+    }
+
+    public void schedule_generation(Runnable callback, Generation generation, int generationValue) {
+        schedule.add(() -> {
+            if (generation.get() != generationValue) {
+                return; // Skip if the generation value does not match
+            }
+            callback.run();
+        });
     }
 }

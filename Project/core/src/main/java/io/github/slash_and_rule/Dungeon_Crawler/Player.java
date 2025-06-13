@@ -3,21 +3,24 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
-
+import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Interfaces.Displayable;
+import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.Disposable;
 
-public class Player implements Displayable, Updatetable, Pausable {
+public class Player implements Displayable, Updatetable, Pausable, Initalizable, Disposable {
     private boolean isPaused = false;
     private float max_speed = 10f; // Maximum speed of the player
 
@@ -36,6 +39,8 @@ public class Player implements Displayable, Updatetable, Pausable {
         screen.drawableSprites.add(this);
         screen.updatableObjects.add(this);
         screen.pausableObjects.add(this);
+        screen.loadableObjects.add(this);
+        screen.disposableObjects.add(this);
     }
 
     @Override
@@ -86,11 +91,6 @@ public class Player implements Displayable, Updatetable, Pausable {
     }
 
     @Override
-    public void hide() {
-        // Implement hide logic for the player if necessary
-    }
-
-    @Override
     public void pause() {
         // Implement pause logic for the player
         isPaused = true;
@@ -104,5 +104,23 @@ public class Player implements Displayable, Updatetable, Pausable {
 
     public void setPosition(float x, float y) {
         hitbox.getBody().setTransform(x, y, 0); // Set the player's position in the world
+    }
+
+    @Override
+    public void init(LoadingScreen loader) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void show(AssetManager assetManager) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void dispose() {
+        // TODO Auto-generated method stub
+
     }
 }

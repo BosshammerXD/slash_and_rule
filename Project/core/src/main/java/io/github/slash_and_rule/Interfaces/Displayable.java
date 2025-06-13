@@ -8,10 +8,4 @@ public interface Displayable {
      * This method should be implemented to define how the object is rendered.
      */
     void draw(SpriteBatch batch);
-
-    /**
-     * This method is called when the object is no longer needed and should be
-     * hidden.
-     */
-    void hide();
 }

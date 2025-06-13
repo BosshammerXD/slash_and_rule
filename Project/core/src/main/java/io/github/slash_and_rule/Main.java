@@ -14,7 +14,7 @@ import io.github.slash_and_rule.Dungeon_Crawler.DungeonCrawlerScene;
  * platforms.
  */
 public class Main extends Game {
-    public AssetManager assetManager = new AssetManager();
+    private AssetManager assetManager = new AssetManager();
     private LoadingScreen loadingScreen;
 
     BaseScreen[] screens = new BaseScreen[10];
@@ -25,7 +25,7 @@ public class Main extends Game {
 
         screens[0] = new DungeonCrawlerScene(assetManager);
 
-        loadingScreen = new LoadingScreen(this, screens[0]);
+        loadingScreen = new LoadingScreen(screens[0], assetManager, screen -> setScreen(screen));
 
         loadingScreen.nextScreen = screens[0];
 

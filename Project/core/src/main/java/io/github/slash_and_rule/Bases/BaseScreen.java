@@ -64,7 +64,6 @@ public abstract class BaseScreen implements Screen {
         }
         this.viewport.apply();
         camera.update();
-
     }
     // Prepare your screen here.
 
@@ -110,6 +109,7 @@ public abstract class BaseScreen implements Screen {
         }
         this.viewport.apply();
         camera.update();
+        batch.setProjectionMatrix(camera.combined);
         ScreenUtils.clear(0, 0, 0, 1, true);
 
         for (Displayable obj : drawableObjects) {

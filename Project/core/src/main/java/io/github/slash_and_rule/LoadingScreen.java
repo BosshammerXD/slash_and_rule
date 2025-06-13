@@ -6,9 +6,11 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.async.AsyncResult;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
+import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 
 public class LoadingScreen extends BaseScreen {
@@ -98,7 +100,7 @@ public class LoadingScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta);
+        // super.render(delta);
         // Additional rendering logic for the loading screen can be added here.
         if (nextScreen == null) {
             System.out.println("No next screen set, cannot proceed with loading.");
@@ -110,6 +112,14 @@ public class LoadingScreen extends BaseScreen {
             msg = "Loading assets: " + (int) (assetManager.getProgress() * 100) + "%";
             return;
         }
+
+        while (!asyncLoadableObjects.isEmpty()) {
+            AsyncResult<AsyncLoadable> v = asyncLoadableObjects.pop().schedule(asyncExecutor);
+            if (v != null) {
+                processingQueue.add(v);
+            }
+        }
+
         if (schedule != null && !schedule.isEmpty()) {
             schedule.pop().run();
             if (!schedule.isEmpty() && schedule.peek() instanceof MsgRunnable) {
@@ -117,6 +127,21 @@ public class LoadingScreen extends BaseScreen {
             }
             return;
         }
+
+        for (int i = 0; i < processingQueue.size(); i++) {
+            AsyncResult<AsyncLoadable> result = processingQueue.poll();
+            if (result != null) {
+                if (result.isDone()) {
+                    AsyncLoadable obj = result.get();
+                    if (obj != null) {
+                        obj.loadDone();
+                    }
+                } else {
+                    processingQueue.add(result);
+                }
+            }
+        }
+
         msg = "waiting for threads to finish...";
         if (!threads.isEmpty()) {
             if (threads.peek().thread.isAlive()) {

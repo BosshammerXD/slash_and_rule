@@ -71,6 +71,9 @@ public abstract class PhysicsScreen extends BaseScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        if (halt) {
+            return; // Skip rendering if the screen is halted
+        }
         // Update the Box2D world
         camera.update();
         debugRenderer.render(world, camera.combined);

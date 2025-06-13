@@ -7,13 +7,17 @@ import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
+import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -25,6 +29,10 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     private float max_speed = 10f; // Maximum speed of the player
 
     private PhysicsScreen screen;
+
+    private TextureAtlas playerAtlas;
+
+    private Animation<TextureAtlas.AtlasRegion>[] moveAnimations = new Animation[4]; // nothing to see here
 
     private ColliderObject hitbox;
 
@@ -58,7 +66,6 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
 
         if (Gdx.input.isKeyPressed(Keys.W)) {
             movDir.y += 1;
-            // hello
         }
         if (Gdx.input.isKeyPressed(Keys.S)) {
             movDir.y -= 1;
@@ -82,12 +89,43 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
             body.setLinearVelocity(currentVelocity);
         }
 
+        int lastMovIndex = movIndex;
+
+        if (Math.abs(currentVelocity.x) > Math.abs(currentVelocity.y)) {
+            if (currentVelocity.x > 0) {
+                movIndex = 2;
+            } else {
+                movIndex = 0;
+            }
+        } else {
+            if (currentVelocity.y > 0) {
+                movIndex = 3;
+            } else {
+                movIndex = 1;
+            }
+        }
+
+        this.stateTime += currentVelocity.len() * delta / 10f * moveAnimations[movIndex].getKeyFrames().length;
+
+        if (movIndex != lastMovIndex) {
+            this.stateTime = 0f; // Reset state time when changing direction
+        }
+
         screen.camera.position.set(pos.x, pos.y, 0);
     }
+
+    private int movIndex;
+    private float stateTime = 0f;
 
     @Override
     public void draw(SpriteBatch batch) {
         // Implement drawing logic for the player
+        if (isPaused) {
+            return; // Skip drawing if the game is paused
+        }
+        TextureRegion currentFrame = moveAnimations[movIndex].getKeyFrame(stateTime, true);
+        batch.draw(currentFrame, hitbox.getBody().getPosition().x - 1f, hitbox.getBody().getPosition().y - 0.5f,
+                2f, 2f); // Draw the player at its position with a size of 1x1
     }
 
     @Override
@@ -109,13 +147,24 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     @Override
     public void init(LoadingScreen loader) {
         // TODO Auto-generated method stub
+        loader.loadAsset("entities/PlayerAtlas/PLayerAtlas.atlas", TextureAtlas.class);
 
+        loader.schedule.add(new MsgRunnable("Loading Player", () -> {
+            this.playerAtlas = loader.getAssetManager().get("entities/PlayerAtlas/PLayerAtlas.atlas",
+                    TextureAtlas.class);
+            this.moveAnimations[0] = new Animation<>(0.1f, playerAtlas.findRegions("MoveLeft"),
+                    Animation.PlayMode.LOOP);
+            this.moveAnimations[2] = new Animation<>(0.1f, playerAtlas.findRegions("MoveRight"),
+                    Animation.PlayMode.LOOP);
+            this.moveAnimations[3] = new Animation<>(0.1f, playerAtlas.findRegions("MoveUp"), Animation.PlayMode.LOOP);
+            this.moveAnimations[1] = new Animation<>(0.1f, playerAtlas.findRegions("MoveDown"),
+                    Animation.PlayMode.LOOP);
+        }));
     }
 
     @Override
     public void show(AssetManager assetManager) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

@@ -6,7 +6,7 @@ import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Animations.MovementAnimation;
 import io.github.slash_and_rule.Animations.MovementAnimation.AnimData;
-import io.github.slash_and_rule.Interfaces.Displayable;
+import io.github.slash_and_rule.Interfaces.SortedDisplayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
@@ -24,8 +24,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Player implements Displayable, Updatetable, Pausable, Initalizable, Disposable {
-    private boolean isPaused = false;
+public class Player implements SortedDisplayable, Updatetable, Pausable, Initalizable, Disposable {
     private float max_speed = 10f; // Maximum speed of the player
 
     private PhysicsScreen screen;
@@ -37,13 +36,13 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
 
     public Player(PhysicsScreen screen, InputManager inputManager) {
         CircleShape hitboxShape = new CircleShape();
-        hitboxShape.setRadius(0.5f); // Set the radius of the player's hitbox
+        hitboxShape.setRadius(7 / 16f); // Set the radius of the player's hitbox
         this.hitbox = new ColliderObject(screen, 1f, 7.5f, 0f, 2.5f, 2.5f, Globals.PlayerCategory, Globals.PlayerMask,
                 hitboxShape, BodyType.DynamicBody, true);
 
         this.screen = screen;
 
-        screen.drawableSprites.add(this);
+        screen.sortedDrawableObjects.add(this);
         screen.updatableObjects.add(this);
         screen.pausableObjects.add(this);
         screen.loadableObjects.add(this);
@@ -55,9 +54,6 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     @Override
     public void update(float delta) {
         // Implement update logic for the player
-        if (isPaused) {
-            return; // Skip updates if the game is paused
-        }
 
         Body body = hitbox.getBody();
 
@@ -103,9 +99,6 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     @Override
     public void draw(SpriteBatch batch) {
         // Implement drawing logic for the player
-        if (isPaused) {
-            return; // Skip drawing if the game is paused
-        }
         Vector2 pos = hitbox.getBody().getPosition();
         float x = pos.x - 1f;
         float y = pos.y - 0.5f;
@@ -122,13 +115,11 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     @Override
     public void pause() {
         // Implement pause logic for the player
-        isPaused = true;
     }
 
     @Override
     public void resume() {
         // Implement resume logic for the player
-        isPaused = false;
     }
 
     public void setPosition(float x, float y) {
@@ -144,18 +135,18 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
             this.moveAnimation = new MovementAnimation(loader.getAssetManager(),
                     "entities/PlayerAtlas/PLayerAtlas.atlas",
                     new AnimData[] {
-                            new AnimData("MoveLeft", 0.02f),
-                            new AnimData("MoveDown", 0.04f),
-                            new AnimData("MoveRight", 0.02f),
-                            new AnimData("MoveUp", 0.04f)
+                            new AnimData("MoveLeft", 0.05f),
+                            new AnimData("MoveDown", 0.1f),
+                            new AnimData("MoveRight", 0.05f),
+                            new AnimData("MoveUp", 0.1f)
                     });
             this.capeMoveAnimation = new MovementAnimation(loader.getAssetManager(),
                     "entities/PlayerAtlas/PLayerAtlas.atlas",
                     new AnimData[] {
-                            new AnimData("CapeMoveLeft", 0.02f),
-                            new AnimData("CapeMoveDown", 0.04f),
-                            new AnimData("CapeMoveRight", 0.02f),
-                            new AnimData("CapeMoveUp", 0.04f)
+                            new AnimData("CapeMoveLeft", 0.05f),
+                            new AnimData("CapeMoveDown", 0.1f),
+                            new AnimData("CapeMoveRight", 0.05f),
+                            new AnimData("CapeMoveUp", 0.1f)
                     });
         }));
     }
@@ -169,5 +160,10 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
     public void dispose() {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public float getSortIndex() {
+        return this.hitbox.getBody().getPosition().y; // Use the y position for sorting
     }
 }

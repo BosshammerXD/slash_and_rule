@@ -7,6 +7,7 @@ import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Pausable;
+import io.github.slash_and_rule.Interfaces.SortedDisplayable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,7 +33,10 @@ public abstract class BaseScreen implements Screen {
     public ArrayList<Initalizable> loadableObjects = new ArrayList<>();
 
     public ArrayList<Displayable> drawableObjects = new ArrayList<>();
-    public ArrayList<Displayable> drawableSprites = new ArrayList<>();
+    public ArrayList<Displayable> backgroundObjects = new ArrayList<>();
+    public ArrayList<SortedDisplayable> sortedDrawableObjects = new ArrayList<>();
+    public ArrayList<Displayable> foregroundObjects = new ArrayList<>();
+
     public ArrayList<Updatetable> updatableObjects = new ArrayList<>();
     public ArrayList<Pausable> pausableObjects = new ArrayList<>();
 
@@ -117,7 +121,16 @@ public abstract class BaseScreen implements Screen {
         }
 
         batch.begin();
-        for (Displayable obj : drawableSprites) {
+        for (Displayable obj : backgroundObjects) {
+            obj.draw(batch);
+        }
+        if (!sortedDrawableObjects.isEmpty()) {
+            sortedDrawableObjects.sort((a, b) -> Float.compare(a.getSortIndex(), b.getSortIndex()));
+            for (SortedDisplayable obj : sortedDrawableObjects) {
+                obj.draw(batch);
+            }
+        }
+        for (Displayable obj : foregroundObjects) {
             obj.draw(batch);
         }
         batch.end();

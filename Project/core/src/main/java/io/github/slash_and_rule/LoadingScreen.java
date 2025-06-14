@@ -122,7 +122,7 @@ public class LoadingScreen extends BaseScreen {
 
         if (schedule != null && !schedule.isEmpty()) {
             schedule.pop().run();
-            if (!schedule.isEmpty() && schedule.peek() instanceof MsgRunnable) {
+            if (schedule.peek() instanceof MsgRunnable) {
                 msg = ((MsgRunnable) schedule.peek()).msg;
             }
             return;

@@ -4,6 +4,8 @@ import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.LoadingScreen;
+import io.github.slash_and_rule.Animations.MovementAnimation;
+import io.github.slash_and_rule.Animations.MovementAnimation.AnimData;
 import io.github.slash_and_rule.Interfaces.Displayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
@@ -14,10 +16,8 @@ import io.github.slash_and_rule.Interfaces.Pausable;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -30,9 +30,8 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
 
     private PhysicsScreen screen;
 
-    private TextureAtlas playerAtlas;
-
-    private Animation<TextureAtlas.AtlasRegion>[] moveAnimations = new Animation[4]; // nothing to see here
+    private MovementAnimation moveAnimation;
+    private MovementAnimation capeMoveAnimation;
 
     private ColliderObject hitbox;
 
@@ -50,6 +49,8 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
         screen.loadableObjects.add(this);
         screen.disposableObjects.add(this);
     }
+
+    private Vector2 lastPos = new Vector2(0, 0);
 
     @Override
     public void update(float delta) {
@@ -79,43 +80,25 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
 
         movDir.nor();
 
-        movDir.scl(this.max_speed*10);
+        movDir.scl(this.max_speed);
 
         body.setLinearVelocity(movDir);
-        //body.applyLinearImpulse(movDir, pos, true);
-        Vector2 currentVelocity = body.getLinearVelocity();
-        if (currentVelocity.len() > max_speed) {
-            currentVelocity.nor().scl(max_speed);
-            body.setLinearVelocity(currentVelocity);
-        }
+        // body.applyLinearImpulse(movDir, pos, true);
+        // Vector2 currentVelocity = body.getLinearVelocity();
+        // if (currentVelocity.len() > max_speed) {
+        // currentVelocity.nor().scl(max_speed);
+        // body.setLinearVelocity(currentVelocity);
+        // }
 
-        int lastMovIndex = movIndex;
+        Vector2 moveVec = new Vector2(pos.x - lastPos.x, pos.y - lastPos.y);
 
-        if (Math.abs(currentVelocity.x) > Math.abs(currentVelocity.y)) {
-            if (currentVelocity.x > 0) {
-                movIndex = 2;
-            } else {
-                movIndex = 0;
-            }
-        } else {
-            if (currentVelocity.y > 0) {
-                movIndex = 3;
-            } else {
-                movIndex = 1;
-            }
-        }
+        moveAnimation.update(moveVec, delta);
+        capeMoveAnimation.update(moveVec, delta);
 
-        this.stateTime += currentVelocity.len() * delta / 10f * moveAnimations[movIndex].getKeyFrames().length;
-
-        if (movIndex != lastMovIndex) {
-            this.stateTime = 0f; // Reset state time when changing direction
-        }
+        lastPos.set(pos);
 
         screen.camera.position.set(pos.x, pos.y, 0);
     }
-
-    private int movIndex;
-    private float stateTime = 0f;
 
     @Override
     public void draw(SpriteBatch batch) {
@@ -123,9 +106,17 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
         if (isPaused) {
             return; // Skip drawing if the game is paused
         }
-        TextureRegion currentFrame = moveAnimations[movIndex].getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, hitbox.getBody().getPosition().x - 1f, hitbox.getBody().getPosition().y - 0.5f,
-                2f, 2f); // Draw the player at its position with a size of 1x1
+        Vector2 pos = hitbox.getBody().getPosition();
+        float x = pos.x - 1f;
+        float y = pos.y - 0.5f;
+
+        if (moveAnimation.getDir() == 1) {
+            batch.draw(capeMoveAnimation.getFrame(), x, y, 2f, 2f);
+            batch.draw(moveAnimation.getFrame(), x, y, 2f, 2f);
+        } else {
+            batch.draw(moveAnimation.getFrame(), x, y, 2f, 2f);
+            batch.draw(capeMoveAnimation.getFrame(), x, y, 2f, 2f);
+        }
     }
 
     @Override
@@ -150,15 +141,22 @@ public class Player implements Displayable, Updatetable, Pausable, Initalizable,
         loader.loadAsset("entities/PlayerAtlas/PLayerAtlas.atlas", TextureAtlas.class);
 
         loader.schedule.add(new MsgRunnable("Loading Player", () -> {
-            this.playerAtlas = loader.getAssetManager().get("entities/PlayerAtlas/PLayerAtlas.atlas",
-                    TextureAtlas.class);
-            this.moveAnimations[0] = new Animation<>(0.2f, playerAtlas.findRegions("MoveLeft"),
-                    Animation.PlayMode.LOOP);
-            this.moveAnimations[2] = new Animation<>(0.2f, playerAtlas.findRegions("MoveRight"),
-                    Animation.PlayMode.LOOP);
-            this.moveAnimations[3] = new Animation<>(0.1f, playerAtlas.findRegions("MoveUp"), Animation.PlayMode.LOOP);
-            this.moveAnimations[1] = new Animation<>(0.1f, playerAtlas.findRegions("MoveDown"),
-                    Animation.PlayMode.LOOP);
+            this.moveAnimation = new MovementAnimation(loader.getAssetManager(),
+                    "entities/PlayerAtlas/PLayerAtlas.atlas",
+                    new AnimData[] {
+                            new AnimData("MoveLeft", 0.02f),
+                            new AnimData("MoveDown", 0.04f),
+                            new AnimData("MoveRight", 0.02f),
+                            new AnimData("MoveUp", 0.04f)
+                    });
+            this.capeMoveAnimation = new MovementAnimation(loader.getAssetManager(),
+                    "entities/PlayerAtlas/PLayerAtlas.atlas",
+                    new AnimData[] {
+                            new AnimData("CapeMoveLeft", 0.02f),
+                            new AnimData("CapeMoveDown", 0.04f),
+                            new AnimData("CapeMoveRight", 0.02f),
+                            new AnimData("CapeMoveUp", 0.04f)
+                    });
         }));
     }
 

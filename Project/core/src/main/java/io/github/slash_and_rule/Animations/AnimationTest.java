@@ -1,4 +1,4 @@
-package io.github.slash_and_rule;
+package io.github.slash_and_rule.Animations;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

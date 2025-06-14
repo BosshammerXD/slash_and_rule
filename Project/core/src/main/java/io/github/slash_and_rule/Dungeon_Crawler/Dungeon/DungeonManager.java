@@ -197,7 +197,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     private void loadRoom(RoomDataHandler handler, DungeonRoom room, int generation) {
         getData(handler, room, screen, newData -> {
             if (loadGeneration.get() != generation) {
-                System.out.println("Load generation mismatch, ignoring request.");
                 return; // Ignore if generation has changed
             }
             handler.loadRoomData(newData, room);
@@ -239,11 +238,9 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
 
     private void changeRoom(Integer direction) {
         loadGeneration.inc();
-        System.out.println(
-                "Changing room in direction: " + direction + " (Generation: " + loadGeneration.get() + ")");
         final int myGeneration = loadGeneration.get(); // Capture current generation
-        this.screen.schedule.clear();
-        this.screen.processingQueue.clear();
+        // this.screen.schedule.clear();
+        // this.screen.processingQueue.clear();
         loadRooms(direction, myGeneration);
     }
 

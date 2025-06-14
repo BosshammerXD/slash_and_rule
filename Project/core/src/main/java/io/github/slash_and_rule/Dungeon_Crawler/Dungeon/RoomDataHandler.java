@@ -32,12 +32,16 @@ public class RoomDataHandler implements Disposable {
             this.blocker = blocker;
             this.sensor = sensor;
             this.spawnPos = spawnPos;
-            this.forceOpen(false);
+            this.setOpen(false);
         }
 
         public void unlock() {
             this.isLocked = false;
-            System.out.println("Door unlocked " + isOpen);
+            setOpen(isOpen);
+        }
+
+        public void lock() {
+            this.isLocked = true;
             setOpen(isOpen);
         }
 
@@ -49,19 +53,10 @@ public class RoomDataHandler implements Disposable {
 
         public void setOpen(boolean open) {
             this.isOpen = open;
-            if (this.isLocked) {
-                return;
-            }
+            open = !this.isLocked && this.isOpen;
             this.sensor.getBody().setActive(this.isActive && open);
             Filter filter = this.blocker.getFixture().getFilterData();
-            filter.maskBits = open ? Globals.ProjectileCategory | Globals.ItemCategory : Globals.WallMask;
-            this.blocker.getFixture().setFilterData(filter);
-        }
-
-        private void forceOpen(boolean open) {
-            this.sensor.getBody().setActive(this.isActive && open);
-            Filter filter = this.blocker.getFixture().getFilterData();
-            filter.maskBits = open ? Globals.ProjectileCategory | Globals.ItemCategory : Globals.WallMask;
+            filter.maskBits = open ? (Globals.ProjectileCategory | Globals.ItemCategory) : Globals.WallMask;
             this.blocker.getFixture().setFilterData(filter);
         }
 
@@ -139,6 +134,9 @@ public class RoomDataHandler implements Disposable {
         for (DungeonDoor door : doors) {
             if (door != null) {
                 door.setActive(active);
+                if (!active) {
+                    door.lock(); // Lock the door when deactivating
+                }
             }
         }
     }
@@ -193,14 +191,25 @@ public class RoomDataHandler implements Disposable {
     }
 
     public void loadRoomData(RoomData data, DungeonRoom room) {
+        final int myGeneration = this.generation.get();
         loadRoomData(data, room, false, true);
+        screen.schedule_generation(() -> {
+            while (!callbacks.isEmpty()) {
+                callbacks.pop().accept(this);
+            }
+        }, generation, myGeneration);
     }
 
     public void loadRoomData(RoomData data, DungeonRoom room, boolean isActive, boolean isOpen,
             RoomDataHandler[] neighbours) {
         final int myGeneration = this.generation.get();
         loadRoomData(data, room, isActive, isOpen);
-        screen.schedule_generation(() -> this.setNeighbours(neighbours, myGeneration), generation, myGeneration);
+        screen.schedule_generation(() -> {
+            this.setNeighbours(neighbours, myGeneration);
+            while (!callbacks.isEmpty()) {
+                callbacks.pop().accept(this);
+            }
+        }, generation, myGeneration);
     }
 
     private void loadRoomData(RoomData data, DungeonRoom room, boolean isActive, boolean isOpen) {
@@ -213,30 +222,22 @@ public class RoomDataHandler implements Disposable {
             this.forceActive(isActive);
             this.forceOpen(isOpen);
             this.isLoaded = true;
-            while (!callbacks.isEmpty()) {
-                callbacks.pop().accept(this);
-            }
         }, this.generation, myGeneration);
     }
 
     public void setNeighbours(RoomDataHandler[] neighbours, int generation) {
         int count = 0;
         for (RoomDataHandler neighbour : neighbours) {
-            if (neighbour != null) {
-                if (this.doors[count] != null) {
-                    final int doorIndex = count; // Final variable for lambda
-                    neighbour.addCallback(newData -> {
-                        // System.out.println("Unlocking door " + doorIndex + " with generation " +
-                        // generation);
-                        if (this.generation.get() != generation) {
-                            return; // Ignore callbacks for older generations
-                        }
-                        this.doors[doorIndex].unlock();
-                    }, generation);
-                }
-                count++;
+            if (neighbour != null && this.doors[count] != null) {
+                this.doors[count].setActive(true);
+                final int doorIndex = count; // Final variable for lambda
+                neighbour.addCallback(newData -> {
+                    this.doors[doorIndex].unlock();
+                }, generation);
             }
+            count++;
         }
+
     }
 
     public void addCallback(Consumer<RoomDataHandler> callback, int generation) {
@@ -249,7 +250,6 @@ public class RoomDataHandler implements Disposable {
             }
             callback.accept(roomData);
         };
-        System.out.println("Unlocking room data with generation " + generation);
         if (this.isLoaded) {
             myCallback.accept(this);
         } else {
@@ -299,7 +299,7 @@ public class RoomDataHandler implements Disposable {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(data.collider.width, data.collider.height);
             this.blockerHolder = new ColliderObject(screen, 0, 0, 0,
-                    data.collider.x, data.collider.y, Globals.WallMask, Globals.WallCategory,
+                    data.collider.x, data.collider.y, Globals.WallCategory, Globals.WallMask,
                     shape, BodyType.StaticBody, false);
         }, this.generation, myGeneration);
 

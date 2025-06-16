@@ -34,6 +34,9 @@ zu klären:
     - was für eine Art von grid für citybuilder [Quadratisch]
     - monsterspawning via spawnpoints defined in Tilemap okay? [ist okay]
 
+Jede Waffe hat Knockback (beim treffen von environment oder gegnern)
+
+
 Done:
   - Spawnpoint for doors
   - make temporary Levels to test out the System (ingame)

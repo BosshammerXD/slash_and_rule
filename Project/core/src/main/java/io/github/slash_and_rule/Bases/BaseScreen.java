@@ -24,6 +24,27 @@ import com.badlogic.gdx.utils.async.AsyncResult;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class BaseScreen implements Screen {
+    private static class GenerationalFunction implements Runnable {
+        private final Generation generation;
+        private final int generationValue;
+        private final Runnable function;
+
+        public GenerationalFunction(Generation generation, Runnable function, int generationValue) {
+            this.generation = generation;
+            this.function = function;
+            this.generationValue = generationValue;
+        }
+
+        public boolean isValid() {
+            return generation.get() == generationValue;
+        }
+
+        @Override
+        public void run() {
+            function.run();
+        }
+    }
+
     public AsyncExecutor asyncExecutor = new AsyncExecutor(1);
 
     public ArrayDeque<AsyncResult<AsyncLoadable>> processingQueue = new ArrayDeque<>();
@@ -83,12 +104,7 @@ public abstract class BaseScreen implements Screen {
             }
         }
 
-        if (!schedule.isEmpty()) {
-            Runnable task = schedule.pop();
-            if (task != null) {
-                task.run();
-            }
-        }
+        handleSchedule();
 
         for (int i = 0; i < processingQueue.size(); i++) {
             AsyncResult<AsyncLoadable> result = processingQueue.poll();
@@ -194,11 +210,20 @@ public abstract class BaseScreen implements Screen {
     }
 
     public void schedule_generation(Runnable callback, Generation generation, int generationValue) {
-        schedule.add(() -> {
-            if (generation.get() != generationValue) {
-                return; // Skip if the generation value does not match
+        schedule.add(new GenerationalFunction(generation, callback, generationValue));
+    }
+
+    private void handleSchedule() {
+        while (!schedule.isEmpty()) {
+            Runnable task = schedule.pop();
+            if (task instanceof GenerationalFunction && !((GenerationalFunction) task).isValid()) {
+                continue; // Skip invalid GenerationalFunction
+            } else if (task != null) {
+                task.run(); // Execute the task if it's not a GenerationalFunction or is valid
+                break;
+            } else {
+                Gdx.app.error("BaseScreen", "Scheduled task is null.");
             }
-            callback.run();
-        });
+        }
     }
 }

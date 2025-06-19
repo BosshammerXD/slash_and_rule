@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class TransformComponent implements Component {
     public Vector2 pos = new Vector2();
-    public Vector2 size = new Vector2(1, 1);
+    public Vector2 velocity = new Vector2(0, 0);
     public float rotation = 0f;
 
     // if in middfield z is used like an offset (to y pos) => zIndex = y + z

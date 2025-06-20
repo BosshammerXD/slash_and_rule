@@ -18,7 +18,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         // Add player and other game objects here
         player = new Player(this, inputManager);
-        engine.addEntity(player.getPlayerEntity());
         dungeonManager = new DungeonManager(this, inputManager, player, "levels", 6, 16, 1, 3f, 0);
     }
 

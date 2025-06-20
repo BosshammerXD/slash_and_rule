@@ -1,6 +1,7 @@
 package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.InputManager;
+import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
 import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
 import io.github.slash_and_rule.Interfaces.Updatetable;
@@ -86,6 +87,8 @@ public abstract class BaseScreen implements Screen {
         Gdx.input.setInputProcessor(inputManager);
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
+
+        EntityManager.setEngine(engine);
 
         engine.addSystem(new AnimationSystem(90, atlasManager));
         engine.addSystem(new RenderSystem(100, camera));

@@ -3,41 +3,31 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
-import io.github.slash_and_rule.LoadingScreen;
-import io.github.slash_and_rule.Animations.MovementAnimation;
-import io.github.slash_and_rule.Animations.MovementAnimation.AnimData;
-import io.github.slash_and_rule.Ashley.Components.MidfieldComponent;
-import io.github.slash_and_rule.Ashley.Components.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
-import io.github.slash_and_rule.Ashley.Components.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
-import io.github.slash_and_rule.Ashley.Components.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Interfaces.SortedDisplayable;
-import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
-import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Player implements SortedDisplayable, Updatetable, Pausable, Initalizable, Disposable {
+public class Player implements SortedDisplayable, Updatetable, Pausable, Disposable {
     private float max_speed = 10f; // Maximum speed of the player
 
     private PhysicsScreen screen;
-
-    private MovementAnimation moveAnimation;
-    private MovementAnimation capeMoveAnimation;
 
     private ColliderObject hitbox;
 
@@ -53,14 +43,11 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
 
         screen.getAtlasManager().add("entities/PlayerAtlas/PLayerAtlas.atlas");
 
-        this.playerEntity = new Entity();
+        EntityManager.start();
 
-        this.playerEntity.add(new PlayerComponent());
-        this.playerEntity.add(new MidfieldComponent());
-        TransformComponent tc = new TransformComponent();
-        tc.pos = new Vector2(2, 2); // Initial position of the player
-        tc.rotation = 0f; // Initial rotation of the player
-        this.playerEntity.add(tc);
+        TransformComponent Tc = new TransformComponent();
+        Tc.pos = new Vector2(2, 2); // Initial position of the player
+        Tc.rotation = 0f; // Initial rotation of the player
 
         RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
                 "entities/PlayerAtlas/PLayerAtlas.atlas",
@@ -95,19 +82,10 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
                 moveData,
                 capeMoveData
         };
-        this.playerEntity.add(rC);
 
-        playerEntity.add(new PhysicsComponent() {
-            {
-                colliders = new ColliderObject[] { hitbox };
-            }
-        });
+        EntityManager.add(new PlayerComponent(), new MidfieldComponent(), rC, Tc);
 
-        // screen.sortedDrawableObjects.add(this);
-        // screen.updatableObjects.add(this);
-        // screen.pausableObjects.add(this);
-        // screen.loadableObjects.add(this);
-        // screen.disposableObjects.add(this);
+        EntityManager.end();
     }
 
     private Vector2 lastPos = new Vector2(0, 0);
@@ -155,9 +133,6 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
 
         Vector2 moveVec = new Vector2(pos.x - lastPos.x, pos.y - lastPos.y);
 
-        moveAnimation.update(moveVec, delta);
-        capeMoveAnimation.update(moveVec, delta);
-
         lastPos.set(pos);
 
         screen.camera.position.set(pos.x, pos.y, 0);
@@ -169,14 +144,6 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
         Vector2 pos = hitbox.getBody().getPosition();
         float x = pos.x - 1f;
         float y = pos.y - 0.5f;
-
-        if (moveAnimation.getDir() == 1) {
-            batch.draw(capeMoveAnimation.getFrame(), x, y, 2f, 2f);
-            batch.draw(moveAnimation.getFrame(), x, y, 2f, 2f);
-        } else {
-            batch.draw(moveAnimation.getFrame(), x, y, 2f, 2f);
-            batch.draw(capeMoveAnimation.getFrame(), x, y, 2f, 2f);
-        }
     }
 
     @Override
@@ -191,36 +158,6 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
 
     public void setPosition(float x, float y) {
         hitbox.getBody().setTransform(x, y, 0); // Set the player's position in the world
-    }
-
-    @Override
-    public void init(LoadingScreen loader) {
-        // TODO Auto-generated method stub
-        loader.loadAsset("entities/PlayerAtlas/PLayerAtlas.atlas", TextureAtlas.class);
-
-        loader.schedule.add(new MsgRunnable("Loading Player", () -> {
-            this.moveAnimation = new MovementAnimation(loader.getAssetManager(),
-                    "entities/PlayerAtlas/PLayerAtlas.atlas",
-                    new AnimData[] {
-                            new AnimData("MoveLeft", 0.05f),
-                            new AnimData("MoveDown", 0.1f),
-                            new AnimData("MoveRight", 0.05f),
-                            new AnimData("MoveUp", 0.1f)
-                    });
-            this.capeMoveAnimation = new MovementAnimation(loader.getAssetManager(),
-                    "entities/PlayerAtlas/PLayerAtlas.atlas",
-                    new AnimData[] {
-                            new AnimData("CapeMoveLeft", 0.05f),
-                            new AnimData("CapeMoveDown", 0.1f),
-                            new AnimData("CapeMoveRight", 0.05f),
-                            new AnimData("CapeMoveUp", 0.1f)
-                    });
-        }));
-    }
-
-    @Override
-    public void show(AssetManager assetManager) {
-        // TODO Auto-generated method stub
     }
 
     @Override

@@ -13,11 +13,11 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import io.github.slash_and_rule.Ashley.Components.BackgroundComponent;
-import io.github.slash_and_rule.Ashley.Components.ForegroundComponent;
-import io.github.slash_and_rule.Ashley.Components.MidfieldComponent;
-import io.github.slash_and_rule.Ashley.Components.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.ForegroundComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 
 public class RenderSystem extends EntitySystem {
     private ImmutableArray<Entity> backgroundEntities;
@@ -40,13 +40,13 @@ public class RenderSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         backgroundEntities = engine.getEntitiesFor(
-                Family.all(RenderableComponent.class, TransformComponent.class, BackgroundComponent.class).get());
+                Family.all(TransformComponent.class, BackgroundComponent.class).get());
 
         midfieldEntities = engine.getEntitiesFor(
-                Family.all(RenderableComponent.class, TransformComponent.class, MidfieldComponent.class).get());
+                Family.all(TransformComponent.class, MidfieldComponent.class).get());
 
         foregroundEntities = engine.getEntitiesFor(
-                Family.all(RenderableComponent.class, TransformComponent.class, ForegroundComponent.class).get());
+                Family.all(TransformComponent.class, ForegroundComponent.class).get());
     }
 
     @Override

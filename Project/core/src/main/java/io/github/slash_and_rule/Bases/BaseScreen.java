@@ -1,7 +1,10 @@
 package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.InputManager;
+import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
+import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
 import io.github.slash_and_rule.Interfaces.Updatetable;
+import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Generation;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Displayable;
@@ -12,6 +15,7 @@ import io.github.slash_and_rule.Interfaces.SortedDisplayable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -73,11 +77,18 @@ public abstract class BaseScreen implements Screen {
     public OrthographicCamera camera = new OrthographicCamera();
     protected Viewport viewport;
 
+    protected Engine engine = new Engine();
+    private AtlasManager atlasManager;
+
     public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
 
-    public BaseScreen(AssetManager assetManager) {
+    public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         Gdx.input.setInputProcessor(inputManager);
         this.assetManager = assetManager;
+        this.atlasManager = atlasManager;
+
+        engine.addSystem(new AnimationSystem(90, atlasManager));
+        engine.addSystem(new RenderSystem(100, camera));
     }
 
     @Override
@@ -96,6 +107,7 @@ public abstract class BaseScreen implements Screen {
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
         if (assetManager != null && assetManager.update()) {
+            atlasManager.AssetsLoaded();
             while (!asyncLoadableObjects.isEmpty()) {
                 AsyncResult<AsyncLoadable> v = asyncLoadableObjects.pop().schedule(asyncExecutor);
                 if (v != null) {
@@ -123,7 +135,6 @@ public abstract class BaseScreen implements Screen {
         if (halt) {
             return; // Skip rendering if the screen is halted
         }
-
         for (Updatetable obj : updatableObjects) {
             obj.update(delta);
         }
@@ -135,6 +146,8 @@ public abstract class BaseScreen implements Screen {
         for (Displayable obj : drawableObjects) {
             obj.draw(batch);
         }
+
+        engine.update(delta);
 
         batch.begin();
         for (Displayable obj : backgroundObjects) {
@@ -225,5 +238,9 @@ public abstract class BaseScreen implements Screen {
                 Gdx.app.error("BaseScreen", "Scheduled task is null.");
             }
         }
+    }
+
+    public AtlasManager getAtlasManager() {
+        return atlasManager;
     }
 }

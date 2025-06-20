@@ -6,6 +6,12 @@ import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Animations.MovementAnimation;
 import io.github.slash_and_rule.Animations.MovementAnimation.AnimData;
+import io.github.slash_and_rule.Ashley.Components.MidfieldComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
+import io.github.slash_and_rule.Ashley.Components.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Interfaces.SortedDisplayable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Interfaces.Updatetable;
@@ -13,6 +19,7 @@ import io.github.slash_and_rule.LoadingScreen.MsgRunnable;
 import io.github.slash_and_rule.Utils.ColliderObject;
 import io.github.slash_and_rule.Interfaces.Pausable;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
@@ -34,6 +41,8 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
 
     private ColliderObject hitbox;
 
+    private Entity playerEntity;
+
     public Player(PhysicsScreen screen, InputManager inputManager) {
         CircleShape hitboxShape = new CircleShape();
         hitboxShape.setRadius(7 / 16f); // Set the radius of the player's hitbox
@@ -42,14 +51,78 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
 
         this.screen = screen;
 
-        screen.sortedDrawableObjects.add(this);
-        screen.updatableObjects.add(this);
-        screen.pausableObjects.add(this);
-        screen.loadableObjects.add(this);
-        screen.disposableObjects.add(this);
+        screen.getAtlasManager().add("entities/PlayerAtlas/PLayerAtlas.atlas");
+
+        this.playerEntity = new Entity();
+
+        this.playerEntity.add(new PlayerComponent());
+        this.playerEntity.add(new MidfieldComponent());
+        TransformComponent tc = new TransformComponent();
+        tc.pos = new Vector2(2, 2); // Initial position of the player
+        tc.rotation = 0f; // Initial rotation of the player
+        this.playerEntity.add(tc);
+
+        RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
+                "entities/PlayerAtlas/PLayerAtlas.atlas",
+                "MoveDown",
+                this::processAnim);
+        TextureData moveData = new TextureData() {
+            {
+                animData = moveAnimData;
+                priority = 1;
+                width = 2f;
+                height = 2f;
+                offsetX = 0f;
+                offsetY = 0f;
+            }
+        };
+        RenderableComponent.AnimData capeMoveAnimData = new RenderableComponent.AnimData(
+                "entities/PlayerAtlas/PLayerAtlas.atlas",
+                "CapeMoveDown",
+                this::processAnim);
+        TextureData capeMoveData = new TextureData() {
+            {
+                animData = capeMoveAnimData;
+                priority = 2;
+                width = 2f;
+                height = 2f;
+                offsetX = 0f;
+                offsetY = 0f;
+            }
+        };
+        RenderableComponent rC = new RenderableComponent();
+        rC.textures = new TextureData[] {
+                moveData,
+                capeMoveData
+        };
+        this.playerEntity.add(rC);
+
+        playerEntity.add(new PhysicsComponent() {
+            {
+                colliders = new ColliderObject[] { hitbox };
+            }
+        });
+
+        // screen.sortedDrawableObjects.add(this);
+        // screen.updatableObjects.add(this);
+        // screen.pausableObjects.add(this);
+        // screen.loadableObjects.add(this);
+        // screen.disposableObjects.add(this);
     }
 
     private Vector2 lastPos = new Vector2(0, 0);
+
+    private void processAnim(RenderableComponent.AnimData animData, float delta) {
+        animData.stateTime += delta;
+        while (animData.stateTime >= 0.5f) {
+            animData.stateTime -= 0.5f;
+            animData.animIndex++;
+        }
+    }
+
+    public Entity getPlayerEntity() {
+        return playerEntity;
+    }
 
     @Override
     public void update(float delta) {
@@ -79,12 +152,6 @@ public class Player implements SortedDisplayable, Updatetable, Pausable, Initali
         movDir.scl(this.max_speed);
 
         body.setLinearVelocity(movDir);
-        // body.applyLinearImpulse(movDir, pos, true);
-        // Vector2 currentVelocity = body.getLinearVelocity();
-        // if (currentVelocity.len() > max_speed) {
-        // currentVelocity.nor().scl(max_speed);
-        // body.setLinearVelocity(currentVelocity);
-        // }
 
         Vector2 moveVec = new Vector2(pos.x - lastPos.x, pos.y - lastPos.y);
 

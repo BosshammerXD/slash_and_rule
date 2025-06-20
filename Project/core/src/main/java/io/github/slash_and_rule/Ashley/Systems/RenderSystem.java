@@ -47,7 +47,6 @@ public class RenderSystem extends EntitySystem {
 
         foregroundEntities = engine.getEntitiesFor(
                 Family.all(RenderableComponent.class, TransformComponent.class, ForegroundComponent.class).get());
-
     }
 
     @Override

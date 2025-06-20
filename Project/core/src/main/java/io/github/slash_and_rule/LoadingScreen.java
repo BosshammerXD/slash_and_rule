@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 import io.github.slash_and_rule.Interfaces.Initalizable;
+import io.github.slash_and_rule.Utils.AtlasManager;
 
 public class LoadingScreen extends BaseScreen {
     public static class MsgRunnable implements Runnable {
@@ -71,8 +72,9 @@ public class LoadingScreen extends BaseScreen {
 
     private Consumer<Screen> changeScreen;
 
-    public LoadingScreen(BaseScreen defaultScreen, AssetManager assetManager, Consumer<Screen> changeScreen) {
-        super(assetManager);
+    public LoadingScreen(BaseScreen defaultScreen, AssetManager assetManager, AtlasManager atlasManager,
+            Consumer<Screen> changeScreen) {
+        super(assetManager, atlasManager);
         this.nextScreen = null; // Initially, there is no next screen set.
         this.defaultScreen = defaultScreen;
         this.changeScreen = changeScreen; // Set the consumer for changing screens.

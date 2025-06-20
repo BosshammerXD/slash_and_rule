@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.SensorObject;
 
 public abstract class PhysicsScreen extends BaseScreen {
@@ -61,9 +62,33 @@ public abstract class PhysicsScreen extends BaseScreen {
         };
     };
 
-    public PhysicsScreen(AssetManager assetManager, boolean debug) {
-        super(assetManager);
+    public PhysicsScreen(AssetManager assetManager, AtlasManager atlasManager, boolean debug) {
+        super(assetManager, atlasManager);
         // Initialize the Box2D world and debug renderer
+        /*
+         * engine.addEntityListener(Family.all(PhysicsComponent.class), new
+         * EntityListener() {
+         * 
+         * @Override
+         * public void entityAdded(com.badlogic.ashley.core.Entity entity) {
+         * PhysicsComponent physicsComponent =
+         * entity.getComponent(PhysicsComponent.class);
+         * if (physicsComponent != null && physicsComponent.body != null) {
+         * world.setContactListener(contactListener);
+         * physicsComponent.body.setUserData(entity);
+         * }
+         * }
+         * 
+         * @Override
+         * public void entityRemoved(com.badlogic.ashley.core.Entity entity) {
+         * PhysicsComponent physicsComponent =
+         * entity.getComponent(PhysicsComponent.class);
+         * if (physicsComponent != null && physicsComponent.body != null) {
+         * physicsComponent.body.setUserData(null);
+         * }
+         * }
+         * });
+         */
         world.setContactListener(contactListener);
         debugRenderer.setDrawBodies(debug);
     }

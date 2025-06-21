@@ -12,12 +12,17 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.Ashley.Systems.CollisionSystem;
+import io.github.slash_and_rule.Ashley.Systems.PhysicsSystem;
 import io.github.slash_and_rule.Utils.AtlasManager;
+import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Utils.SensorObject;
 
 public abstract class PhysicsScreen extends BaseScreen {
     protected World world = new World(new Vector2(0, 0), true);
     protected Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+    private PhysicsBuilder physicsBuilder = new PhysicsBuilder(world);
 
     public ArrayList<SensorObject> sensors = new ArrayList<>();
 
@@ -65,32 +70,11 @@ public abstract class PhysicsScreen extends BaseScreen {
     public PhysicsScreen(AssetManager assetManager, AtlasManager atlasManager, boolean debug) {
         super(assetManager, atlasManager);
         // Initialize the Box2D world and debug renderer
-        /*
-         * engine.addEntityListener(Family.all(PhysicsComponent.class), new
-         * EntityListener() {
-         * 
-         * @Override
-         * public void entityAdded(com.badlogic.ashley.core.Entity entity) {
-         * PhysicsComponent physicsComponent =
-         * entity.getComponent(PhysicsComponent.class);
-         * if (physicsComponent != null && physicsComponent.body != null) {
-         * world.setContactListener(contactListener);
-         * physicsComponent.body.setUserData(entity);
-         * }
-         * }
-         * 
-         * @Override
-         * public void entityRemoved(com.badlogic.ashley.core.Entity entity) {
-         * PhysicsComponent physicsComponent =
-         * entity.getComponent(PhysicsComponent.class);
-         * if (physicsComponent != null && physicsComponent.body != null) {
-         * physicsComponent.body.setUserData(null);
-         * }
-         * }
-         * });
-         */
-        world.setContactListener(contactListener);
+        // world.setContactListener(contactListener);
         debugRenderer.setDrawBodies(debug);
+
+        engine.addSystem(new PhysicsSystem(Globals.PhysicsSystemPriority, world));
+        engine.addSystem(new CollisionSystem(Globals.CollisionSystemPriority, world));
     }
 
     @Override
@@ -107,5 +91,9 @@ public abstract class PhysicsScreen extends BaseScreen {
 
     public World getWorld() {
         return world;
+    }
+
+    public PhysicsBuilder getPhysicsBuilder() {
+        return physicsBuilder;
     }
 }

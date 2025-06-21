@@ -37,10 +37,11 @@ public class EntityManager {
         }
     }
 
-    public static void end() {
+    public static Entity end() {
         checkEngine();
         checkEntity();
         engine.addEntity(entity);
+        return entity;
     }
 
     private static void checkEngine() {
@@ -55,5 +56,15 @@ public class EntityManager {
             throw new IllegalStateException(
                     "Entity is not created. Please call EntityManager.start() before using EntityManager.getEntity().");
         }
+    }
+
+    public static Entity makeEntity(Component... components) {
+        checkEngine();
+        Entity newEntity = engine.createEntity();
+        for (Component component : components) {
+            newEntity.add(component);
+        }
+        engine.addEntity(newEntity);
+        return newEntity;
     }
 }

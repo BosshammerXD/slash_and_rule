@@ -64,7 +64,7 @@ public class RenderSystem extends EntitySystem {
         // Render midfield entities
         renderEntities(midfieldEntities, e -> {
             TransformComponent transform = tm.get(e);
-            return transform.z + transform.pos.y;
+            return transform.z + transform.position.y;
         });
         // Render foreground entities
         renderEntities(foregroundEntities, e -> tm.get(e).z);
@@ -81,8 +81,8 @@ public class RenderSystem extends EntitySystem {
 
         for (RenderableComponent.TextureData textureData : renderable.textures) {
             batch.draw(textureData.texture,
-                    transform.pos.x + textureData.offsetX,
-                    transform.pos.y + textureData.offsetY,
+                    transform.position.x + textureData.offsetX,
+                    transform.position.y + textureData.offsetY,
                     textureData.width, textureData.height);
         }
     }

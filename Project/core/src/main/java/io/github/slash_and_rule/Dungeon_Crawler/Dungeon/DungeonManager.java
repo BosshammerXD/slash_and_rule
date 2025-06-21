@@ -165,7 +165,7 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
                 this.neighbours[(originDir + 3) % 4].clear();
 
                 this.room.setNeighbours(this.neighbours, generation);
-                player.setPosition(spawnPos[0], spawnPos[1]);
+                /// layer.setPosition(spawnPos[0], spawnPos[1]);
                 this.screen.halt = false; // Resume screen processing
 
                 loadRoom(this.neighbours[originDir], dungeon.neighbours[originDir],

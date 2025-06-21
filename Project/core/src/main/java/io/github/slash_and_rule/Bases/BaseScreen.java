@@ -1,8 +1,11 @@
 package io.github.slash_and_rule.Bases;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
+import io.github.slash_and_rule.Ashley.Systems.InputSystem;
+import io.github.slash_and_rule.Ashley.Systems.MovementSystem;
 import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
 import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.Utils.AtlasManager;
@@ -90,8 +93,10 @@ public abstract class BaseScreen implements Screen {
 
         EntityManager.setEngine(engine);
 
-        engine.addSystem(new AnimationSystem(90, atlasManager));
-        engine.addSystem(new RenderSystem(100, camera));
+        engine.addSystem(new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
+        engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera));
+        engine.addSystem(new InputSystem(Globals.InputSystemPriority));
+        engine.addSystem(new MovementSystem(Globals.MovementSystemPriority));
     }
 
     @Override

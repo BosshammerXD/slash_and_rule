@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
+import io.github.slash_and_rule.Utils.Mappers;
 
 public class CollisionSystem extends EntitySystem {
     private static class GameContactListener implements ContactListener {
@@ -49,7 +50,7 @@ public class CollisionSystem extends EntitySystem {
 
     private final GameContactListener contactListener = new GameContactListener();
 
-    private ComponentMapper<SensorComponent> sensorMapper = ComponentMapper.getFor(SensorComponent.class);
+    private ComponentMapper<SensorComponent> sensorMapper = Mappers.sensorMapper;
 
     public CollisionSystem(int priority, World world) {
         super(priority);

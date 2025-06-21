@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Function;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -18,14 +17,13 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundCo
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.ForegroundComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Utils.Mappers;
 
 public class RenderSystem extends EntitySystem {
     private ImmutableArray<Entity> backgroundEntities;
     private ImmutableArray<Entity> midfieldEntities;
     private ImmutableArray<Entity> foregroundEntities;
-
-    private ComponentMapper<RenderableComponent> rm = ComponentMapper.getFor(RenderableComponent.class);
-    private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -60,14 +58,14 @@ public class RenderSystem extends EntitySystem {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         // Render background entities
-        renderEntities(backgroundEntities, e -> tm.get(e).z);
+        renderEntities(backgroundEntities, e -> Mappers.transformMapper.get(e).z);
         // Render midfield entities
         renderEntities(midfieldEntities, e -> {
-            TransformComponent transform = tm.get(e);
+            TransformComponent transform = Mappers.transformMapper.get(e);
             return transform.z + transform.position.y;
         });
         // Render foreground entities
-        renderEntities(foregroundEntities, e -> tm.get(e).z);
+        renderEntities(foregroundEntities, e -> Mappers.transformMapper.get(e).z);
         batch.end();
     }
 
@@ -76,10 +74,14 @@ public class RenderSystem extends EntitySystem {
     }
 
     private void renderEntity(Entity entities) {
-        RenderableComponent renderable = rm.get(entities);
-        TransformComponent transform = tm.get(entities);
+        RenderableComponent renderable = Mappers.renderableMapper.get(entities);
+        TransformComponent transform = Mappers.transformMapper.get(entities);
 
-        for (RenderableComponent.TextureData textureData : renderable.textures) {
+        TextureData[] textures = new TextureData[renderable.textures.length];
+        System.arraycopy(renderable.textures, 0, textures, 0, renderable.textures.length);
+        Arrays.sort(textures, Comparator.comparingInt(t -> t.priority));
+
+        for (RenderableComponent.TextureData textureData : textures) {
             batch.draw(textureData.texture,
                     transform.position.x + textureData.offsetX,
                     transform.position.y + textureData.offsetY,

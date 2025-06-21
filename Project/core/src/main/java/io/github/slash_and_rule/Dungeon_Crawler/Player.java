@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.InputManager;
+import io.github.slash_and_rule.Animations.AnimationFunctions;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
@@ -14,8 +15,8 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableCo
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Interfaces.Inputhandler;
 import io.github.slash_and_rule.Interfaces.Pausable;
+import io.github.slash_and_rule.Utils.Mappers;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -26,6 +27,8 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class Player implements Pausable, Disposable {
     private Entity playerEntity;
+    private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
+    private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
     public Player(PhysicsScreen screen, InputManager inputManager) {
         CircleShape colliderShape = new CircleShape();
@@ -40,7 +43,8 @@ public class Player implements Pausable, Disposable {
         RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
                 "entities/PlayerAtlas/PLayerAtlas.atlas",
                 "MoveDown",
-                this::processAnim);
+                AnimationFunctions.mappedTimes(
+                        AnimationFunctions.makeNameTimes(animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
         TextureData moveData = new TextureData() {
             {
                 animData = moveAnimData;
@@ -54,7 +58,8 @@ public class Player implements Pausable, Disposable {
         RenderableComponent.AnimData capeMoveAnimData = new RenderableComponent.AnimData(
                 "entities/PlayerAtlas/PLayerAtlas.atlas",
                 "CapeMoveDown",
-                this::processAnim);
+                AnimationFunctions.mappedTimes(
+                        AnimationFunctions.makeNameTimes(capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
         TextureData capeMoveData = new TextureData() {
             {
                 animData = capeMoveAnimData;
@@ -93,32 +98,18 @@ public class Player implements Pausable, Disposable {
                 pC);
     }
 
-    private void processAnim(RenderableComponent.AnimData animData, float delta) {
-        animData.stateTime += delta;
-        while (animData.stateTime >= 0.1f) {
-            animData.stateTime -= 0.5f;
-            animData.animIndex++;
-        }
-    }
-
     private static class PlayerInput implements Inputhandler {
-        public Vector2 lastpos = new Vector2(0, 0);
-
         private OrthographicCamera camera;
 
         public PlayerInput(OrthographicCamera camera) {
             this.camera = camera;
         }
 
-        private ComponentMapper<TransformComponent> transformMapper = ComponentMapper
-                .getFor(TransformComponent.class);
-        private ComponentMapper<MovementComponent> movementMapper = ComponentMapper
-                .getFor(MovementComponent.class);
-
         @Override
         public void handleInput(Entity entity, float deltaTime) {
-            MovementComponent movement = movementMapper.get(entity);
-            if (movement == null) {
+            MovementComponent movement = Mappers.movementMapper.get(entity);
+            RenderableComponent render = Mappers.renderableMapper.get(entity);
+            if (movement == null || render == null) {
                 return;
             }
             movement.velocity.set(0, 0); // Reset velocity each frame
@@ -137,13 +128,31 @@ public class Player implements Pausable, Disposable {
             movement.velocity.nor(); // Normalize the velocity vector
             movement.velocity.scl(movement.max_speed); // Scale by max speed
 
-            TransformComponent transform = transformMapper.get(entity);
+            TransformComponent transform = Mappers.transformMapper.get(entity);
             if (transform == null) {
                 return;
             }
             Vector2 pos = transform.position;
 
             camera.position.set(pos.x, pos.y, 0);
+
+            Vector2 moveVec = new Vector2(
+                    pos.x - transform.lastPosition.x,
+                    pos.y - transform.lastPosition.y);
+
+            AnimationFunctions.movementAnimData(
+                    render.textures[0].animData, moveVec,
+                    animNames,
+                    deltaTime, 1f);
+            if (render.textures[0].animData.name.equals("MoveUp")) {
+                render.textures[1].priority = 2;
+            } else {
+                render.textures[1].priority = 0;
+            }
+            AnimationFunctions.movementAnimData(
+                    render.textures[1].animData, moveVec,
+                    capeAnimNames,
+                    deltaTime, 1f);
         }
     }
 

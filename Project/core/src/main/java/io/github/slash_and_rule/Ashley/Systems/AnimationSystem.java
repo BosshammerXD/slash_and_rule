@@ -1,6 +1,5 @@
 package io.github.slash_and_rule.Ashley.Systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -8,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Utils.AtlasManager;
+import io.github.slash_and_rule.Utils.Mappers;
 
 public class AnimationSystem extends IteratingSystem {
-    private ComponentMapper<RenderableComponent> renderableMapper = ComponentMapper.getFor(RenderableComponent.class);
 
     private AtlasManager atlasManager;
 
@@ -22,7 +21,7 @@ public class AnimationSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        RenderableComponent renderable = renderableMapper.get(entity);
+        RenderableComponent renderable = Mappers.renderableMapper.get(entity);
         if (renderable == null || renderable.textures == null) {
             return;
         }

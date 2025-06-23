@@ -63,7 +63,7 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
 
     private Generation loadGeneration = new Generation();
 
-    public DungeonManager(PhysicsScreen screen, InputManager inputManager,
+    public DungeonManager(PhysicsScreen screen,
             Player player,
             String assetFolder,
             int depth, int maxDifficulty,
@@ -111,7 +111,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
         dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
                 random, branchcap, branchmul);
         loader.threads.add(new ThreadData(dungeon, () -> loadRooms(loader)));
-        // loader.threads.add(new ThreadData(() -> this.setRendererWhenReady()));
     }
 
     private void loadRooms(LoadingScreen loader) {
@@ -165,7 +164,7 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
                 this.neighbours[(originDir + 3) % 4].clear();
 
                 this.room.setNeighbours(this.neighbours, generation);
-                /// layer.setPosition(spawnPos[0], spawnPos[1]);
+                /// player.setPosition(spawnPos[0], spawnPos[1]);
                 this.screen.halt = false; // Resume screen processing
 
                 loadRoom(this.neighbours[originDir], dungeon.neighbours[originDir],

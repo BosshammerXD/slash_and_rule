@@ -71,10 +71,12 @@ public class CollisionSystem extends EntitySystem {
             SensorComponent sensorA = sensorMapper.get(entityA);
             SensorComponent sensorB = sensorMapper.get(entityB);
 
-            if (sensorA != null && sensorA.collisionHandler != null) {
-                sensorA.collisionHandler.handleCollision(entityA, entityB);
-            } else if (sensorB != null && sensorB.collisionHandler != null) {
-                sensorB.collisionHandler.handleCollision(entityB, entityA);
+            if (sensorA != null) {
+                sensorA.collisionHandler.handleCollision(entityA, contact.getFixtureA(), entityB,
+                        contact.getFixtureB());
+            } else if (sensorB != null) {
+                sensorB.collisionHandler.handleCollision(entityB, contact.getFixtureB(), entityA,
+                        contact.getFixtureA());
             }
         }
         contactListener.clearContacts();

@@ -1,7 +1,6 @@
 package io.github.slash_and_rule.Ashley.Systems;
 
 import java.util.ArrayDeque;
-import java.util.function.Consumer;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -12,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonRoom;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -24,8 +25,11 @@ public class DungeonSystem extends EntitySystem {
 
     private Engine engine;
 
-    public DungeonSystem(int priority) {
+    private DungeonManager dungeonManager;
+
+    public DungeonSystem(int priority, DungeonManager dungeonManager) {
         super(priority);
+        this.dungeonManager = dungeonManager;
         // TODO
     }
 
@@ -58,26 +62,17 @@ public class DungeonSystem extends EntitySystem {
             return;
         }
         Fixture[] doorComponents = dungeonComponent.doors[direction];
-        Consumer<Fixture> action;
-        if (open) {
-            action = fixture -> {
-                if (fixture.getUserData() instanceof Integer) {
-                    set_door_filter(fixture, Globals.PlayerCategory);
-                } else {
-                    set_door_filter(fixture, (short) (Globals.ItemCategory | Globals.ProjectileCategory));
-                }
-            };
-        } else {
-            action = fixture -> {
-                if (fixture.getUserData() instanceof Integer) {
-                    set_door_filter(fixture, (short) 0);
-                } else {
-                    set_door_filter(fixture, Globals.WallMask);
-                }
-            };
-        }
+        short filter1 = open ? Globals.PlayerCategory : (short) 0;
+        short filter2 = open ? (short) (Globals.ItemCategory | Globals.ProjectileCategory) : Globals.WallMask;
         for (Fixture doorComponent : doorComponents) {
-            action.accept(doorComponent);
+            if (doorComponent == null) {
+                continue;
+            }
+            if (doorComponent.getUserData() instanceof Integer) {
+                set_door_filter(doorComponent, filter1);
+            } else {
+                set_door_filter(doorComponent, filter2);
+            }
         }
     }
 
@@ -139,6 +134,7 @@ public class DungeonSystem extends EntitySystem {
         schedule.clear();
         // Set the current room inactive and the new room active
         set_room_active(room, false);
+        set_open_doors(false); // close doors so when we move back, the doors are closed
         set_room_active(neighbours[direction], true);
         // shift the new room to the current room and the old room to the correct
         // neighbour
@@ -146,10 +142,12 @@ public class DungeonSystem extends EntitySystem {
         neighbours[(direction + 2) % 4] = room;
         room = neighbours[direction];
         neighbours[direction] = null;
+        dungeonManager.move(direction);
         // clear the rest of the neighbours
         clear_room((direction + 1) % 4);
         clear_room((direction + 3) % 4);
-
+        // set the doors
+        set_open_doors(dungeonManager.getRoom().cleared);
         // schedule the new rooms for Generation
     }
 }

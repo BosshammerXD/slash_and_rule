@@ -67,4 +67,22 @@ public class EntityManager {
         engine.addEntity(newEntity);
         return newEntity;
     }
+
+    private Entity obj_entity;
+
+    public EntityManager() {
+        this.obj_entity = new Entity();
+    }
+
+    public Entity reset() {
+        this.obj_entity = new Entity();
+        return this.obj_entity;
+    }
+
+    public Entity build(Component... components) {
+        for (Component component : components) {
+            obj_entity.add(component);
+        }
+        return obj_entity;
+    }
 }

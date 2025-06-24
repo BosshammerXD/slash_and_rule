@@ -270,4 +270,16 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
             renderer.render();
         }
     }
+
+    public void move(int direction) {
+        dungeon = dungeon.neighbours[direction];
+    }
+
+    public DungeonRoom getRoom() {
+        return dungeon;
+    }
+
+    public DungeonRoom[] getNeighbours() {
+        return dungeon.neighbours;
+    }
 }

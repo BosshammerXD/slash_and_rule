@@ -307,7 +307,7 @@ public class RoomDataHandler implements Disposable {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(data.sensor.width, data.sensor.height);
             this.sensorHolder = new SensorObject(screen, 0, 0, 0,
-                    data.sensor.x, data.sensor.y, Globals.PlayerSensorCategory, Globals.PlayerCategory,
+                    data.sensor.x, data.sensor.y, Globals.SensorCategory, Globals.PlayerCategory,
                     shape, data.type, false, fixture -> notifyRoomChange(data.type));
         }, this.generation, myGeneration);
         screen.schedule_generation(() -> {

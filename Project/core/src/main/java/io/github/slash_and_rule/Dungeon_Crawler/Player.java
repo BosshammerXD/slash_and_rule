@@ -34,14 +34,14 @@ public class Player implements Pausable, Disposable {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 
-        screen.getAtlasManager().add("entities/PlayerAtlas/PLayerAtlas.atlas");
+        screen.getAtlasManager().add("entities/PlayerAtlas/PlayerAtlas.atlas");
 
         TransformComponent tC = new TransformComponent();
         tC.position = new Vector2(2, 2); // Initial position of the player
         tC.rotation = 0f; // Initial rotation of the player
 
         RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
-                "entities/PlayerAtlas/PLayerAtlas.atlas",
+                "entities/PlayerAtlas/PlayerAtlas.atlas",
                 "MoveDown",
                 AnimationFunctions.mappedTimes(
                         AnimationFunctions.makeNameTimes(animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
@@ -56,7 +56,7 @@ public class Player implements Pausable, Disposable {
             }
         };
         RenderableComponent.AnimData capeMoveAnimData = new RenderableComponent.AnimData(
-                "entities/PlayerAtlas/PLayerAtlas.atlas",
+                "entities/PlayerAtlas/PlayerAtlas.atlas",
                 "CapeMoveDown",
                 AnimationFunctions.mappedTimes(
                         AnimationFunctions.makeNameTimes(capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));

@@ -1,5 +1,9 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.function.Consumer;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -12,53 +16,137 @@ import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.DoorData;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
+import io.github.slash_and_rule.Interfaces.CollisionHandler;
 
 public class DungeonBuilder {
     private EntityManager entityManager = new EntityManager();
-    private RoomData roomData;
 
     private Entity entity;
 
     private DungeonComponent dungeonComponent;
     private PhysicsComponent physicsComponent;
-    private Fixture[] physicsFixtures;
-    private Fixture[] doorFixtures;
+    private SensorComponent sensorComponent;
+    private ArrayDeque<Fixture> physicsFixtures;
+    private Fixture[][] doorFixtures;
+    private Vector2[] spawnPoints = new Vector2[4]; // 0: left, 1: down, 2: right, 3: up
 
     private PhysicsBuilder physicsBuilder;
 
-    public DungeonBuilder(RoomData data, PhysicsBuilder physicsBuilder) {
+    public DungeonBuilder(PhysicsBuilder physicsBuilder) {
         this.physicsBuilder = physicsBuilder;
+    }
+        
+    public Entity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
+        setup(data, collisionHandler);
 
-        entity = entityManager.reset();
+        for (int i = 0; i < data.walls.length; i++) {
+            ColliderData wall = data.walls[i];
+            makeWall(wall, physicsComponent.body);
+        }
 
-        this.roomData = data;
+        for (DoorData door : data.doors) {
+            makeDoor(door, neighbours, physicsComponent.body);
+        }
+
+        this.physicsComponent.fixtures = makeFixtures();
+        this.dungeonComponent.spawnPoints = spawnPoints;
+
+        this.dungeonComponent.doors = doorFixtures;
+
+        entityManager.build(
+            this.physicsComponent,
+            this.dungeonComponent
+        );
+
+        this.entityManager.finish();
+
+        return this.entity;
+    }
+
+    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours, CollisionHandler collisionHandler, Consumer<Entity> onFinish) {
+        schedule.add(() -> setup(data, collisionHandler));
+
+        for (int i = 0; i < data.walls.length; i++) {
+            ColliderData wall = data.walls[i];
+            schedule.add(() -> makeWall(wall, physicsComponent.body));
+        }
+
+        for (int i = 0; i < 4; i++) {
+            DoorData door = data.doors[i];
+            schedule.add(() -> makeDoor(door, neighbours, physicsComponent.body));
+        }
+
+        schedule.add(() -> {
+            this.physicsComponent.fixtures = makeFixtures();
+            this.dungeonComponent.spawnPoints = spawnPoints;
+            this.dungeonComponent.doors = doorFixtures;
+        });
+
+        schedule.add(() -> entityManager.build(
+            this.physicsComponent,
+            this.dungeonComponent
+        ));
+
+        schedule.add(() -> {
+            this.entityManager.finish();
+            if (onFinish != null) {
+                onFinish.accept(this.entity);
+            }
+        });
+    }
+
+    private int dirToIndex(String direction) {
+        switch (direction.toLowerCase()) {
+            case "left":
+                return 0;
+            case "bottom":
+                return 1;
+            case "right":
+                return 2;
+            case "top":
+                return 3;
+            default:
+                throw new IllegalArgumentException("Invalid direction: " + direction);
+        }
+    }
+
+    private void setup(RoomData data, CollisionHandler collisionHandler) {
+        this.entity = entityManager.reset();
+
+        this.physicsFixtures = new ArrayDeque<>();
+        this.doorFixtures = new Fixture[4][];
+
         this.dungeonComponent = new DungeonComponent();
         this.dungeonComponent.map = data.map;
+        this.physicsComponent = new PhysicsComponent();
 
         this.physicsComponent = new PhysicsComponent();
         this.physicsComponent.body = physicsBuilder.makeBody(
                 entity, BodyType.StaticBody, 0, false);
+        
+        this.sensorComponent = new SensorComponent();
+        this.sensorComponent.collisionHandler = collisionHandler;
 
-        this.physicsFixtures = new Fixture[data.walls.length];
-        this.doorFixtures = new Fixture[data.doors.length * 2];
+        this.physicsComponent.body.setUserData(this.entity);
+    }
 
-        for (int i = 0; i < data.walls.length; i++) {
-            ColliderData wall = data.walls[i];
-            makeWall(i, wall, physicsComponent.body);
+    private HashMap<String, Fixture> makeFixtures() {
+        HashMap<String, Fixture> doorFixtures = new HashMap<>();
+        int index = 0;
+        for (Fixture fixture : physicsFixtures) {
+            String name = "wall_" + index++;
+            doorFixtures.put(name, fixture);
         }
-
-        for (int i = 0; i < data.doors.length; i++) {
-            DoorData door = data.doors[i];
-            makeDoor(i * 2, door, physicsComponent.body);
-        }
+        return doorFixtures;
     }
 
     private Shape makeRectangleShape(ColliderData collider) {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(collider.width / 2, collider.height / 2, new Vector2(collider.x, collider.y), 0);
+        shape.setAsBox(collider.width, collider.height, new Vector2(collider.x, collider.y), 0);
         return shape;
     }
 
@@ -67,18 +155,29 @@ public class DungeonBuilder {
         return physicsBuilder.addFixture(body, shape, Globals.WallCategory, Globals.WallMask, false);
     }
 
-    private void makeWall(int index, ColliderData wall, Body body) {
-        physicsFixtures[index] = buildWall(wall, body);
+    private void makeWall(ColliderData wall, Body body) {
+        physicsFixtures.add(buildWall(wall, body));
     }
 
-    private void makeDoor(int index, DoorData door, Body body) {
+    private void makeDoor(DoorData door, Object[] neighbours, Body body) {
+        // TODO: Add the picture of the door
+        int index = dirToIndex(door.type);
+        Object neighbour = neighbours[index];
+        if (neighbour == null) { 
+            makeWall(door.collider, body);
+            return;
+        }
+
+        doorFixtures[index] = new Fixture[2];
+
         ColliderData doorwall = door.collider;
-        doorFixtures[index] = buildWall(doorwall, body);
+        doorFixtures[index][0] = buildWall(doorwall, body);
 
         Shape doorShape = makeRectangleShape(door.sensor);
-        doorFixtures[index + 1] = physicsBuilder.addFixture(
-                body, doorShape, Globals.PlayerSensorCategory, (short) 0, true);
+        doorFixtures[index][1] = physicsBuilder.addFixture(
+                body, doorShape, Globals.SensorCategory, (short) 0, true);
 
+        spawnPoints[index] = new Vector2(door.sensor.x, door.sensor.y);
     }
 
 }

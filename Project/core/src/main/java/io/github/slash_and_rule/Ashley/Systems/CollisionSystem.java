@@ -60,6 +60,7 @@ public class CollisionSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         for (Contact contact : contactListener.getContacts()) {
+            System.out.println("Collision");
             Object userDataA = contact.getFixtureA().getBody().getUserData();
             Object userDataB = contact.getFixtureB().getBody().getUserData();
             if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {

@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
-import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
@@ -49,7 +48,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     private float branchmul;
     private int maxDifficulty;
     private DungeonRoom dungeon;
-    private Player player;
 
     private PhysicsScreen screen;
 
@@ -62,9 +60,9 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     private OrthogonalTiledMapRenderer renderer;
 
     private Generation loadGeneration = new Generation();
+    private Consumer<LoadingScreen> onDungeonGenerated;
 
     public DungeonManager(PhysicsScreen screen,
-            Player player,
             String assetFolder,
             int depth, int maxDifficulty,
             int branchcap,
@@ -75,7 +73,6 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
         this.branchcap = branchcap;
         this.branchmul = branchmul;
         this.maxDifficulty = maxDifficulty;
-        this.player = player;
 
         this.room = new RoomDataHandler(screen, this::changeRoom, loadGeneration);
         this.neighbours = new RoomDataHandler[] {
@@ -95,7 +92,11 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
 
         screen.loadableObjects.add(this);
         screen.disposableObjects.add(this);
-        screen.drawableObjects.add(this);
+        //screen.drawableObjects.add(this);
+    }
+
+    public void setOnDungeonGenerated(Consumer<LoadingScreen> onDungeonGenerated) {
+        this.onDungeonGenerated = onDungeonGenerated;
     }
 
     // Split up dungeon into Levels
@@ -106,25 +107,15 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
 
     @Override
     public void init(LoadingScreen loader) {
-        this.renderer = new OrthogonalTiledMapRenderer(null, 1 / 16f);
+        //this.renderer = new OrthogonalTiledMapRenderer(null, 1 / 16f);
+        System.out.println("DungeonManager: Initializing Dungeon with depth " + depth + ", maxDifficulty " + maxDifficulty
+                + ", branchcap " + branchcap + ", branchmul " + branchmul);
         BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
         dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
                 random, branchcap, branchmul);
-        loader.threads.add(new ThreadData(dungeon, () -> loadRooms(loader)));
-    }
-
-    private void loadRooms(LoadingScreen loader) {
-        loadFirstRoom(this.room, dungeon, loader, () -> this.renderer.setMap(this.room.map));
-
-        int count = 0;
-        for (DungeonRoom neighbour : dungeon.neighbours) {
-            if (neighbour != null) {
-                loadRoomInit(this.neighbours[count], neighbour, loader);
-            } else {
-                this.neighbours[count].clear();
-            }
-            count++;
-        }
+        loader.threads.add(new ThreadData(dungeon, () -> {
+            System.out.println("Dungeon generated, loading rooms...");
+            onDungeonGenerated.accept(loader);}));
     }
 
     private boolean processing = false;
@@ -178,7 +169,11 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
         }, this.loadGeneration, generation);
     }
 
-    private void getData(RoomDataHandler handler, DungeonRoom room, BaseScreen myScreen, Consumer<RoomData> callback) {
+    public void getData(DungeonRoom room, Consumer<RoomData> callback) {
+        getData(room, this.screen, callback);
+    }
+
+    public void getData(DungeonRoom room, BaseScreen myScreen, Consumer<RoomData> callback) {
         if (room == null) {
             return; // No room to load
         }
@@ -194,26 +189,10 @@ public class DungeonManager implements Initalizable, Disposable, Displayable {
     }
 
     private void loadRoom(RoomDataHandler handler, DungeonRoom room, int generation) {
-        getData(handler, room, screen, newData -> {
+        getData(room, screen, newData -> {
             if (loadGeneration.get() != generation) {
                 return; // Ignore if generation has changed
             }
-            handler.loadRoomData(newData, room);
-        });
-    }
-
-    private void loadFirstRoom(RoomDataHandler handler, DungeonRoom room, LoadingScreen loader,
-            Runnable onLoad) {
-        handler.clear();
-        getData(handler, room, loader, newData -> {
-            handler.loadRoomData(newData, room, true, true, this.neighbours);
-            handler.addCallback(myData -> this.renderer.setMap(myData.map), 0);
-        });
-    }
-
-    private void loadRoomInit(RoomDataHandler handler, DungeonRoom room, LoadingScreen loader) {
-        handler.clear();
-        getData(handler, room, loader, newData -> {
             handler.loadRoomData(newData, room);
         });
     }

@@ -86,7 +86,6 @@ public abstract class PhysicsScreen extends BaseScreen {
         // Update the Box2D world
         camera.update();
         debugRenderer.render(world, camera.combined);
-        world.step(delta, 6, 2);
     }
 
     public World getWorld() {

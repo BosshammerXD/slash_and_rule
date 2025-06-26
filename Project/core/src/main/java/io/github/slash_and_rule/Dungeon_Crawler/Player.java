@@ -26,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
 
 public class Player implements Pausable, Disposable {
+    private EntityManager entityManager = new EntityManager();
     private Entity playerEntity;
     private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
     private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
@@ -35,6 +36,8 @@ public class Player implements Pausable, Disposable {
         colliderShape.setRadius(7 / 16f);
 
         screen.getAtlasManager().add("entities/PlayerAtlas/PlayerAtlas.atlas");
+
+        this.playerEntity = entityManager.reset();
 
         TransformComponent tC = new TransformComponent();
         tC.position = new Vector2(2, 2); // Initial position of the player
@@ -76,7 +79,7 @@ public class Player implements Pausable, Disposable {
                 capeMoveData
         };
         MovementComponent mC = new MovementComponent();
-        mC.max_speed = 5f;
+        mC.max_speed = 10f;
         mC.velocity = new Vector2(0, 0);
 
         ControllableComponent cC = new ControllableComponent();
@@ -94,8 +97,8 @@ public class Player implements Pausable, Disposable {
                         pC.body, colliderShape, 1f,
                         Globals.PlayerCategory, Globals.PlayerMask, false));
 
-        this.playerEntity = EntityManager.makeEntity(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC,
-                pC);
+        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC);
+        entityManager.finish();
     }
 
     private static class PlayerInput implements Inputhandler {

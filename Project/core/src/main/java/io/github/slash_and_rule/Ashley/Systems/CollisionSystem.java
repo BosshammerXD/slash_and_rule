@@ -60,14 +60,14 @@ public class CollisionSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         for (Contact contact : contactListener.getContacts()) {
-            System.out.println("Collision");
             Object userDataA = contact.getFixtureA().getBody().getUserData();
             Object userDataB = contact.getFixtureB().getBody().getUserData();
             if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
+                System.out.println("Skipping - not entities");
                 continue; // Skip if user data is not an Entity
             }
             Entity entityA = (Entity) userDataA;
-            Entity entityB = (Entity) userDataA;
+            Entity entityB = (Entity) userDataB;
 
             SensorComponent sensorA = sensorMapper.get(entityA);
             SensorComponent sensorB = sensorMapper.get(entityB);

@@ -17,7 +17,7 @@ public class DungeonRoom implements Runnable {
     private String[][][] representation;
     private Runnable runFunc;
     public String path = null;
-    public boolean cleared = false;
+    public boolean cleared = true;
 
     public DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random,
             int branchDepthCap, float branchmul) {

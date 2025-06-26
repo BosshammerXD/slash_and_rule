@@ -39,7 +39,7 @@ public class DungeonBuilder {
     public DungeonBuilder(PhysicsBuilder physicsBuilder) {
         this.physicsBuilder = physicsBuilder;
     }
-        
+
     public Entity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
         setup(data, collisionHandler);
 
@@ -58,16 +58,17 @@ public class DungeonBuilder {
         this.dungeonComponent.doors = doorFixtures;
 
         entityManager.build(
-            this.physicsComponent,
-            this.dungeonComponent
-        );
+                this.physicsComponent,
+                this.dungeonComponent,
+                this.sensorComponent);
 
         this.entityManager.finish();
 
         return this.entity;
     }
 
-    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours, CollisionHandler collisionHandler, Consumer<Entity> onFinish) {
+    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
+            CollisionHandler collisionHandler, Consumer<Entity> onFinish) {
         schedule.add(() -> setup(data, collisionHandler));
 
         for (int i = 0; i < data.walls.length; i++) {
@@ -75,8 +76,7 @@ public class DungeonBuilder {
             schedule.add(() -> makeWall(wall, physicsComponent.body));
         }
 
-        for (int i = 0; i < 4; i++) {
-            DoorData door = data.doors[i];
+        for (DoorData door : data.doors) {
             schedule.add(() -> makeDoor(door, neighbours, physicsComponent.body));
         }
 
@@ -87,9 +87,9 @@ public class DungeonBuilder {
         });
 
         schedule.add(() -> entityManager.build(
-            this.physicsComponent,
-            this.dungeonComponent
-        ));
+                this.physicsComponent,
+                this.dungeonComponent,
+                this.sensorComponent));
 
         schedule.add(() -> {
             this.entityManager.finish();
@@ -127,7 +127,7 @@ public class DungeonBuilder {
         this.physicsComponent = new PhysicsComponent();
         this.physicsComponent.body = physicsBuilder.makeBody(
                 entity, BodyType.StaticBody, 0, false);
-        
+
         this.sensorComponent = new SensorComponent();
         this.sensorComponent.collisionHandler = collisionHandler;
 
@@ -163,7 +163,7 @@ public class DungeonBuilder {
         // TODO: Add the picture of the door
         int index = dirToIndex(door.type);
         Object neighbour = neighbours[index];
-        if (neighbour == null) { 
+        if (neighbour == null) {
             makeWall(door.collider, body);
             return;
         }
@@ -177,7 +177,11 @@ public class DungeonBuilder {
         doorFixtures[index][1] = physicsBuilder.addFixture(
                 body, doorShape, Globals.SensorCategory, (short) 0, true);
 
-        spawnPoints[index] = new Vector2(door.sensor.x, door.sensor.y);
+        // Set the door direction as UserData so the collision handler knows which door
+        // was touched
+        doorFixtures[index][1].setUserData(index);
+
+        spawnPoints[index] = new Vector2(door.spawnPoint[0], door.spawnPoint[1]);
     }
 
 }

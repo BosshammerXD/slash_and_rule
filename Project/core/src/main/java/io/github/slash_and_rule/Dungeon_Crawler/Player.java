@@ -92,7 +92,7 @@ public class Player implements Pausable, Disposable {
                 "Collider",
                 screen.getPhysicsBuilder().addFixture(
                         pC.body, colliderShape, 1f,
-                        Globals.PlayerCategory, Globals.PlayerMask));
+                        Globals.PlayerCategory, Globals.PlayerMask, false));
 
         this.playerEntity = EntityManager.makeEntity(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC,
                 pC);

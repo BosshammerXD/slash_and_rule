@@ -3,10 +3,10 @@ package io.github.slash_and_rule.Utils;
 import com.badlogic.ashley.core.ComponentMapper;
 
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 

@@ -1,7 +1,6 @@
 package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem;
@@ -75,7 +74,6 @@ public abstract class BaseScreen implements Screen {
 
     public boolean halt = false;
 
-    protected InputManager inputManager = new InputManager();
     protected SpriteBatch batch = new SpriteBatch();
 
     public OrthographicCamera camera = new OrthographicCamera();
@@ -87,7 +85,6 @@ public abstract class BaseScreen implements Screen {
     public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
 
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
-        Gdx.input.setInputProcessor(inputManager);
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
 

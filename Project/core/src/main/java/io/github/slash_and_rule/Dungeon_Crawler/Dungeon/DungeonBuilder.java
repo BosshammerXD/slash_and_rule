@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;

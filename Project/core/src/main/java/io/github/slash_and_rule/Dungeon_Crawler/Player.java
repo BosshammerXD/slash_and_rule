@@ -1,8 +1,8 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
+import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.InputManager;
 import io.github.slash_and_rule.Animations.AnimationFunctions;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
@@ -13,7 +13,6 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComp
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
-import io.github.slash_and_rule.Interfaces.Inputhandler;
 import io.github.slash_and_rule.Interfaces.Pausable;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -31,7 +30,10 @@ public class Player implements Pausable, Disposable {
     private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
     private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
-    public Player(PhysicsScreen screen, InputManager inputManager) {
+    private TextureData moveTextureData;
+    private TextureData capeTextureData;
+
+    public Player(PhysicsScreen screen) {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 
@@ -43,41 +45,37 @@ public class Player implements Pausable, Disposable {
         tC.position = new Vector2(2, 2); // Initial position of the player
         tC.rotation = 0f; // Initial rotation of the player
 
+        RenderableComponent rC = new RenderableComponent();
         RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
                 "entities/PlayerAtlas/PlayerAtlas.atlas",
                 "MoveDown",
                 AnimationFunctions.mappedTimes(
                         AnimationFunctions.makeNameTimes(animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
-        TextureData moveData = new TextureData() {
+        this.moveTextureData = new TextureData() {
             {
                 animData = moveAnimData;
-                priority = 1;
                 width = 2f;
                 height = 2f;
                 offsetX = -1f;
                 offsetY = -0.5f;
             }
         };
+        rC.addTextureDatas(1, this.moveTextureData);
         RenderableComponent.AnimData capeMoveAnimData = new RenderableComponent.AnimData(
                 "entities/PlayerAtlas/PlayerAtlas.atlas",
                 "CapeMoveDown",
                 AnimationFunctions.mappedTimes(
                         AnimationFunctions.makeNameTimes(capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
-        TextureData capeMoveData = new TextureData() {
+        this.capeTextureData = new TextureData() {
             {
                 animData = capeMoveAnimData;
-                priority = 2;
                 width = 2f;
                 height = 2f;
                 offsetX = -1f;
                 offsetY = -0.5f;
             }
         };
-        RenderableComponent rC = new RenderableComponent();
-        rC.textures = new TextureData[] {
-                moveData,
-                capeMoveData
-        };
+        rC.addTextureDatas(2, this.capeTextureData);
         MovementComponent mC = new MovementComponent();
         mC.max_speed = 10f;
         mC.velocity = new Vector2(0, 0);
@@ -101,61 +99,67 @@ public class Player implements Pausable, Disposable {
         entityManager.finish();
     }
 
-    private static class PlayerInput implements Inputhandler {
+    private class PlayerInput extends Inputhandler {
         private OrthographicCamera camera;
+        private TransformComponent tC;
 
         public PlayerInput(OrthographicCamera camera) {
             this.camera = camera;
         }
 
         @Override
-        public void handleInput(Entity entity, float deltaTime) {
-            MovementComponent movement = Mappers.movementMapper.get(entity);
-            RenderableComponent render = Mappers.renderableMapper.get(entity);
-            if (movement == null || render == null) {
-                return;
-            }
-            movement.velocity.set(0, 0); // Reset velocity each frame
+        public void preEvents(Entity entity) {
+            tC = Mappers.transformMapper.get(entity);
+        }
+
+        @Override
+        public void pollevent() {
+            movement();
+            camera.position.set(tC.position.x, tC.position.y, 0);
+            apply(Mappers.renderableMapper, this::animation);
+        }
+
+        private void movement() {
+            Vector2 velocity = new Vector2(0, 0);
             if (Gdx.input.isKeyPressed(Globals.MoveUpKey)) {
-                movement.velocity.y += 1;
+                velocity.y += 1;
             }
             if (Gdx.input.isKeyPressed(Globals.MoveDownKey)) {
-                movement.velocity.y -= 1;
+                velocity.y -= 1;
             }
             if (Gdx.input.isKeyPressed(Globals.MoveLeftKey)) {
-                movement.velocity.x -= 1;
+                velocity.x -= 1;
             }
             if (Gdx.input.isKeyPressed(Globals.MoveRightKey)) {
-                movement.velocity.x += 1;
+                velocity.x += 1;
             }
-            movement.velocity.nor(); // Normalize the velocity vector
-            movement.velocity.scl(movement.max_speed); // Scale by max speed
+            velocity.nor(); // Normalize the velocity vector
+            apply(Mappers.movementMapper, comp -> {
+                comp.velocity.set(velocity).scl(comp.max_speed);
+            });
+        }
 
-            TransformComponent transform = Mappers.transformMapper.get(entity);
-            if (transform == null) {
+        private void animation(RenderableComponent comp) {
+            if (tC == null) {
                 return;
             }
-            Vector2 pos = transform.position;
-
-            camera.position.set(pos.x, pos.y, 0);
-
             Vector2 moveVec = new Vector2(
-                    pos.x - transform.lastPosition.x,
-                    pos.y - transform.lastPosition.y);
+                    tC.position.x - tC.lastPosition.x,
+                    tC.position.y - tC.lastPosition.y);
 
             AnimationFunctions.movementAnimData(
-                    render.textures[0].animData, moveVec,
+                    moveTextureData.animData, moveVec,
                     animNames,
-                    deltaTime, 1f);
-            if (render.textures[0].animData.name.equals("MoveUp")) {
-                render.textures[1].priority = 2;
+                    delta, 1f);
+            if (moveTextureData.animData.name.equals("MoveUp")) {
+                comp.changePriority(0, 2, capeTextureData);
             } else {
-                render.textures[1].priority = 0;
+                comp.changePriority(2, 0, capeTextureData);
             }
             AnimationFunctions.movementAnimData(
-                    render.textures[1].animData, moveVec,
+                    capeTextureData.animData, moveVec,
                     capeAnimNames,
-                    deltaTime, 1f);
+                    delta, 1f);
         }
     }
 

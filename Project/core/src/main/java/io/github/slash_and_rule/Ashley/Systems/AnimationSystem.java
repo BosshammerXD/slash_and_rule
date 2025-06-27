@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -25,7 +26,7 @@ public class AnimationSystem extends IteratingSystem {
         if (renderable == null || renderable.textures == null) {
             return;
         }
-        for (RenderableComponent.TextureData textureData : renderable.textures) {
+        for (TextureData textureData : renderable.getAllTextures()) {
             RenderableComponent.AnimData animData = textureData.animData;
             if (animData == null) {
                 continue;

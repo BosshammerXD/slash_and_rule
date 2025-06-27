@@ -14,9 +14,9 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonRoom;

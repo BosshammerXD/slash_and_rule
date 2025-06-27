@@ -11,6 +11,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Affine2;
 
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
@@ -77,15 +78,16 @@ public class RenderSystem extends EntitySystem {
         RenderableComponent renderable = Mappers.renderableMapper.get(entities);
         TransformComponent transform = Mappers.transformMapper.get(entities);
 
-        TextureData[] textures = new TextureData[renderable.textures.length];
-        System.arraycopy(renderable.textures, 0, textures, 0, renderable.textures.length);
-        Arrays.sort(textures, Comparator.comparingInt(t -> t.priority));
+        for (Integer key : renderable.textures.keySet()) {
+            for (TextureData textureData : renderable.textures.get(key)) {
+                Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
+                        .preTranslate(transform.position.x, transform.position.y)
+                        .translate(textureData.offsetX, textureData.offsetY);
 
-        for (RenderableComponent.TextureData textureData : textures) {
-            batch.draw(textureData.texture,
-                    transform.position.x + textureData.offsetX,
-                    transform.position.y + textureData.offsetY,
-                    textureData.width, textureData.height);
+                batch.draw(textureData.texture,
+                        textureData.width, textureData.height,
+                        transformMatrix);
+            }
         }
     }
 

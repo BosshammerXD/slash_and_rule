@@ -7,8 +7,11 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -46,6 +49,25 @@ public class PhysicsSystem extends EntitySystem {
                         world.destroyBody(component.body);
                         component.body = null;
                         component.fixtures = null;
+                    }
+                });
+
+        engine.addEntityListener(
+                Family.all(WeaponComponent.class, PhysicsComponent.class).get(),
+                new EntityListener() {
+                    @Override
+                    public void entityAdded(Entity entity) {
+                        WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+                        PhysicsComponent physics = Mappers.physicsMapper.get(entity);
+                        RevoluteJointDef jointDef = new RevoluteJointDef();
+                        jointDef.initialize(weapon.body, physics.body, physics.body.getPosition());
+                        jointDef.collideConnected = false;
+                        jointDef.enableMotor = false;
+                        weapon.joint = (RevoluteJoint) world.createJoint(jointDef);
+                    }
+
+                    @Override
+                    public void entityRemoved(Entity entity) {
                     }
                 });
     }

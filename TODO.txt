@@ -1,14 +1,7 @@
-- decide wether or not to use a Queue or a stack in the todo list
 - research how to do ui layer
 - find out how to implement pause menu
 
-- change loadingscreen to use Async
-
 DungeonCrawler:
-  - make own animation class fo full controll
-  - close doors, when neighbour is not ready {implemet ready flag for that}
-  - give character its sprite
-  - store set inputs somewhere
   - implement controller inputs
   - implement enemy class
   - implement enemy Spawn System

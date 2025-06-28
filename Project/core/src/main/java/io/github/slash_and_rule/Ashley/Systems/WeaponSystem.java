@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem(int priority) {
@@ -13,8 +14,46 @@ public class WeaponSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        // Hier wird die Logik für die Waffenverarbeitung implementiert
-        // Zum Beispiel: Überprüfen, ob die Waffe bereit ist, Schaden zu verursachen
-        // und dann die entsprechenden Aktionen ausführen.
+        WeaponComponent weapon = entity.getComponent(WeaponComponent.class);
+        if (weapon.state == WeaponStates.CHARGING && weapon.time <= weapon.chargetime) {
+            weapon.time += deltaTime;
+        }
+        if (weapon.time > weapon.chargetime) {
+            weapon.time = weapon.chargetime;
+        }
+
+        if (weapon.state == WeaponStates.ATTACKING) {
+            weapon.time = 0f;
+            weapon.state = WeaponStates.COOLDOWN;
+
+            attack(weapon);
+        } else if (weapon.state == WeaponStates.COOLDOWN) {
+            weapon.time += deltaTime;
+
+            stepAttack(weapon);
+
+            if (weapon.time >= weapon.cooldown) {
+                weapon.state = WeaponStates.IDLE;
+                weapon.time = 0f;
+            }
+        }
+
+        rotateWeapon(weapon);
+    }
+
+    private void attack(WeaponComponent weapon) {
+        // TODO
+    }
+
+    private void stepAttack(WeaponComponent weapon) {
+        // TODO
+    }
+
+    private void rotateWeapon(WeaponComponent weapon) {
+        if (weapon.joint == null) {
+            return;
+        }
+        weapon.body.setTransform(weapon.body.getPosition(), weapon.target.angleRad());
+
     }
 }

@@ -8,9 +8,12 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.slash_and_rule.Ashley.Components.HealthComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -60,6 +63,9 @@ public class CollisionSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         for (Contact contact : contactListener.getContacts()) {
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+
             Object userDataA = contact.getFixtureA().getBody().getUserData();
             Object userDataB = contact.getFixtureB().getBody().getUserData();
             if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
@@ -69,17 +75,42 @@ public class CollisionSystem extends EntitySystem {
             Entity entityA = (Entity) userDataA;
             Entity entityB = (Entity) userDataB;
 
-            SensorComponent sensorA = sensorMapper.get(entityA);
-            SensorComponent sensorB = sensorMapper.get(entityB);
+            handleWeapons(entityA, fixtureA, entityB, fixtureB);
 
-            if (sensorA != null) {
-                sensorA.collisionHandler.handleCollision(entityA, contact.getFixtureA(), entityB,
-                        contact.getFixtureB());
-            } else if (sensorB != null) {
-                sensorB.collisionHandler.handleCollision(entityB, contact.getFixtureB(), entityA,
-                        contact.getFixtureA());
-            }
+            handleSensors(entityA, fixtureA, entityB, fixtureB);
         }
         contactListener.clearContacts();
+    }
+
+    private void handleWeapons(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
+        WeaponComponent weaponA = Mappers.weaponMapper.get(entityA);
+        WeaponComponent weaponB = Mappers.weaponMapper.get(entityB);
+
+        HealthComponent healthA = Mappers.healthMapper.get(entityA);
+        HealthComponent healthB = Mappers.healthMapper.get(entityB);
+        if (weaponA != null && healthB != null) {
+            int damage = weaponA.damage;
+            if (weaponA.chargetime > 0f) {
+                damage *= weaponA.chargeVal / weaponA.chargetime;
+            }
+            healthB.health -= damage;
+        } else if (weaponB != null && healthA != null) {
+            int damage = weaponB.damage;
+            if (weaponB.chargetime > 0f) {
+                damage *= weaponB.chargeVal / weaponB.chargetime;
+            }
+            healthA.health -= damage;
+        }
+    }
+
+    private void handleSensors(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
+        SensorComponent sensorA = sensorMapper.get(entityA);
+        SensorComponent sensorB = sensorMapper.get(entityB);
+
+        if (sensorA != null) {
+            sensorA.collisionHandler.handleCollision(entityA, fixtureA, entityB, fixtureB);
+        } else if (sensorB != null) {
+            sensorB.collisionHandler.handleCollision(entityB, fixtureB, entityA, fixtureA);
+        }
     }
 }

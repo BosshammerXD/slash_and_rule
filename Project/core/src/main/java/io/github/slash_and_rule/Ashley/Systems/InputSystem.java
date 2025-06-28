@@ -23,9 +23,12 @@ public class InputSystem extends EntitySystem {
 
     private Inputcollector inputcollector = new Inputcollector();
 
+    public void setInputProcessor() {
+        Gdx.input.setInputProcessor(inputcollector);
+    }
+
     public InputSystem(int priority) {
         super(priority);
-        Gdx.input.setInputProcessor(inputcollector);
     }
 
     @Override

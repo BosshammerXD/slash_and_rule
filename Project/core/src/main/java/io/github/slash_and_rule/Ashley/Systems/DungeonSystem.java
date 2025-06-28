@@ -94,7 +94,7 @@ public class DungeonSystem extends EntitySystem {
         }
 
         short filter1 = open ? Globals.PlayerCategory : (short) 0;
-        short filter2 = open ? (short) (Globals.ItemCategory | Globals.ProjectileCategory) : Globals.WallMask;
+        short filter2 = open ? (short) (Globals.ItemCategory | Globals.HitboxCategory) : Globals.WallMask;
         for (Fixture doorComponent : doorComponents) {
             if (doorComponent == null) {
                 continue;

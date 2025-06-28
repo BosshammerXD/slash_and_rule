@@ -84,6 +84,8 @@ public abstract class BaseScreen implements Screen {
 
     public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
 
+    private InputSystem inputSystem = new InputSystem(Globals.InputSystemPriority);
+
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
@@ -92,7 +94,7 @@ public abstract class BaseScreen implements Screen {
 
         engine.addSystem(new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
         engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera));
-        engine.addSystem(new InputSystem(Globals.InputSystemPriority));
+        engine.addSystem(inputSystem);
         engine.addSystem(new MovementSystem(Globals.MovementSystemPriority));
     }
 
@@ -105,6 +107,7 @@ public abstract class BaseScreen implements Screen {
         }
         this.viewport.apply();
         camera.update();
+        inputSystem.setInputProcessor(); // Set the input processor for the InputSystem
     }
     // Prepare your screen here.
 

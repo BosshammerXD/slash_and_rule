@@ -1,7 +1,6 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
 import io.github.slash_and_rule.Bases.Inputhandler;
-import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.AnimationFunctions;
 import io.github.slash_and_rule.Ashley.EntityManager;
@@ -12,15 +11,24 @@ import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.PlannedFixture;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Interfaces.Pausable;
+import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Mappers;
+import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -33,11 +41,11 @@ public class Player implements Pausable, Disposable {
     private TextureData moveTextureData;
     private TextureData capeTextureData;
 
-    public Player(PhysicsScreen screen) {
+    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, AtlasManager atlasManager) {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 
-        screen.getAtlasManager().add("entities/PlayerAtlas/PlayerAtlas.atlas");
+        atlasManager.add("entities/PlayerAtlas/PlayerAtlas.atlas");
 
         this.playerEntity = entityManager.reset();
 
@@ -81,21 +89,38 @@ public class Player implements Pausable, Disposable {
         mC.velocity = new Vector2(0, 0);
 
         ControllableComponent cC = new ControllableComponent();
-        cC.inputhandler = new PlayerInput(screen.camera);
+        cC.inputhandler = new PlayerInput(camera);
 
         PhysicsComponent pC = new PhysicsComponent();
-        pC.body = screen.getPhysicsBuilder().makeBody(
+        pC.body = physicsBuilder.makeBody(
                 playerEntity,
                 tC.position.x, tC.position.y,
                 BodyType.DynamicBody, 7.5f, true);
-
+        pC.body.setFixedRotation(true);
         pC.fixtures.put(
                 "Collider",
-                screen.getPhysicsBuilder().addFixture(
+                physicsBuilder.addFixture(
                         pC.body, colliderShape, 1f,
                         Globals.PlayerCategory, Globals.PlayerMask, false));
 
-        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC);
+        WeaponComponent wC = new WeaponComponent();
+        wC.body = physicsBuilder.makeBody(playerEntity, BodyType.DynamicBody, 0, true);
+        wC.body.setTransform(pC.body.getPosition(), 0);
+
+        PolygonShape weaponShape = new PolygonShape();
+        weaponShape.setAsBox(0.5f, 0.25f, new Vector2(2, 0), 0);
+
+        wC.buildFixtures(
+                new PlannedFixture(0f, 0.1f,
+                        physicsBuilder.addFixture(
+                                wC.body, weaponShape, 1f,
+                                (short) 0, Globals.PlayerCategory, true)));
+
+        MassData mData = wC.body.getMassData();
+        mData.mass = 0.001f;
+        wC.body.setMassData(mData);
+
+        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC, wC);
         entityManager.finish();
     }
 
@@ -110,6 +135,48 @@ public class Player implements Pausable, Disposable {
         @Override
         public void preEvents(Entity entity) {
             tC = Mappers.transformMapper.get(entity);
+        }
+
+        @Override
+        public void mouseEvent(MouseInputType type, int screenX, int screenY, int button) {
+            if (type == MouseInputType.MOVED || type == MouseInputType.DRAGGED) {
+                mouseMoved(screenX, screenY);
+            } else if (type == MouseInputType.DOWN && button == Globals.AttackButton) {
+                mousePressed();
+            } else if (type == MouseInputType.UP && button == Globals.AttackButton) {
+                mouseReleased();
+            }
+        }
+
+        private void mouseMoved(int x, int y) {
+            // Convert screen coordinates to world coordinates
+            Vector3 worldCoords = camera.unproject(new Vector3(x, y, 0));
+            apply(Mappers.weaponMapper, comp -> {
+                Vector2 weaponPos = comp.body.getPosition();
+                comp.target = new Vector2(worldCoords.x - weaponPos.x, worldCoords.y - weaponPos.y);
+            });
+        }
+
+        private void mousePressed() {
+            apply(Mappers.weaponMapper, comp -> {
+                if (comp.state != WeaponStates.IDLE) {
+                    return;
+                }
+                if (comp.chargetime != 0f) {
+                    comp.time = 0f;
+                    comp.state = WeaponStates.CHARGING;
+                } else {
+                    comp.state = WeaponStates.ATTACKING;
+                }
+            });
+        }
+
+        private void mouseReleased() {
+            apply(Mappers.weaponMapper, comp -> {
+                if (comp.state == WeaponStates.CHARGING) {
+                    comp.state = WeaponStates.ATTACKING;
+                }
+            });
         }
 
         @Override

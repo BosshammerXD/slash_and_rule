@@ -33,7 +33,6 @@ public class CollisionSystem extends EntitySystem {
 
         @Override
         public void beginContact(Contact contact) {
-            // TODO Auto-generated method stub
             contacts.add(contact);
         }
 
@@ -90,16 +89,16 @@ public class CollisionSystem extends EntitySystem {
         HealthComponent healthB = Mappers.healthMapper.get(entityB);
         if (weaponA != null && healthB != null) {
             int damage = weaponA.damage;
-            if (weaponA.chargetime > 0f) {
-                damage *= weaponA.chargeVal / weaponA.chargetime;
+            if (weaponA.chargeVal > 0f) {
+                damage *= weaponA.chargetime / weaponA.chargeVal;
             }
-            healthB.health -= damage;
+            healthB.appliedDamage += damage;
         } else if (weaponB != null && healthA != null) {
             int damage = weaponB.damage;
             if (weaponB.chargetime > 0f) {
                 damage *= weaponB.chargeVal / weaponB.chargetime;
             }
-            healthA.health -= damage;
+            healthA.appliedDamage += damage;
         }
     }
 

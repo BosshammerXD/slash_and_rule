@@ -5,6 +5,7 @@ import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.AnimationFunctions;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
+import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
@@ -120,7 +121,8 @@ public class Player implements Pausable, Disposable {
         mData.mass = 0.001f;
         wC.body.setMassData(mData);
 
-        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC, wC);
+        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC, wC,
+                new HealthComponent());
         entityManager.finish();
     }
 
@@ -242,7 +244,6 @@ public class Player implements Pausable, Disposable {
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
-
+        // TODO: Figure out, what we need to dispose here
     }
 }

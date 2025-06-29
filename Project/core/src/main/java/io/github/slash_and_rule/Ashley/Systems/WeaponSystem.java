@@ -16,10 +16,10 @@ public class WeaponSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         WeaponComponent weapon = entity.getComponent(WeaponComponent.class);
         if (weapon.state == WeaponStates.CHARGING && weapon.time <= weapon.chargetime) {
-            weapon.time += deltaTime;
+            weapon.chargetime += deltaTime;
         }
-        if (weapon.time > weapon.chargetime) {
-            weapon.time = weapon.chargetime;
+        if (weapon.chargetime > weapon.chargeVal) {
+            weapon.chargetime = weapon.chargeVal;
         }
 
         if (weapon.state == WeaponStates.ATTACKING) {
@@ -42,11 +42,11 @@ public class WeaponSystem extends IteratingSystem {
     }
 
     private void attack(WeaponComponent weapon) {
-        // TODO
+        // TODO: Initiate Attack Logic needed?
     }
 
     private void stepAttack(WeaponComponent weapon) {
-        // TODO
+        // TODO: Perform Attack frames
     }
 
     private void rotateWeapon(WeaponComponent weapon) {

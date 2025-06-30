@@ -10,18 +10,22 @@ public class MovementAnimData extends LoopedAnimData {
     private float[] frameDurations;
     private int nameIndex = 0;
 
-    public MovementAnimData(String atlasPath, Supplier<Vector2> movVecSupplier, String[] animNames, float[] frameDurations) {
-        super(atlasPath, animNames[0], frameDurations[0]);
+    public MovementAnimData(String atlasPath, Supplier<Vector2> movVecSupplier, String[] animNames, float[] frameDurations, int startIndex) {
+        super(atlasPath, animNames[startIndex], frameDurations[startIndex]);
         this.movementVector = movVecSupplier;
         this.animationNames = animNames;
         this.frameDurations = frameDurations;
+    }
+
+    public MovementAnimData(String atlasPath, Supplier<Vector2> movVecSupplier, String[] animNames, float[] frameDurations) {
+        this(atlasPath, movVecSupplier, animNames, frameDurations, 0);
     }
 
     @Override
     public void update(float deltaTime) {
         Vector2 movementVector = this.movementVector.get();
         if (movementVector.isZero() || movementVector.len() < 0.01f) {
-            stateTime = 0f; // Reset animation time if no movement
+            stateTime = 0f;
             animIndex = 0;
         }
 

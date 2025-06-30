@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.MovementAnimData;
+import io.github.slash_and_rule.Animations.triggeredAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
@@ -28,7 +29,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
@@ -50,9 +50,9 @@ public class Player implements Pausable, Disposable {
 
         this.playerEntity = entityManager.reset();
 
-        TransformComponent tC = new TransformComponent();
-        tC.position = new Vector2(2, 2); // Initial position of the player
-        tC.rotation = 0f; // Initial rotation of the player
+        TransformComponent tC = new TransformComponent(
+            new Vector2(2, 2), 0f
+        );
 
         RenderableComponent rC = new RenderableComponent();
         MovementAnimData moveAnimData = new MovementAnimData(
@@ -84,12 +84,8 @@ public class Player implements Pausable, Disposable {
             }
         };
         rC.addTextureDatas(2, this.capeTextureData);
-        MovementComponent mC = new MovementComponent();
-        mC.max_speed = 10f;
-        mC.velocity = new Vector2(0, 0);
 
-        ControllableComponent cC = new ControllableComponent();
-        cC.inputhandler = new PlayerInput(camera);
+        ControllableComponent cC = new ControllableComponent(new PlayerInput(camera));
 
         PhysicsComponent pC = new PhysicsComponent();
         pC.body = physicsBuilder.makeBody(
@@ -103,24 +99,31 @@ public class Player implements Pausable, Disposable {
                         pC.body, colliderShape, 1f,
                         Globals.PlayerCategory, Globals.PlayerMask, false));
 
-        WeaponComponent wC = new WeaponComponent();
-        wC.body = physicsBuilder.makeBody(playerEntity, BodyType.DynamicBody, 0, true);
-        wC.body.setTransform(pC.body.getPosition(), 0);
-
         PolygonShape weaponShape = new PolygonShape();
         weaponShape.setAsBox(0.5f, 0.25f, new Vector2(2, 0), 0);
 
-        wC.buildFixtures(
-                new PlannedFixture(0f, 0.1f,
-                        physicsBuilder.addFixture(
-                                wC.body, weaponShape, 1f,
-                                (short) 0, Globals.PlayerCategory, true)));
+        PlannedFixture[] fixtures = new PlannedFixture[] {
+            new PlannedFixture(0f, 0.1f, weaponShape, Globals.PlayerCategory)
+        };
 
-        MassData mData = wC.body.getMassData();
-        mData.mass = 0.001f;
-        wC.body.setMassData(mData);
+        WeaponComponent wC = new WeaponComponent(
+            physicsBuilder, playerEntity, fixtures, 
+            10, 1f, 1f, 
+            new TextureData() {
+                {
+                    animData = new triggeredAnimData("entities/PlayerAtlas/PlayerAtlas.atlas", "Attack", 0.1f, 0);
+                    width = 4f;
+                    height = 4f;
+                    offsetX = -1f;
+                    offsetY = -0.5f;
+                }
+            }
+        );
+        wC.body.setTransform(tC.position, 0);
 
-        entityManager.build(new PlayerComponent(), new MidfieldComponent(), rC, tC, mC, cC, pC, wC,
+        entityManager.build(new PlayerComponent(), new MidfieldComponent(), 
+                rC, tC, cC, pC, wC,
+                new MovementComponent(new Vector2(0f,0f), 10f),
                 new HealthComponent());
         entityManager.finish();
     }

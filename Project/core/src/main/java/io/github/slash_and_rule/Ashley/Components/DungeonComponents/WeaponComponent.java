@@ -4,14 +4,20 @@ import java.util.ArrayDeque;
 import java.util.TreeMap;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.Animations.triggeredAnimData;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
 public class WeaponComponent implements Component {
     public static class ProjectileData {
@@ -39,12 +45,12 @@ public class WeaponComponent implements Component {
     public static class PlannedFixture {
         public float start;
         public float end;
-        public Fixture fixture;
+        public Shape shape;
 
-        public PlannedFixture(float start, float end, Fixture fixture) {
+        public PlannedFixture(float start, float end, Shape shape, short maskBits) {
             this.start = start;
             this.end = end;
-            this.fixture = fixture;
+            this.shape = shape;
         }
     }
 
@@ -80,11 +86,13 @@ public class WeaponComponent implements Component {
     public int index = 0;
     public timedActions[] fixtures;
 
-    public void buildFixtures(PlannedFixture... fixtures) {
+    public void buildFixtures(PhysicsBuilder physicsBuilder, PlannedFixture... fixtures) {
         TreeMap<Float, ArrayDeque<Runnable>> fixtureMap = new TreeMap<>();
-        for (PlannedFixture fixture : fixtures) {
-            applyCategory(fixtureMap, fixture, Globals.HitboxCategory);
-            applyCategory(fixtureMap, fixture, (short) 0);
+        for (PlannedFixture fixtureData : fixtures) {
+            Fixture fixture = physicsBuilder.addFixture(this.body, fixtureData.shape, 1f, Globals.HitboxCategory, (short) 0, true);
+            
+            applyCategory(fixtureMap, fixture, fixtureData.start, Globals.HitboxCategory, physicsBuilder);
+            applyCategory(fixtureMap, fixture, fixtureData.end, (short) 0, physicsBuilder);
         }
         this.fixtures = new timedActions[fixtureMap.size()];
         int index = 0;
@@ -95,11 +103,9 @@ public class WeaponComponent implements Component {
         }
     }
 
-    private void applyCategory(TreeMap<Float, ArrayDeque<Runnable>> fixtureMap, PlannedFixture fixtureData,
-            short categoryBits) {
-        float time = categoryBits == 0 ? fixtureData.end : fixtureData.start;
+    private void applyCategory(TreeMap<Float, ArrayDeque<Runnable>> fixtureMap, Fixture fixture,
+            float time, short categoryBits, PhysicsBuilder physicsBuilder) {
         ArrayDeque<Runnable> actionQueue = getDeque(fixtureMap, time);
-        Fixture fixture = fixtureData.fixture;
         actionQueue.add(() -> {
             Filter filter = fixture.getFilterData();
             filter.categoryBits = categoryBits;
@@ -118,6 +124,7 @@ public class WeaponComponent implements Component {
 
     // Die Textur / Animations Daten der Waffe
     public TextureData textureData;
+    public triggeredAnimData animData;
 
     // Werte für Schaden und Rückstoß
     public int damage;
@@ -126,7 +133,7 @@ public class WeaponComponent implements Component {
     // Wie lange die Waffe braucht um nach dem letzten Angriff wieder einsatzbereit
     // zu sein
     public float cooldown;
-    public float time;
+    public float time = 0f;
 
     // Wie lange bis die Waffe vollständig aufgeladen ist (bspw. das ziehen von
     // einem Bogen)
@@ -135,4 +142,37 @@ public class WeaponComponent implements Component {
 
     // Die Projektile die die Waffe schießt
     public ProjectileData[] projectiles;
+
+    public WeaponComponent() {
+        this.body = null;
+        this.joint = null;
+        this.textureData = new TextureData();
+        this.animData = new triggeredAnimData("", "", 0.1f, 0);
+        this.damage = 0;
+        this.weight = 0f;
+        this.cooldown = 0f;
+        this.time = 0f;
+        this.chargetime = 0f;
+        this.projectiles = new ProjectileData[0];
+    }
+
+    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage, float weight, float cooldown,
+            TextureData textureData, ProjectileData[] projectiles) {
+        this.body = physicsBuilder.makeBody(entity, BodyType.DynamicBody, 0, true);
+        this.buildFixtures(physicsBuilder, fixtures);
+        this.damage = damage;
+        this.weight = weight;
+        this.cooldown = cooldown;
+        this.projectiles = projectiles;
+        this.textureData = textureData;
+        this.animData = (triggeredAnimData) textureData.animData;
+        MassData mD = this.body.getMassData();
+        mD.mass = 0.001f;
+        this.body.setMassData(mD);
+    }
+
+    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage, float weight, float cooldown,
+            TextureData textureData) {
+        this(physicsBuilder, entity, fixtures, damage, weight, cooldown, textureData, new ProjectileData[0]);
+    }
 }

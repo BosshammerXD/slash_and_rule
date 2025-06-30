@@ -1,18 +1,24 @@
 package io.github.slash_and_rule.Animations;
 
 public class triggeredAnimData extends LoopedAnimData {
-    public triggeredAnimData(String atlasPath, String name, float frameDuration) {
+    private int stillframe;
+    private boolean triggered = false;
+
+    public triggeredAnimData(String atlasPath, String name, float frameDuration, int stillframe) {
         super(atlasPath, name, frameDuration);
+        this.stillframe = stillframe;
+        this.animIndex = stillframe;
     }
 
     public void trigger() {
         this.animIndex = 0;
         this.stateTime = 0f;
+        this.triggered = true;
     }
 
     @Override
     public void update(float deltaTime) {
-        if (animIndex < 0) {
+        if (!triggered) {
             return;
         }
         super.update(deltaTime);
@@ -20,6 +26,7 @@ public class triggeredAnimData extends LoopedAnimData {
 
     @Override
     public void overflow() {
-        this.animIndex = -1;
+        this.animIndex = stillframe;
+        this.triggered = false;
     }
 }

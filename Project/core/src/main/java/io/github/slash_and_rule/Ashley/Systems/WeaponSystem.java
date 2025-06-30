@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem(int priority) {
@@ -30,7 +31,9 @@ public class WeaponSystem extends IteratingSystem {
         } else if (weapon.state == WeaponStates.COOLDOWN) {
             weapon.time += deltaTime;
 
-            stepAttack(weapon);
+            // TODO: Perform Attack frames
+            handleHitboxes(weapon);
+            handleAnim(weapon, deltaTime);
 
             if (weapon.time >= weapon.cooldown) {
                 weapon.state = WeaponStates.IDLE;
@@ -45,8 +48,19 @@ public class WeaponSystem extends IteratingSystem {
         // TODO: Initiate Attack Logic needed?
     }
 
-    private void stepAttack(WeaponComponent weapon) {
-        // TODO: Perform Attack frames
+    private void handleHitboxes(WeaponComponent weapon) {
+        if (weapon.index >= weapon.fixtures.length) {
+            return;
+        }
+        timedActions actions = weapon.fixtures[weapon.index];
+        if (actions.time <= weapon.time) {
+            actions.run();
+            weapon.index++;
+        }
+    }
+
+    private void handleAnim(WeaponComponent weapon, float deltaTime) {
+        
     }
 
     private void rotateWeapon(WeaponComponent weapon) {
@@ -54,6 +68,5 @@ public class WeaponSystem extends IteratingSystem {
             return;
         }
         weapon.body.setTransform(weapon.body.getPosition(), weapon.target.angleRad());
-
     }
 }

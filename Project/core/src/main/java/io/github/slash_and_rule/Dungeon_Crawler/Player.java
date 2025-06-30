@@ -2,7 +2,7 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.Animations.AnimationFunctions;
+import io.github.slash_and_rule.Animations.MovementAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
@@ -55,11 +55,10 @@ public class Player implements Pausable, Disposable {
         tC.rotation = 0f; // Initial rotation of the player
 
         RenderableComponent rC = new RenderableComponent();
-        RenderableComponent.AnimData moveAnimData = new RenderableComponent.AnimData(
-                "entities/PlayerAtlas/PlayerAtlas.atlas",
-                "MoveDown",
-                AnimationFunctions.mappedTimes(
-                        AnimationFunctions.makeNameTimes(animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
+        MovementAnimData moveAnimData = new MovementAnimData(
+            "entities/PlayerAtlas/PlayerAtlas.atlas", 
+            () -> new Vector2().set(tC.position).sub(tC.lastPosition), 
+            animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
         this.moveTextureData = new TextureData() {
             {
                 animData = moveAnimData;
@@ -70,11 +69,11 @@ public class Player implements Pausable, Disposable {
             }
         };
         rC.addTextureDatas(1, this.moveTextureData);
-        RenderableComponent.AnimData capeMoveAnimData = new RenderableComponent.AnimData(
-                "entities/PlayerAtlas/PlayerAtlas.atlas",
-                "CapeMoveDown",
-                AnimationFunctions.mappedTimes(
-                        AnimationFunctions.makeNameTimes(capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f }), 0));
+        MovementAnimData capeMoveAnimData = new MovementAnimData(
+            "entities/PlayerAtlas/PlayerAtlas.atlas",
+            () -> new Vector2().set(tC.position).sub(tC.lastPosition),
+            capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
+        
         this.capeTextureData = new TextureData() {
             {
                 animData = capeMoveAnimData;
@@ -128,15 +127,9 @@ public class Player implements Pausable, Disposable {
 
     private class PlayerInput extends Inputhandler {
         private OrthographicCamera camera;
-        private TransformComponent tC;
 
         public PlayerInput(OrthographicCamera camera) {
             this.camera = camera;
-        }
-
-        @Override
-        public void preEvents(Entity entity) {
-            tC = Mappers.transformMapper.get(entity);
         }
 
         @Override
@@ -184,7 +177,9 @@ public class Player implements Pausable, Disposable {
         @Override
         public void pollevent() {
             movement();
-            camera.position.set(tC.position.x, tC.position.y, 0);
+            apply(Mappers.transformMapper, comp -> {
+                camera.position.set(comp.position.x, comp.position.y, 0);
+            });
             apply(Mappers.renderableMapper, this::animation);
         }
 
@@ -209,26 +204,11 @@ public class Player implements Pausable, Disposable {
         }
 
         private void animation(RenderableComponent comp) {
-            if (tC == null) {
-                return;
-            }
-            Vector2 moveVec = new Vector2(
-                    tC.position.x - tC.lastPosition.x,
-                    tC.position.y - tC.lastPosition.y);
-
-            AnimationFunctions.movementAnimData(
-                    moveTextureData.animData, moveVec,
-                    animNames,
-                    delta, 1f);
             if (moveTextureData.animData.name.equals("MoveUp")) {
                 comp.changePriority(0, 2, capeTextureData);
             } else {
                 comp.changePriority(2, 0, capeTextureData);
             }
-            AnimationFunctions.movementAnimData(
-                    capeTextureData.animData, moveVec,
-                    capeAnimNames,
-                    delta, 1f);
         }
     }
 

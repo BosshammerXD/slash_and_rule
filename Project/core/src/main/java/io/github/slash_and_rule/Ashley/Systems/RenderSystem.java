@@ -80,6 +80,10 @@ public class RenderSystem extends EntitySystem {
 
         for (Integer key : renderable.textures.keySet()) {
             for (TextureData textureData : renderable.textures.get(key)) {
+                if (textureData.texture == null) {
+                    continue;
+                }
+
                 Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
                         .preTranslate(transform.position.x, transform.position.y)
                         .translate(textureData.offsetX, textureData.offsetY);

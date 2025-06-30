@@ -2,31 +2,13 @@ package io.github.slash_and_rule.Ashley.Components.DrawingComponents;
 
 import java.util.ArrayDeque;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import io.github.slash_and_rule.Animations.AnimData;
+
 public class RenderableComponent implements Component {
-    public static class AnimData {
-        public String atlasPath;
-        public String name;
-        public int animIndex = 0;
-        public float stateTime = 0f;
-        public BiConsumer<AnimData, Float> updater;
-
-        public AnimData(String atlasPath, String name, BiConsumer<AnimData, Float> updater) {
-            this.atlasPath = atlasPath;
-            this.name = name;
-            this.updater = updater;
-        }
-
-        public AnimData(String atlasPath, String name, BiConsumer<AnimData, Float> updater, float stateTime) {
-            this(atlasPath, name, updater);
-            this.stateTime = stateTime;
-        }
-    }
-
     public static class TextureData {
         public TextureRegion texture;
         public AnimData animData;

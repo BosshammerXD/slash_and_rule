@@ -39,7 +39,7 @@ public class AnimationSystem extends IteratingSystem {
                 continue;
             }
             if (animData.animIndex > anim.length - 1) {
-                animData.animIndex %= anim.length;
+                animData.overflow();
             }
             textureData.texture = anim[animData.animIndex];
         }

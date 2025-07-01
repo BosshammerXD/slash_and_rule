@@ -88,10 +88,12 @@ public class EntityManager {
 
     public void finish() {
         if (engine == null) {
-            throw new IllegalStateException("Engine is not set. Please call EntityManager.setEngine(engine) before using EntityManager.finish().");
+            throw new IllegalStateException(
+                    "Engine is not set. Please call EntityManager.setEngine(engine) before using EntityManager.finish().");
         }
         if (obj_entity == null) {
-            throw new IllegalStateException("Entity is not created. Please call EntityManager.reset() before using EntityManager.finish().");
+            throw new IllegalStateException(
+                    "Entity is not created. Please call EntityManager.reset() before using EntityManager.finish().");
         }
         engine.addEntity(obj_entity);
         obj_entity = null;

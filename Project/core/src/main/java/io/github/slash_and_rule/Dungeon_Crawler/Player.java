@@ -22,7 +22,6 @@ import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
@@ -34,7 +33,6 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class Player implements Pausable, Disposable {
     private EntityManager entityManager = new EntityManager();
-    private Entity playerEntity;
     private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
     private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
@@ -48,7 +46,7 @@ public class Player implements Pausable, Disposable {
         atlasManager.add("entities/PlayerAtlas/PlayerAtlas.atlas");
         atlasManager.add("weapons/BasicSword/BasicSword.atlas");
 
-        this.playerEntity = entityManager.reset();
+        entityManager.reset();
 
         TransformComponent tC = new TransformComponent(
                 new Vector2(2, 2), 0f);
@@ -88,7 +86,6 @@ public class Player implements Pausable, Disposable {
 
         PhysicsComponent pC = new PhysicsComponent();
         pC.body = physicsBuilder.makeBody(
-                playerEntity,
                 tC.position.x, tC.position.y,
                 BodyType.DynamicBody, 7.5f, true);
         pC.body.setFixedRotation(true);
@@ -107,7 +104,7 @@ public class Player implements Pausable, Disposable {
         };
 
         WeaponComponent wC = new WeaponComponent(
-                physicsBuilder, playerEntity, fixtures,
+                physicsBuilder, fixtures,
                 10, 1f, 0.5f,
                 new WeaponComponent.WeaponTextureData(
                         "weapons/BasicSword/BasicSword.atlas",

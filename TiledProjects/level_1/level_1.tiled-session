@@ -3,11 +3,16 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "leaf_1.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "file.lastUsedOpenFilter": "Alle Dateien (*)",
     "fileStates": {
+        "Dungeon_Tileset_Tryout.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
+        },
         "end.tmx": {
             "expandedObjectLayers": [
                 4
@@ -29,7 +34,9 @@
         },
         "filler_0.tmx": {
             "expandedObjectLayers": [
-                4
+                4,
+                3,
+                2
             ],
             "scale": 2,
             "selectedLayer": 3,
@@ -46,6 +53,14 @@
             ],
             "scale": 2.4289772727272725,
             "selectedLayer": 3,
+            "viewCenter": {
+                "x": 175.79415204678364,
+                "y": 175.79415204678364
+            }
+        },
+        "leaf_1.tmx": {
+            "scale": 2.4289772727272725,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 175.79415204678364,
                 "y": 175.79415204678364
@@ -70,9 +85,21 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 11,
     "openFiles": [
+        "Dungeon_Tileset_Tryout.tsx",
+        "start.tmx",
+        "end.tmx",
+        "leaf_0.tmx",
+        "filler_0.tmx",
+        "leaf_1.tmx"
     ],
     "project": "level_1.tiled-project",
     "recentFiles": [
+        "Dungeon_Tileset_Tryout.tsx",
+        "start.tmx",
+        "end.tmx",
+        "leaf_0.tmx",
+        "filler_0.tmx",
+        "leaf_1.tmx",
         "endd.tmx"
     ],
     "tileset.lastUsedFormat": "tsx"

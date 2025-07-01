@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.TreeMap;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -158,10 +157,10 @@ public class WeaponComponent implements Component {
         this.projectiles = new ProjectileData[0];
     }
 
-    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage,
+    public WeaponComponent(PhysicsBuilder physicsBuilder, PlannedFixture[] fixtures, int damage,
             float weight, float cooldown,
             WeaponTextureData textureData, ProjectileData[] projectiles) {
-        this.body = physicsBuilder.makeBody(entity, BodyType.DynamicBody, 0, true);
+        this.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
         this.buildFixtures(physicsBuilder, fixtures);
         this.damage = damage;
         this.weight = weight;
@@ -173,10 +172,10 @@ public class WeaponComponent implements Component {
         this.body.setMassData(mD);
     }
 
-    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage,
+    public WeaponComponent(PhysicsBuilder physicsBuilder, PlannedFixture[] fixtures, int damage,
             float weight, float cooldown,
             WeaponTextureData textureData) {
-        this(physicsBuilder, entity, fixtures, damage, weight, cooldown, textureData, new ProjectileData[0]);
+        this(physicsBuilder, fixtures, damage, weight, cooldown, textureData, new ProjectileData[0]);
     }
 
     public static class WeaponTextureData {

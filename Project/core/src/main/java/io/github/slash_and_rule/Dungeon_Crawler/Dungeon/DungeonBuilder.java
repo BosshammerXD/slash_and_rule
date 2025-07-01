@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.SpawnerComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
@@ -53,16 +55,6 @@ public class DungeonBuilder {
             makeDoor(door, neighbours, physicsComponent.body);
         }
 
-        for (UtilData util : data.utils) {
-            if (util.type.equals("entry")) {
-                makeEntry(util);
-            } else if (util.type.equals("spawner")) {
-                makeSpawner(util);
-            } else if (util.type.equals("chest")) {
-                makeTreasure(util);
-            }
-        }
-
         this.physicsComponent.fixtures = makeFixtures();
         this.dungeonComponent.spawnPoints = spawnPoints;
 
@@ -72,6 +64,16 @@ public class DungeonBuilder {
                 this.physicsComponent,
                 this.dungeonComponent,
                 this.sensorComponent);
+
+        for (UtilData util : data.utils) {
+            if (util.type.equals("entry")) {
+                makeEntry(util);
+            } else if (util.type.equals("spawner")) {
+                makeSpawner(util);
+            } else if (util.type.equals("chest")) {
+                makeTreasure(util);
+            }
+        }
 
         this.entityManager.finish();
 
@@ -91,16 +93,6 @@ public class DungeonBuilder {
             schedule.add(() -> makeDoor(door, neighbours, physicsComponent.body));
         }
 
-        for (UtilData util : data.utils) {
-            if (util.type.equals("entry")) {
-                schedule.add(() -> makeEntry(util));
-            } else if (util.type.equals("spawner")) {
-                schedule.add(() -> makeSpawner(util));
-            } else if (util.type.equals("chest")) {
-                schedule.add(() -> makeTreasure(util));
-            }
-        }
-
         schedule.add(() -> {
             this.physicsComponent.fixtures = makeFixtures();
             this.dungeonComponent.spawnPoints = spawnPoints;
@@ -112,8 +104,19 @@ public class DungeonBuilder {
                 this.dungeonComponent,
                 this.sensorComponent));
 
+        schedule.add(() -> this.entityManager.finish());
+
+        for (UtilData util : data.utils) {
+            if (util.type.equals("entry")) {
+                schedule.add(() -> makeEntry(util));
+            } else if (util.type.equals("spawner")) {
+                schedule.add(() -> makeSpawner(util));
+            } else if (util.type.equals("chest")) {
+                schedule.add(() -> makeTreasure(util));
+            }
+        }
+
         schedule.add(() -> {
-            this.entityManager.finish();
             if (onFinish != null) {
                 onFinish.accept(this.entity);
             }
@@ -146,8 +149,7 @@ public class DungeonBuilder {
         this.physicsComponent = new PhysicsComponent();
 
         this.physicsComponent = new PhysicsComponent();
-        this.physicsComponent.body = physicsBuilder.makeBody(
-                entity, BodyType.StaticBody, 0, false);
+        this.physicsComponent.body = physicsBuilder.makeBody(BodyType.StaticBody, 0, false);
 
         this.sensorComponent = new SensorComponent();
         this.sensorComponent.collisionHandler = collisionHandler;
@@ -207,14 +209,42 @@ public class DungeonBuilder {
 
     private void makeEntry(UtilData entry) {
         // TODO
+        CircleShape shape = new CircleShape();
+        shape.setPosition(new Vector2(entry.x, entry.y));
+        shape.setRadius(entry.width);
+        float x = entry.x + entry.width / 2f;
+        float y = entry.y + entry.height / 2f;
+
+        PhysicsComponent pC = new PhysicsComponent();
+        pC.body = physicsBuilder.makeBody(x, y, BodyType.StaticBody, 0f, false);
+        pC.fixtures.put(
+                "Sensor",
+                physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
+
+        EntityManager.makeEntity(pC);
     }
 
     private void makeSpawner(UtilData spawner) {
         // TODO
+        EntityManager.makeEntity(
+                new SpawnerComponent());
     }
 
     private void makeTreasure(UtilData treasure) {
         // TODO
+        CircleShape shape = new CircleShape();
+        shape.setPosition(new Vector2(treasure.x, treasure.y));
+        shape.setRadius(treasure.width);
+        float x = treasure.x + treasure.width / 2f;
+        float y = treasure.y + treasure.height / 2f;
+
+        PhysicsComponent pC = new PhysicsComponent();
+        pC.body = physicsBuilder.makeBody(x, y, BodyType.StaticBody, 0f, false);
+        pC.fixtures.put(
+                "Sensor",
+                physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
+
+        EntityManager.makeEntity(pC);
     }
 
 }

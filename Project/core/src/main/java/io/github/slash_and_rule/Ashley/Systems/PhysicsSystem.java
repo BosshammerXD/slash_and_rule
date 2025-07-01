@@ -36,6 +36,8 @@ public class PhysicsSystem extends EntitySystem {
                 new EntityListener() {
                     @Override
                     public void entityAdded(Entity entity) {
+                        PhysicsComponent component = Mappers.physicsMapper.get(entity);
+                        component.body.setUserData(entity);
                     }
 
                     @Override

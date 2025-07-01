@@ -3,7 +3,6 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.MovementAnimData;
-import io.github.slash_and_rule.Animations.triggeredAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
@@ -47,18 +46,18 @@ public class Player implements Pausable, Disposable {
         colliderShape.setRadius(7 / 16f);
 
         atlasManager.add("entities/PlayerAtlas/PlayerAtlas.atlas");
+        atlasManager.add("weapons/BasicSword/BasicSword.atlas");
 
         this.playerEntity = entityManager.reset();
 
         TransformComponent tC = new TransformComponent(
-            new Vector2(2, 2), 0f
-        );
+                new Vector2(2, 2), 0f);
 
         RenderableComponent rC = new RenderableComponent();
         MovementAnimData moveAnimData = new MovementAnimData(
-            "entities/PlayerAtlas/PlayerAtlas.atlas", 
-            () -> new Vector2().set(tC.position).sub(tC.lastPosition), 
-            animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
+                "entities/PlayerAtlas/PlayerAtlas.atlas",
+                () -> new Vector2().set(tC.position).sub(tC.lastPosition),
+                animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
         this.moveTextureData = new TextureData() {
             {
                 animData = moveAnimData;
@@ -70,10 +69,10 @@ public class Player implements Pausable, Disposable {
         };
         rC.addTextureDatas(1, this.moveTextureData);
         MovementAnimData capeMoveAnimData = new MovementAnimData(
-            "entities/PlayerAtlas/PlayerAtlas.atlas",
-            () -> new Vector2().set(tC.position).sub(tC.lastPosition),
-            capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
-        
+                "entities/PlayerAtlas/PlayerAtlas.atlas",
+                () -> new Vector2().set(tC.position).sub(tC.lastPosition),
+                capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
+
         this.capeTextureData = new TextureData() {
             {
                 animData = capeMoveAnimData;
@@ -100,30 +99,24 @@ public class Player implements Pausable, Disposable {
                         Globals.PlayerCategory, Globals.PlayerMask, false));
 
         PolygonShape weaponShape = new PolygonShape();
-        weaponShape.setAsBox(0.5f, 0.25f, new Vector2(2, 0), 0);
+        weaponShape.set(
+                new float[] { 7 / 16f, 0f, 1.5f, 1f, 2f, 0f, 1.5f, -1f });
 
         PlannedFixture[] fixtures = new PlannedFixture[] {
-            new PlannedFixture(0f, 0.1f, weaponShape, Globals.PlayerCategory)
+                new PlannedFixture(0.1f, 0.3f, weaponShape, Globals.PlayerCategory)
         };
 
         WeaponComponent wC = new WeaponComponent(
-            physicsBuilder, playerEntity, fixtures, 
-            10, 1f, 1f, 
-            new TextureData() {
-                {
-                    animData = new triggeredAnimData("entities/PlayerAtlas/PlayerAtlas.atlas", "Attack", 0.1f, 0);
-                    width = 4f;
-                    height = 4f;
-                    offsetX = -1f;
-                    offsetY = -0.5f;
-                }
-            }
-        );
+                physicsBuilder, playerEntity, fixtures,
+                10, 1f, 0.5f,
+                new WeaponComponent.WeaponTextureData(
+                        "weapons/BasicSword/BasicSword.atlas",
+                        "AtkAnim", 0.1f, 0, 3f, 3f, -0.4f, -0.5f));
         wC.body.setTransform(tC.position, 0);
 
-        entityManager.build(new PlayerComponent(), new MidfieldComponent(), 
+        entityManager.build(new PlayerComponent(), new MidfieldComponent(),
                 rC, tC, cC, pC, wC,
-                new MovementComponent(new Vector2(0f,0f), 10f),
+                new MovementComponent(new Vector2(0f, 0f), 10f),
                 new HealthComponent());
         entityManager.finish();
     }

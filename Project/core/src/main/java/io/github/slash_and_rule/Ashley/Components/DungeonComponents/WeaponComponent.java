@@ -89,8 +89,9 @@ public class WeaponComponent implements Component {
     public void buildFixtures(PhysicsBuilder physicsBuilder, PlannedFixture... fixtures) {
         TreeMap<Float, ArrayDeque<Runnable>> fixtureMap = new TreeMap<>();
         for (PlannedFixture fixtureData : fixtures) {
-            Fixture fixture = physicsBuilder.addFixture(this.body, fixtureData.shape, 1f, Globals.HitboxCategory, (short) 0, true);
-            
+            Fixture fixture = physicsBuilder.addFixture(this.body, fixtureData.shape, 1f, Globals.HitboxCategory,
+                    (short) 0, true);
+
             applyCategory(fixtureMap, fixture, fixtureData.start, Globals.HitboxCategory, physicsBuilder);
             applyCategory(fixtureMap, fixture, fixtureData.end, (short) 0, physicsBuilder);
         }
@@ -123,7 +124,8 @@ public class WeaponComponent implements Component {
     }
 
     // Die Textur / Animations Daten der Waffe
-    public TextureData textureData;
+    public WeaponTextureData textureData;
+    public TextureData texture;
     public triggeredAnimData animData;
 
     // Werte für Schaden und Rückstoß
@@ -146,7 +148,7 @@ public class WeaponComponent implements Component {
     public WeaponComponent() {
         this.body = null;
         this.joint = null;
-        this.textureData = new TextureData();
+        this.textureData = new WeaponTextureData();
         this.animData = new triggeredAnimData("", "", 0.1f, 0);
         this.damage = 0;
         this.weight = 0f;
@@ -156,8 +158,9 @@ public class WeaponComponent implements Component {
         this.projectiles = new ProjectileData[0];
     }
 
-    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage, float weight, float cooldown,
-            TextureData textureData, ProjectileData[] projectiles) {
+    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage,
+            float weight, float cooldown,
+            WeaponTextureData textureData, ProjectileData[] projectiles) {
         this.body = physicsBuilder.makeBody(entity, BodyType.DynamicBody, 0, true);
         this.buildFixtures(physicsBuilder, fixtures);
         this.damage = damage;
@@ -165,14 +168,48 @@ public class WeaponComponent implements Component {
         this.cooldown = cooldown;
         this.projectiles = projectiles;
         this.textureData = textureData;
-        this.animData = (triggeredAnimData) textureData.animData;
         MassData mD = this.body.getMassData();
         mD.mass = 0.001f;
         this.body.setMassData(mD);
     }
 
-    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage, float weight, float cooldown,
-            TextureData textureData) {
+    public WeaponComponent(PhysicsBuilder physicsBuilder, Entity entity, PlannedFixture[] fixtures, int damage,
+            float weight, float cooldown,
+            WeaponTextureData textureData) {
         this(physicsBuilder, entity, fixtures, damage, weight, cooldown, textureData, new ProjectileData[0]);
+    }
+
+    public static class WeaponTextureData {
+        public String atlasPath;
+        public String animName;
+        public float frameDuration;
+        public int priority;
+        public float width;
+        public float height;
+        public float offsetX;
+        public float offsetY;
+
+        public WeaponTextureData(String atlasPath, String animName, float frameDuration, int priority, float width,
+                float height, float offsetX, float offsetY) {
+            this.atlasPath = atlasPath;
+            this.animName = animName;
+            this.frameDuration = frameDuration;
+            this.priority = priority;
+            this.width = width;
+            this.height = height;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+        }
+
+        public WeaponTextureData() {
+            this.atlasPath = "";
+            this.animName = "";
+            this.frameDuration = 0.1f;
+            this.priority = 0;
+            this.width = 1f;
+            this.height = 1f;
+            this.offsetX = 0f;
+            this.offsetY = 0f;
+        }
     }
 }

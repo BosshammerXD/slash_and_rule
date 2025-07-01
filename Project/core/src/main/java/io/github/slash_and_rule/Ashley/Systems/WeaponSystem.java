@@ -1,16 +1,57 @@
 package io.github.slash_and_rule.Ashley.Systems;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.slash_and_rule.Animations.triggeredAnimData;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponTextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
+import io.github.slash_and_rule.Utils.Mappers;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem(int priority) {
         super(Family.all(WeaponComponent.class).get(), priority);
+    }
+
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+
+        engine.addEntityListener(
+                Family.all(WeaponComponent.class, RenderableComponent.class).get(),
+                new EntityListener() {
+                    @Override
+                    public void entityAdded(Entity entity) {
+                        System.out.println("WeaponSystem: Entity added with WeaponComponent: " + entity);
+                        WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+                        RenderableComponent renderable = Mappers.renderableMapper.get(entity);
+                        WeaponTextureData textureData = weapon.textureData;
+                        triggeredAnimData animData = new triggeredAnimData(textureData.atlasPath, textureData.animName,
+                                textureData.frameDuration, -1);
+                        weapon.animData = animData;
+                        weapon.texture = new RenderableComponent.TextureData() {
+                            {
+                                texture = null;
+                                animData = weapon.animData;
+                                width = textureData.width;
+                                height = textureData.height;
+                                offsetX = textureData.offsetX;
+                                offsetY = textureData.offsetY;
+                            }
+                        };
+                        renderable.addTextureDatas(textureData.priority, weapon.texture);
+                    }
+
+                    @Override
+                    public void entityRemoved(Entity entity) {
+                    }
+                });
     }
 
     @Override
@@ -31,9 +72,7 @@ public class WeaponSystem extends IteratingSystem {
         } else if (weapon.state == WeaponStates.COOLDOWN) {
             weapon.time += deltaTime;
 
-            // TODO: Perform Attack frames
             handleHitboxes(weapon);
-            handleAnim(weapon, deltaTime);
 
             if (weapon.time >= weapon.cooldown) {
                 weapon.state = WeaponStates.IDLE;
@@ -45,7 +84,7 @@ public class WeaponSystem extends IteratingSystem {
     }
 
     private void attack(WeaponComponent weapon) {
-        // TODO: Initiate Attack Logic needed?
+        weapon.animData.trigger();
     }
 
     private void handleHitboxes(WeaponComponent weapon) {
@@ -59,14 +98,11 @@ public class WeaponSystem extends IteratingSystem {
         }
     }
 
-    private void handleAnim(WeaponComponent weapon, float deltaTime) {
-        
-    }
-
     private void rotateWeapon(WeaponComponent weapon) {
         if (weapon.joint == null) {
             return;
         }
         weapon.body.setTransform(weapon.body.getPosition(), weapon.target.angleRad());
+        weapon.texture.angle = weapon.target.angleDeg() - 45f;
     }
 }

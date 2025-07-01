@@ -21,6 +21,8 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         this.viewport = new ExtendViewport(16, 9, camera);
 
+        engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
+
         // Add player and other game objects here
         player = new Player(getPhysicsBuilder(), camera, atlasManager);
         dungeonManager = new DungeonManager(this, "levels", 6, 16, 1, 3f, 0);
@@ -28,7 +30,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
                 1 / 16f);
 
         engine.addSystem(dungeonSystem);
-        engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
 
         System.out.println(Gdx.input.getInputProcessor());
     }

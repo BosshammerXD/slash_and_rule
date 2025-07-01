@@ -1,6 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -14,24 +13,26 @@ import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.LoadingScreen.ThreadData;
 import io.github.slash_and_rule.Utils.LRUCache;
+import io.github.slash_and_rule.Utils.RandomCollection;
 
 public class DungeonManager implements Initalizable, Disposable {
-    public static class LevelData {
+    public class LevelData {
         public String startRoom;
-        public String[] fillerRooms;
-        public String[] leafRooms;
+        public RandomCollection<String> fillerRoomsCollection;
+        public RandomCollection<String> leafRoomsCollection;
         public String endRoom;
 
-        public LevelData(String location, String startRoom, String[] fillerRooms, String[] leafRooms, String endRoom) {
+        public LevelData(String location, String startRoom, String[] fillerRooms, int[] fillerWeights, String[] leafRooms, int[] leafWeights, String endRoom) {
             this.startRoom = location + startRoom + ".tmx";
-            this.fillerRooms = Arrays.stream(fillerRooms)
-                    .map(room -> location + room + ".tmx")
-                    .toArray(String[]::new);
-            this.leafRooms = Arrays.stream(leafRooms)
-                    .map(room -> location + room + ".tmx")
-                    .toArray(String[]::new);
+            this.fillerRoomsCollection = new RandomCollection<>(random);
+            for (int i = 0; i < fillerRooms.length; i++) {
+                this.fillerRoomsCollection.add(fillerWeights[i], location + fillerRooms[i] + ".tmx");
+            }
+            this.leafRoomsCollection = new RandomCollection<>(random);
+            for (int i = 0; i < leafRooms.length; i++) {
+                this.leafRoomsCollection.add(leafWeights[i], location + leafRooms[i] + ".tmx");
+            }
             this.endRoom = location + endRoom + ".tmx";
-
         }
     }
 
@@ -67,10 +68,15 @@ public class DungeonManager implements Initalizable, Disposable {
         this.screen = screen;
 
         this.levels = new LevelData[] {
-                new LevelData(assetFolder + "/testlevel/", "start", new String[] { "filler" }, new String[] { "leaf" },
-                        "end"), };
+                new LevelData(assetFolder + "/testlevel/", "start", 
+                    new String[] { "filler" }, new int[] {1}, 
+                    new String[] { "leaf" }, new int[] {1}, "end"), 
+                new LevelData(assetFolder + "/level_1/", "start", 
+                    new String[] { "filler_0" }, new int[] {1},
+                    new String[] { "leaf_0", "leaf_1" }, new int[] {1, 2}, "end"), 
+        };
 
-        RoomData.scale = 1 / 16f;
+        RoomData.scale = 1 / 32f;
 
         screen.loadableObjects.add(this);
         screen.disposableObjects.add(this);
@@ -125,15 +131,11 @@ public class DungeonManager implements Initalizable, Disposable {
         } else if (type == 3) {
             return levels[currentLevel].endRoom; // Placeholder for end room
         }
-
-        return (type == 1) ? pickRandom(levels[currentLevel].fillerRooms) : pickRandom(levels[currentLevel].leafRooms); // Placeholder
-    }
-
-    private String pickRandom(String[] array) {
-        if (array.length == 0) {
-            return null; // No rooms available
+        if (type == 1) {
+            return levels[currentLevel].fillerRoomsCollection.next();
+        } else {
+            return levels[currentLevel].leafRoomsCollection.next();
         }
-        return array[random.nextInt(array.length)];
     }
 
     @Override
@@ -142,6 +144,7 @@ public class DungeonManager implements Initalizable, Disposable {
             room.dispose();
         }
         roomCache.clear();
+        DungeonRoom.numRooms = 0;
     }
 
     @Override

@@ -19,6 +19,7 @@ import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsCompo
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.DoorData;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.UtilData;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
 
@@ -52,6 +53,16 @@ public class DungeonBuilder {
             makeDoor(door, neighbours, physicsComponent.body);
         }
 
+        for (UtilData util : data.utils) {
+            if (util.type.equals("entry")) {
+                makeEntry(util);
+            } else if (util.type.equals("spawner")) {
+                makeSpawner(util);
+            } else if (util.type.equals("chest")) {
+                makeTreasure(util);
+            }
+        }
+
         this.physicsComponent.fixtures = makeFixtures();
         this.dungeonComponent.spawnPoints = spawnPoints;
 
@@ -78,6 +89,16 @@ public class DungeonBuilder {
 
         for (DoorData door : data.doors) {
             schedule.add(() -> makeDoor(door, neighbours, physicsComponent.body));
+        }
+
+        for (UtilData util : data.utils) {
+            if (util.type.equals("entry")) {
+                schedule.add(() -> makeEntry(util));
+            } else if (util.type.equals("spawner")) {
+                schedule.add(() -> makeSpawner(util));
+            } else if (util.type.equals("chest")) {
+                schedule.add(() -> makeTreasure(util));
+            }
         }
 
         schedule.add(() -> {
@@ -182,6 +203,18 @@ public class DungeonBuilder {
         doorFixtures[index][1].setUserData(index);
 
         spawnPoints[index] = new Vector2(door.spawnPoint[0], door.spawnPoint[1]);
+    }
+
+    private void makeEntry(UtilData entry) {
+        // TODO
+    }
+
+    private void makeSpawner(UtilData spawner) {
+        // TODO
+    }
+
+    private void makeTreasure(UtilData treasure) {
+        // TODO
     }
 
 }

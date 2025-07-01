@@ -25,9 +25,9 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         // Add player and other game objects here
         player = new Player(getPhysicsBuilder(), camera, atlasManager);
-        dungeonManager = new DungeonManager(this, "levels", 6, 16, 1, 3f, 0);
+        dungeonManager = new DungeonManager(this, "levels", 6, 16, 1, 3f, 1);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, getPhysicsBuilder(), camera,
-                1 / 16f);
+                1 / 32f);
 
         engine.addSystem(dungeonSystem);
 

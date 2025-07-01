@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="16">
+ <tileset firstgid="1" source="Dungeon_Tileset_Tryout.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="11" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,1,4,0,0,0,4,5,0,0,
+0,0,17,18,34,50,67,20,21,0,0,
+0,0,33,34,66,66,51,50,37,0,0,
+0,0,34,67,50,50,35,51,35,0,0,
+0,0,51,51,34,185,51,50,67,0,0,
+0,0,66,50,50,50,67,66,50,0,0,
+0,0,65,50,34,51,50,66,69,0,0,
+0,0,81,82,34,35,34,84,85,0,0,
+0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="4" name="Utils">
+  <object id="15" x="144" y="176" width="64" height="64">
+   <properties>
+    <property name="type" value="entry"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="2" name="collisions">
+  <object id="2" x="224" y="96" width="64" height="32"/>
+  <object id="3" x="64" y="96" width="64" height="32"/>
+  <object id="4" x="64" y="288" width="64" height="32"/>
+  <object id="5" x="224" y="288" width="64" height="32"/>
+  <object id="6" x="64" y="128" width="32" height="32"/>
+  <object id="7" x="256" y="128" width="32" height="32"/>
+  <object id="8" x="64" y="256" width="32" height="32"/>
+  <object id="9" x="256" y="256" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="3" name="doors">
+  <object id="10" x="128" y="96" width="96" height="32">
+   <properties>
+    <property name="type" value="top"/>
+   </properties>
+  </object>
+  <object id="11" x="128" y="288" width="96" height="32">
+   <properties>
+    <property name="type" value="bottom"/>
+   </properties>
+  </object>
+  <object id="12" x="64" y="160" width="32" height="96">
+   <properties>
+    <property name="type" value="left"/>
+   </properties>
+  </object>
+  <object id="13" x="256" y="160" width="32" height="96">
+   <properties>
+    <property name="type" value="right"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="28">
+ <tileset firstgid="1" source="Dungeon_Tileset_Tryout.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="11" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,
+113,3,3,4,67,68,35,3,4,4,5,
+129,55,131,75,67,50,34,75,131,55,21,
+33,51,67,66,67,66,67,51,50,51,37,
+49,67,67,34,66,34,35,36,66,67,53,
+68,67,66,50,68,51,67,35,50,51,67,
+51,66,35,68,34,51,36,67,66,67,50,
+34,34,35,50,34,35,34,35,36,51,34,
+49,50,34,35,51,51,35,66,67,68,53,
+65,178,50,51,34,35,51,34,35,36,69,
+81,82,83,84,51,50,35,82,83,84,85
+</data>
+ </layer>
+ <objectgroup id="2" name="collision">
+  <object id="1" x="32" y="64" width="96" height="32"/>
+  <object id="3" x="0" y="256" width="32" height="96"/>
+  <object id="5" x="32" y="320" width="96" height="32"/>
+  <object id="8" x="224" y="320" width="96" height="32"/>
+  <object id="17" x="224" y="64" width="96" height="32"/>
+  <object id="18" x="320" y="256" width="32" height="96"/>
+  <object id="19" x="320" y="64" width="32" height="96"/>
+  <object id="20" x="0" y="64" width="32" height="96"/>
+ </objectgroup>
+ <objectgroup id="3" name="door">
+  <object id="9" x="128" y="320" width="96" height="32">
+   <properties>
+    <property name="type" value="bottom"/>
+   </properties>
+  </object>
+  <object id="21" x="128" y="64" width="96" height="32">
+   <properties>
+    <property name="type" value="top"/>
+   </properties>
+  </object>
+  <object id="22" x="320" y="160" width="32" height="96">
+   <properties>
+    <property name="type" value="right"/>
+   </properties>
+  </object>
+  <object id="23" x="0" y="160" width="32" height="96">
+   <properties>
+    <property name="type" value="left"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="utils">
+  <object id="24" x="80" y="144">
+   <properties>
+    <property name="type" value="spawner"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="25" x="272" y="144">
+   <properties>
+    <property name="type" value="spawner"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="26" x="80" y="272">
+   <properties>
+    <property name="type" value="spawner"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="27" x="272" y="272">
+   <properties>
+    <property name="type" value="spawner"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+</map>

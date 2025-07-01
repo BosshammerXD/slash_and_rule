@@ -1,13 +1,14 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
 import java.util.ArrayDeque;
-import java.util.Stack;
 import java.util.function.Consumer;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.CircleMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
@@ -78,13 +79,34 @@ public class RoomData implements AsyncLoadable, Disposable {
         }
     }
 
+    public static class UtilData {
+        public float x, y, width, height;
+        public String type;
+
+        public UtilData(Rectangle rect, String type) {
+            this.x = rect.x;
+            this.y = rect.y;
+            this.width = rect.width;
+            this.height = rect.height;
+            this.type = type;
+        }
+
+        public UtilData(Circle circ, String type) {
+            this.x = circ.x - circ.radius;
+            this.y = circ.y - circ.radius;
+            this.width = circ.radius * 2;
+            this.height = circ.radius * 2;
+            this.type = type;
+        }
+    }
+
     public static float scale = 1f;
 
     private boolean done = false;
 
     public TiledMap map;
     public ColliderData[] walls;
-
+    public UtilData[] utils;
     public DoorData[] doors;
 
     private BaseScreen screen;
@@ -116,6 +138,7 @@ public class RoomData implements AsyncLoadable, Disposable {
             map = screen.getAssetManager().get(mapFilePath, TiledMap.class);
             genWallData();
             genDoorData();
+            genUtilData();
             return this;
         });
     }
@@ -144,12 +167,12 @@ public class RoomData implements AsyncLoadable, Disposable {
     }
 
     private void genWallData() {
-        MapObjects objects = map.getLayers().get("Collision").getObjects();
-        Stack<ColliderData> wallStack = new Stack<>();
+        MapObjects objects = map.getLayers().get("collision").getObjects();
+        ArrayDeque<ColliderData> wallStack = new ArrayDeque<>();
 
         for (MapObject object : objects) {
             if (object instanceof RectangleMapObject rectangleObject) {
-                wallStack.push(new ColliderData(getRect(rectangleObject)));
+                wallStack.add(new ColliderData(getRect(rectangleObject)));
             }
         }
 
@@ -158,16 +181,35 @@ public class RoomData implements AsyncLoadable, Disposable {
 
     private void genDoorData() {
         MapObjects objects = map.getLayers().get("door").getObjects();
-        Stack<DoorData> doorColliderStack = new Stack<>();
+        ArrayDeque<DoorData> doorColliderStack = new ArrayDeque<>();
 
         for (MapObject object : objects) {
             String type = object.getProperties().get("type", String.class);
             if (object instanceof RectangleMapObject rectangleObject && type != null) {
-                doorColliderStack.push(new DoorData(getRect(rectangleObject), type));
+                doorColliderStack.add(new DoorData(getRect(rectangleObject), type));
             }
         }
 
         doors = doorColliderStack.toArray(new DoorData[0]);
+    }
+
+    private void genUtilData() {
+        if (map.getLayers().get("util") == null) {
+            utils = new UtilData[0];
+            return;
+        }
+        MapObjects objects = map.getLayers().get("util").getObjects();
+        ArrayDeque<UtilData> utilStack = new ArrayDeque<>();
+        for (MapObject object : objects) {
+            String type = object.getProperties().get("type", String.class);
+            if (object instanceof RectangleMapObject rectangleObject) {
+                utilStack.add(new UtilData(getRect(rectangleObject), type));
+            } else if (object instanceof CircleMapObject circleObject) {
+                utilStack.add(new UtilData(getCirc(circleObject), type));
+            }
+        }
+
+        utils = utilStack.toArray(new UtilData[0]);
     }
 
     private Rectangle getRect(RectangleMapObject rectObject) {
@@ -177,6 +219,14 @@ public class RoomData implements AsyncLoadable, Disposable {
         rect.width *= scale / 2f;
         rect.height *= scale / 2f;
         return rect;
+    }
+
+    private Circle getCirc(CircleMapObject circObject) {
+        Circle circ = circObject.getCircle();
+        circ.x *= scale;
+        circ.y *= scale;
+        circ.radius *= scale / 2f;
+        return circ;
     }
 
     @Override

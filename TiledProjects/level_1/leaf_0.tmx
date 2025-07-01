@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="10">
+ <tileset firstgid="1" source="Dungeon_Tileset_Tryout.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="11" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,1,0,0,0,4,5,0,0,
+0,0,0,17,34,50,50,20,21,0,0,
+0,0,0,34,36,68,50,66,50,0,0,
+0,0,0,36,68,151,67,36,67,0,0,
+0,0,0,51,68,51,36,34,35,0,0,
+0,0,0,81,36,67,68,84,85,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,97,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="2" name="collisions">
+  <object id="1" x="224" y="96" width="64" height="32"/>
+  <object id="2" x="224" y="224" width="64" height="32"/>
+  <object id="3" x="96" y="96" width="32" height="32"/>
+  <object id="4" x="96" y="224" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="3" name="doors">
+  <object id="5" x="256" y="128" width="32" height="96">
+   <properties>
+    <property name="type" value="right"/>
+   </properties>
+  </object>
+  <object id="6" x="96" y="128" width="32" height="96">
+   <properties>
+    <property name="type" value="left"/>
+   </properties>
+  </object>
+  <object id="7" x="128" y="96" width="96" height="32">
+   <properties>
+    <property name="type" value="top"/>
+   </properties>
+  </object>
+  <object id="8" x="128" y="224" width="96" height="32">
+   <properties>
+    <property name="type" value="bottom"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="utils">
+  <object id="9" x="152" y="152" width="48" height="48">
+   <properties>
+    <property name="type" value="chest"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>

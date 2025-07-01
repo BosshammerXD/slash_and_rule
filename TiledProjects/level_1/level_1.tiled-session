@@ -1,0 +1,79 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "Alle Dateien (*)",
+    "fileStates": {
+        "end.tmx": {
+            "expandedObjectLayers": [
+                4
+            ],
+            "scale": 2.4289772727272725,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 175.79415204678367,
+                "y": 175.79415204678364
+            }
+        },
+        "endd.tmx": {
+            "scale": 2.4289772727272725,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 175.79415204678367,
+                "y": 175.79415204678364
+            }
+        },
+        "filler_0.tmx": {
+            "expandedObjectLayers": [
+                4
+            ],
+            "scale": 2,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 190,
+                "y": 182
+            }
+        },
+        "leaf_0.tmx": {
+            "expandedObjectLayers": [
+                4,
+                3,
+                2
+            ],
+            "scale": 2.4289772727272725,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 175.79415204678364,
+                "y": 175.79415204678364
+            }
+        },
+        "start.tmx": {
+            "expandedObjectLayers": [
+                4,
+                3,
+                2
+            ],
+            "scale": 2,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 158.5,
+                "y": 137
+            }
+        }
+    },
+    "last.imagePath": "C:/Users/Admin/NotOneDrive/Programmierzeugs/Java/libgdx/slash_and_rule/TiledProjects/level_1",
+    "map.height": 11,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 11,
+    "openFiles": [
+    ],
+    "project": "level_1.tiled-project",
+    "recentFiles": [
+        "endd.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

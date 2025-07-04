@@ -54,7 +54,6 @@ public class DungeonBuilder {
     }
 
     public RoomEntity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
-        System.out.println("\nmaking room\n");
         setup(data, collisionHandler);
 
         Entity[] utilEntities = new Entity[data.utils.length];
@@ -168,7 +167,6 @@ public class DungeonBuilder {
 
         this.physicsComponent = new PhysicsComponent();
         this.physicsComponent.body = physicsBuilder.makeBody(BodyType.StaticBody, 0, false);
-        System.out.println("DungeonBuilder: Created body" + this.entity + ", " + this.physicsComponent.body);
 
         this.sensorComponent = new SensorComponent();
         this.sensorComponent.collisionHandler = collisionHandler;

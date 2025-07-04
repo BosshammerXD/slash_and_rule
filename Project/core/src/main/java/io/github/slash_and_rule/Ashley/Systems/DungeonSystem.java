@@ -52,6 +52,7 @@ public class DungeonSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+        camera.update();
         if (!this.schedule.isEmpty()) {
             schedule.pop().run();
         }
@@ -147,6 +148,7 @@ public class DungeonSystem extends EntitySystem {
 
         // set the new room as active
         setMap();
+        System.out.println();
     }
 
     private void scheduleRoom(int direction, DungeonRoom room) {
@@ -186,7 +188,6 @@ public class DungeonSystem extends EntitySystem {
 
         // Load both rooms in parallel to avoid nested callback timing issues
         dungeonManager.getData(myRoom, loader, roomdata -> {
-            System.out.println("\n" + myRoom.path + "\n");
             this.room = dungeonBuilder.makeRoom(roomdata, myRoom.neighbours, new DoorHandler());
             addRoomEntity(room, -1);
             room.setActive(true);

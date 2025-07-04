@@ -20,6 +20,7 @@ import io.github.slash_and_rule.Utils.Mappers;
 public class CollisionSystem extends EntitySystem {
     private static class GameContactListener implements ContactListener {
         private ArrayDeque<Contact> contacts = new ArrayDeque<>();
+        private ArrayDeque<Contact> leaved = new ArrayDeque<>();
 
         @Override
         public void postSolve(Contact contact, ContactImpulse impulse) {
@@ -38,11 +39,15 @@ public class CollisionSystem extends EntitySystem {
 
         @Override
         public void endContact(Contact contact) {
-            // TODO Auto-generated method stub
+            leaved.add(contact);
         }
 
         public ArrayDeque<Contact> getContacts() {
             return contacts;
+        }
+
+        public ArrayDeque<Contact> getLeaved() {
+            return leaved;
         }
 
         public void clearContacts() {
@@ -79,6 +84,27 @@ public class CollisionSystem extends EntitySystem {
             handleSensors(entityA, fixtureA, entityB, fixtureB);
         }
         contactListener.clearContacts();
+        for (Contact contact : contactListener.getLeaved()) {
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+
+            Object userDataA = fixtureA.getBody().getUserData();
+            Object userDataB = fixtureB.getBody().getUserData();
+            if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
+                continue; // Skip if user data is not an Entity
+            }
+            Entity entityA = (Entity) userDataA;
+            Entity entityB = (Entity) userDataB;
+
+            SensorComponent sensorA = sensorMapper.get(entityA);
+            SensorComponent sensorB = sensorMapper.get(entityB);
+
+            if (sensorA != null) {
+                sensorA.isTriggered = false;
+            } else if (sensorB != null) {
+                sensorB.isTriggered = false;
+            }
+        }
     }
 
     private void handleWeapons(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
@@ -108,8 +134,10 @@ public class CollisionSystem extends EntitySystem {
 
         if (sensorA != null) {
             sensorA.collisionHandler.handleCollision(entityA, fixtureA, entityB, fixtureB);
+            sensorA.isTriggered = true;
         } else if (sensorB != null) {
             sensorB.collisionHandler.handleCollision(entityB, fixtureB, entityA, fixtureA);
+            sensorB.isTriggered = true;
         }
     }
 }

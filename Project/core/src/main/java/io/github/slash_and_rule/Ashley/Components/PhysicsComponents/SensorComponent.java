@@ -6,6 +6,7 @@ import io.github.slash_and_rule.Interfaces.CollisionHandler;
 
 public class SensorComponent implements Component {
     public CollisionHandler collisionHandler;
+    public boolean isTriggered = false;
 
     public SensorComponent() {
         // Default constructor

@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.SpawnerComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -26,6 +27,7 @@ import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
 
 public class DungeonBuilder {
+
     private EntityManager entityManager = new EntityManager();
 
     private Entity entity;
@@ -43,7 +45,7 @@ public class DungeonBuilder {
         this.physicsBuilder = physicsBuilder;
     }
 
-    public Entity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
+    public RoomEntity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
         setup(data, collisionHandler);
 
         for (int i = 0; i < data.walls.length; i++) {
@@ -56,7 +58,6 @@ public class DungeonBuilder {
         }
 
         this.physicsComponent.fixtures = makeFixtures();
-        this.dungeonComponent.spawnPoints = spawnPoints;
 
         this.dungeonComponent.doors = doorFixtures;
 
@@ -77,11 +78,11 @@ public class DungeonBuilder {
 
         this.entityManager.finish();
 
-        return this.entity;
+        return new RoomEntity(entity, spawnPoints, data.map, new Entity[0]);
     }
 
     public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
-            CollisionHandler collisionHandler, Consumer<Entity> onFinish) {
+            CollisionHandler collisionHandler, Consumer<RoomEntity> onFinish) {
         schedule.add(() -> setup(data, collisionHandler));
 
         for (int i = 0; i < data.walls.length; i++) {
@@ -95,7 +96,6 @@ public class DungeonBuilder {
 
         schedule.add(() -> {
             this.physicsComponent.fixtures = makeFixtures();
-            this.dungeonComponent.spawnPoints = spawnPoints;
             this.dungeonComponent.doors = doorFixtures;
         });
 
@@ -118,7 +118,7 @@ public class DungeonBuilder {
 
         schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(this.entity);
+                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, new Entity[0]));
             }
         });
     }
@@ -145,7 +145,6 @@ public class DungeonBuilder {
         this.doorFixtures = new Fixture[4][];
 
         this.dungeonComponent = new DungeonComponent();
-        this.dungeonComponent.map = data.map;
         this.physicsComponent = new PhysicsComponent();
 
         this.physicsComponent = new PhysicsComponent();
@@ -153,8 +152,6 @@ public class DungeonBuilder {
 
         this.sensorComponent = new SensorComponent();
         this.sensorComponent.collisionHandler = collisionHandler;
-
-        this.physicsComponent.body.setUserData(this.entity);
     }
 
     private HashMap<String, Fixture> makeFixtures() {
@@ -227,6 +224,7 @@ public class DungeonBuilder {
     private void makeSpawner(UtilData spawner) {
         // TODO
         EntityManager.makeEntity(
+                new TransformComponent(new Vector2(spawner.x, spawner.y), 0),
                 new SpawnerComponent());
     }
 

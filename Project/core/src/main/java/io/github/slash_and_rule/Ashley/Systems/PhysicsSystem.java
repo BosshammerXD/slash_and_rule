@@ -70,6 +70,16 @@ public class PhysicsSystem extends EntitySystem {
 
                     @Override
                     public void entityRemoved(Entity entity) {
+                        WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+                        if (weapon.joint != null) {
+                            world.destroyJoint(weapon.joint);
+                            weapon.joint = null;
+                        }
+                        if (weapon.body != null) {
+                            world.destroyBody(weapon.body);
+                            weapon.body.setUserData(null);
+                            weapon.body = null;
+                        }
                     }
                 });
     }

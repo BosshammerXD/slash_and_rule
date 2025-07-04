@@ -34,7 +34,7 @@ public class Globals {
         public static final int RenderSystemPriority = 100;
         public static final int AnimationSystemPriority = 90;
         public static final int MovementSystemPriority = 70;
-        public static final int DungeonSystemPriority = 60;
+        public static final int DungeonSystemPriority = 80;
         public static final int CollisionSystemPriority = 50;
         public static final int PhysicsSystemPriority = 40;
         public static final int WeaponSystemPriority = 30;

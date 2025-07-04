@@ -5,73 +5,13 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 public class EntityManager {
-    private static Engine engine;
-
-    private static Entity entity;
-
-    public static void setEngine(Engine engine) {
-        EntityManager.engine = engine;
-    }
-
-    public static Entity getEntity() {
-        checkEntity();
-        return entity;
-    }
-
-    public static void start() {
-        checkEngine();
-        entity = engine.createEntity();
-    }
-
-    public static void add(Component component) {
-        checkEngine();
-        checkEntity();
-        entity.add(component);
-    }
-
-    public static void add(Component... components) {
-        checkEngine();
-        checkEntity();
-        for (Component component : components) {
-            entity.add(component);
-        }
-    }
-
-    public static Entity end() {
-        checkEngine();
-        checkEntity();
-        engine.addEntity(entity);
-        return entity;
-    }
-
-    private static void checkEngine() {
-        if (engine == null) {
-            throw new IllegalStateException(
-                    "Engine is not set. Please call EntityManager.setEngine(engine) before using EntityManager.");
-        }
-    }
-
-    private static void checkEntity() {
-        if (entity == null) {
-            throw new IllegalStateException(
-                    "Entity is not created. Please call EntityManager.start() before using EntityManager.getEntity().");
-        }
-    }
-
-    public static Entity makeEntity(Component... components) {
-        checkEngine();
-        Entity newEntity = engine.createEntity();
-        for (Component component : components) {
-            newEntity.add(component);
-        }
-        engine.addEntity(newEntity);
-        return newEntity;
-    }
+    private Engine engine;
 
     private Entity obj_entity;
 
-    public EntityManager() {
+    public EntityManager(Engine engine) {
         this.obj_entity = new Entity();
+        this.engine = engine;
     }
 
     public Entity reset() {
@@ -97,5 +37,22 @@ public class EntityManager {
         }
         engine.addEntity(obj_entity);
         obj_entity = null;
+    }
+
+    public Entity makeEntity(Component... components) {
+        Entity entity = new Entity();
+        for (Component component : components) {
+            entity.add(component);
+        }
+        return entity;
+    }
+
+    public Entity addEntity(Component... components) {
+        Entity entity = new Entity();
+        for (Component component : components) {
+            entity.add(component);
+        }
+        engine.addEntity(entity);
+        return entity;
     }
 }

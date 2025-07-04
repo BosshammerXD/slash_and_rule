@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.Mappers;
@@ -29,8 +30,6 @@ public class RoomEntity {
         T component = mapper.get(entity);
         if (component != null) {
             callback.accept(component);
-        } else {
-            System.out.println("RoomEntity: Entity does not have " + mapper.getClass().getSimpleName());
         }
     }
 
@@ -70,6 +69,11 @@ public class RoomEntity {
         for (Entity utilEntity : utilEntities) {
             applyToComponent(Mappers.physicsMapper, utilEntity, physicsActive);
         }
+        applyToComponent(Mappers.renderableMapper, entity, comp -> {
+            for (TextureData textureData : comp.getAllTextures()) {
+                textureData.atlasPath = (active) ? "levels/level_1/levelSprites.atlas" : null;
+            }
+        });
     }
 
     public void roomFinishedLoading(int direction) {

@@ -11,7 +11,9 @@ import io.github.slash_and_rule.Animations.AnimData;
 public class RenderableComponent implements Component {
     public static class TextureData {
         public TextureRegion texture;
-        public AnimData animData;
+        public AnimData animData = null;
+        public String atlasPath = null;
+        public String name = null;
 
         public float width;
         public float height;

@@ -80,6 +80,7 @@ public abstract class BaseScreen implements Screen {
     protected Viewport viewport;
 
     protected Engine engine = new Engine();
+    protected EntityManager entityManager = new EntityManager(engine);
     private AtlasManager atlasManager;
 
     public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
@@ -90,10 +91,8 @@ public abstract class BaseScreen implements Screen {
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
 
-        EntityManager.setEngine(engine);
-
         engine.addSystem(new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
-        engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera));
+        engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
         engine.addSystem(inputSystem);
         engine.addSystem(new MovementSystem(Globals.MovementSystemPriority));
     }

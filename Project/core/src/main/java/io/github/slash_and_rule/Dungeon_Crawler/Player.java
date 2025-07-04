@@ -32,14 +32,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.utils.Disposable;
 
 public class Player implements Pausable, Disposable {
-    private EntityManager entityManager = new EntityManager();
     private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
     private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
     private TextureData moveTextureData;
     private TextureData capeTextureData;
 
-    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, AtlasManager atlasManager) {
+    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, AtlasManager atlasManager,
+            EntityManager entityManager) {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 

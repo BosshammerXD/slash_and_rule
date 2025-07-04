@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
+import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -64,6 +65,7 @@ public class DungeonSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         this.engine = engine;
         this.players = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
+        this.dungeonBuilder.setEntityManager(new EntityManager(engine));
     }
 
     private class DoorHandler implements CollisionHandler {
@@ -184,6 +186,7 @@ public class DungeonSystem extends EntitySystem {
 
         // Load both rooms in parallel to avoid nested callback timing issues
         dungeonManager.getData(myRoom, loader, roomdata -> {
+            System.out.println("\n" + myRoom.path + "\n");
             this.room = dungeonBuilder.makeRoom(roomdata, myRoom.neighbours, new DoorHandler());
             addRoomEntity(room, -1);
             room.setActive(true);

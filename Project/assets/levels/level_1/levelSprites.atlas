@@ -1,0 +1,41 @@
+
+levelSprites.png
+size: 256, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+Dungeon_Portal
+  rotate: false
+  xy: 100, 68
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+Dungeon_Wall_Bottom
+  rotate: false
+  xy: 2, 68
+  size: 96, 32
+  orig: 96, 32
+  offset: 0, 0
+  index: -1
+Dungeon_Wall_Left
+  rotate: false
+  xy: 134, 4
+  size: 32, 96
+  orig: 32, 96
+  offset: 0, 0
+  index: -1
+Dungeon_Wall_Right
+  rotate: false
+  xy: 168, 4
+  size: 32, 96
+  orig: 32, 96
+  offset: 0, 0
+  index: -1
+Dungeon_Wall_Top
+  rotate: false
+  xy: 2, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

@@ -19,6 +19,7 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.ForegroundCo
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class RenderSystem extends EntitySystem {
@@ -28,24 +29,26 @@ public class RenderSystem extends EntitySystem {
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
+    private AtlasManager atlasManager;
 
-    public RenderSystem(int priority, OrthographicCamera camera) {
+    public RenderSystem(int priority, OrthographicCamera camera, AtlasManager atlasManager) {
         super(priority);
 
         this.batch = new SpriteBatch();
         this.camera = camera;
+        this.atlasManager = atlasManager;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         backgroundEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, BackgroundComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, BackgroundComponent.class).get());
 
         midfieldEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, MidfieldComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, MidfieldComponent.class).get());
 
         foregroundEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, ForegroundComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, ForegroundComponent.class).get());
     }
 
     @Override
@@ -55,9 +58,10 @@ public class RenderSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
 
-        camera.update();
+        // camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
         // Render background entities
         renderEntities(backgroundEntities, e -> Mappers.transformMapper.get(e).z);
         // Render midfield entities
@@ -81,7 +85,10 @@ public class RenderSystem extends EntitySystem {
         for (Integer key : renderable.textures.keySet()) {
             for (TextureData textureData : renderable.textures.get(key)) {
                 if (textureData.texture == null) {
-                    continue;
+                    if (textureData.name == null || textureData.atlasPath == null) {
+                        continue;
+                    }
+                    textureData.texture = atlasManager.getTexture(textureData.atlasPath, textureData.name);
                 }
 
                 Affine2 transformMatrix = new Affine2().rotate(textureData.angle)

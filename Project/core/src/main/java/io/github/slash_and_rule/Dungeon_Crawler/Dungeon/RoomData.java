@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.CircleMapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
@@ -91,11 +91,11 @@ public class RoomData implements AsyncLoadable, Disposable {
             this.type = type;
         }
 
-        public UtilData(Circle circ, String type) {
-            this.x = circ.x - circ.radius;
-            this.y = circ.y - circ.radius;
-            this.width = circ.radius * 2;
-            this.height = circ.radius * 2;
+        public UtilData(Ellipse elli, String type) {
+            this.x = elli.x - elli.width;
+            this.y = elli.y - elli.height;
+            this.width = elli.width * 2;
+            this.height = elli.height * 2;
             this.type = type;
         }
     }
@@ -204,12 +204,13 @@ public class RoomData implements AsyncLoadable, Disposable {
             String type = object.getProperties().get("type", String.class);
             if (object instanceof RectangleMapObject rectangleObject) {
                 utilStack.add(new UtilData(getRect(rectangleObject), type));
-            } else if (object instanceof CircleMapObject circleObject) {
-                utilStack.add(new UtilData(getCirc(circleObject), type));
+            } else if (object instanceof EllipseMapObject circleObject) {
+                utilStack.add(new UtilData(getElli(circleObject), type));
             }
         }
 
         utils = utilStack.toArray(new UtilData[0]);
+        System.out.println(utilStack.toString());
     }
 
     private Rectangle getRect(RectangleMapObject rectObject) {
@@ -221,12 +222,13 @@ public class RoomData implements AsyncLoadable, Disposable {
         return rect;
     }
 
-    private Circle getCirc(CircleMapObject circObject) {
-        Circle circ = circObject.getCircle();
-        circ.x *= scale;
-        circ.y *= scale;
-        circ.radius *= scale / 2f;
-        return circ;
+    private Ellipse getElli(EllipseMapObject elliObject) {
+        Ellipse elli = elliObject.getEllipse();
+        elli.x *= scale;
+        elli.y *= scale;
+        elli.width *= scale / 2f;
+        elli.height *= scale / 2f;
+        return elli;
     }
 
     @Override

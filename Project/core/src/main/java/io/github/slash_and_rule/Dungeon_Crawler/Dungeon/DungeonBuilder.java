@@ -16,6 +16,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.SpawnerComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -28,13 +31,14 @@ import io.github.slash_and_rule.Interfaces.CollisionHandler;
 
 public class DungeonBuilder {
 
-    private EntityManager entityManager = new EntityManager();
+    private EntityManager entityManager;
 
     private Entity entity;
 
     private DungeonComponent dungeonComponent;
     private PhysicsComponent physicsComponent;
     private SensorComponent sensorComponent;
+    private RenderableComponent renderableComponent;
     private ArrayDeque<Fixture> physicsFixtures;
     private Fixture[][] doorFixtures;
     private Vector2[] spawnPoints = new Vector2[4]; // 0: left, 1: down, 2: right, 3: up
@@ -45,8 +49,15 @@ public class DungeonBuilder {
         this.physicsBuilder = physicsBuilder;
     }
 
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     public RoomEntity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
+        System.out.println("\nmaking room\n");
         setup(data, collisionHandler);
+
+        Entity[] utilEntities = new Entity[data.utils.length];
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -64,26 +75,31 @@ public class DungeonBuilder {
         entityManager.build(
                 this.physicsComponent,
                 this.dungeonComponent,
-                this.sensorComponent);
+                this.sensorComponent,
+                this.renderableComponent,
+                new TransformComponent(),
+                new BackgroundComponent());
 
+        int index = 0;
         for (UtilData util : data.utils) {
             if (util.type.equals("entry")) {
-                makeEntry(util);
+                utilEntities[index] = makeEntry(util);
             } else if (util.type.equals("spawner")) {
-                makeSpawner(util);
+                utilEntities[index] = makeSpawner(util);
             } else if (util.type.equals("chest")) {
-                makeTreasure(util);
+                utilEntities[index] = makeTreasure(util);
             }
+            index++;
         }
 
-        this.entityManager.finish();
-
-        return new RoomEntity(entity, spawnPoints, data.map, new Entity[0]);
+        return new RoomEntity(entity, spawnPoints, data.map, utilEntities);
     }
 
     public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
             CollisionHandler collisionHandler, Consumer<RoomEntity> onFinish) {
         schedule.add(() -> setup(data, collisionHandler));
+        Entity[] utilEntities = new Entity[data.utils.length];
+        int index = 0;
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -102,23 +118,26 @@ public class DungeonBuilder {
         schedule.add(() -> entityManager.build(
                 this.physicsComponent,
                 this.dungeonComponent,
-                this.sensorComponent));
-
-        schedule.add(() -> this.entityManager.finish());
+                this.sensorComponent,
+                this.renderableComponent,
+                new TransformComponent(),
+                new BackgroundComponent()));
 
         for (UtilData util : data.utils) {
+            final int i = index;
             if (util.type.equals("entry")) {
-                schedule.add(() -> makeEntry(util));
+                schedule.add(() -> utilEntities[i] = makeEntry(util));
             } else if (util.type.equals("spawner")) {
-                schedule.add(() -> makeSpawner(util));
+                schedule.add(() -> utilEntities[i] = makeSpawner(util));
             } else if (util.type.equals("chest")) {
-                schedule.add(() -> makeTreasure(util));
+                schedule.add(() -> utilEntities[i] = makeTreasure(util));
             }
+            index++;
         }
 
         schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, new Entity[0]));
+                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, utilEntities));
             }
         });
     }
@@ -149,9 +168,12 @@ public class DungeonBuilder {
 
         this.physicsComponent = new PhysicsComponent();
         this.physicsComponent.body = physicsBuilder.makeBody(BodyType.StaticBody, 0, false);
+        System.out.println("DungeonBuilder: Created body" + this.entity + ", " + this.physicsComponent.body);
 
         this.sensorComponent = new SensorComponent();
         this.sensorComponent.collisionHandler = collisionHandler;
+
+        this.renderableComponent = new RenderableComponent();
     }
 
     private HashMap<String, Fixture> makeFixtures() {
@@ -170,6 +192,13 @@ public class DungeonBuilder {
         return shape;
     }
 
+    private Shape makeCircleShape(UtilData util) {
+        CircleShape shape = new CircleShape();
+        shape.setPosition(new Vector2(util.x + util.width, util.y + util.height));
+        shape.setRadius(util.width);
+        return shape;
+    }
+
     private Fixture buildWall(ColliderData wall, Body body) {
         Shape shape = makeRectangleShape(wall);
         return physicsBuilder.addFixture(body, shape, Globals.WallCategory, Globals.WallMask, false);
@@ -179,11 +208,42 @@ public class DungeonBuilder {
         physicsFixtures.add(buildWall(wall, body));
     }
 
+    private void addWallSprite(ColliderData wall, int direction) {
+        String spriteName;
+        switch (direction) {
+            case 0:
+                spriteName = "Dungeon_Wall_Left";
+                break;
+            case 1:
+                spriteName = "Dungeon_Wall_Bottom";
+                break;
+            case 2:
+                spriteName = "Dungeon_Wall_Right";
+                break;
+            case 3:
+                spriteName = "Dungeon_Wall_Top";
+                break;
+            default:
+                return;
+        }
+        TextureData textureData = new TextureData();
+        textureData.name = spriteName;
+        textureData.width = wall.width * 2f;
+        textureData.height = wall.height * 2f;
+        textureData.offsetX = wall.x - wall.width;
+        textureData.offsetY = wall.y - wall.height;
+        if (direction == 3) {
+            textureData.height *= 2;
+        }
+        renderableComponent.addTextureDatas(0, textureData);
+    }
+
     private void makeDoor(DoorData door, Object[] neighbours, Body body) {
         // TODO: Add the picture of the door
         int index = dirToIndex(door.type);
         Object neighbour = neighbours[index];
         if (neighbour == null) {
+            addWallSprite(door.collider, index);
             makeWall(door.collider, body);
             return;
         }
@@ -204,45 +264,37 @@ public class DungeonBuilder {
         spawnPoints[index] = new Vector2(door.spawnPoint[0], door.spawnPoint[1]);
     }
 
-    private void makeEntry(UtilData entry) {
+    private Entity makeEntry(UtilData entry) {
         // TODO
-        CircleShape shape = new CircleShape();
-        shape.setPosition(new Vector2(entry.x, entry.y));
-        shape.setRadius(entry.width);
-        float x = entry.x + entry.width / 2f;
-        float y = entry.y + entry.height / 2f;
+        Shape shape = makeCircleShape(entry);
 
         PhysicsComponent pC = new PhysicsComponent();
-        pC.body = physicsBuilder.makeBody(x, y, BodyType.StaticBody, 0f, false);
+        pC.body = physicsBuilder.makeBody(0, 0, BodyType.StaticBody, 0f, false);
         pC.fixtures.put(
                 "Sensor",
                 physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
 
-        EntityManager.makeEntity(pC);
+        return entityManager.makeEntity(pC);
     }
 
-    private void makeSpawner(UtilData spawner) {
+    private Entity makeSpawner(UtilData spawner) {
         // TODO
-        EntityManager.makeEntity(
+        return entityManager.makeEntity(
                 new TransformComponent(new Vector2(spawner.x, spawner.y), 0),
                 new SpawnerComponent());
     }
 
-    private void makeTreasure(UtilData treasure) {
+    private Entity makeTreasure(UtilData treasure) {
         // TODO
-        CircleShape shape = new CircleShape();
-        shape.setPosition(new Vector2(treasure.x, treasure.y));
-        shape.setRadius(treasure.width);
-        float x = treasure.x + treasure.width / 2f;
-        float y = treasure.y + treasure.height / 2f;
+        Shape shape = makeCircleShape(treasure);
 
         PhysicsComponent pC = new PhysicsComponent();
-        pC.body = physicsBuilder.makeBody(x, y, BodyType.StaticBody, 0f, false);
+        pC.body = physicsBuilder.makeBody(0, 0, BodyType.StaticBody, 0f, false);
         pC.fixtures.put(
                 "Sensor",
                 physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
 
-        EntityManager.makeEntity(pC);
+        return entityManager.makeEntity(pC);
     }
 
 }

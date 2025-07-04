@@ -18,13 +18,14 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
+        atlasManager.add("levels/level_1/levelSprites.atlas");
 
         this.viewport = new ExtendViewport(16, 9, camera);
 
         engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
 
         // Add player and other game objects here
-        player = new Player(getPhysicsBuilder(), camera, atlasManager);
+        player = new Player(getPhysicsBuilder(), camera, atlasManager, entityManager);
         System.out.println("Player created: " + player);
         dungeonManager = new DungeonManager(this, "levels", 6, 16, 1, 3f, 1);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, getPhysicsBuilder(), camera,

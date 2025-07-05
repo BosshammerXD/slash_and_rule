@@ -14,7 +14,11 @@ public class HealthComponent implements Component {
         this.maxHealth = maxHealth;
     }
 
+    public HealthComponent(int health) {
+        this(health, health);
+    }
+
     public HealthComponent() {
-        this(100, 100); // Default values
+        this(100, 100);
     }
 }

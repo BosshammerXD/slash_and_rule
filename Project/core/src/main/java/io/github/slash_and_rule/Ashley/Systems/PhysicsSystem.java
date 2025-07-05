@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
@@ -92,7 +93,16 @@ public class PhysicsSystem extends EntitySystem {
             if (collider == null || collider.body == null || movement == null) {
                 continue;
             }
-            collider.body.setLinearVelocity(movement.velocity);
+            Vector2 velocity = collider.body.getLinearVelocity();
+            if (velocity.len() > movement.lastVelocity.len()) {
+                velocity.sub(movement.lastVelocity);
+                movement.lastVelocity.set(movement.velocity);
+                velocity.add(movement.velocity);
+            } else {
+                movement.lastVelocity.set(velocity);
+                velocity.set(movement.velocity);
+            }
+            collider.body.setLinearVelocity(velocity);
         }
 
         world.step(deltaTime, 6, 2);

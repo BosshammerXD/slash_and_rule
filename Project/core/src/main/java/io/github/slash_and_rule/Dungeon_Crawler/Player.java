@@ -43,6 +43,9 @@ public class Player implements Pausable, Disposable {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 
+        PolygonShape hurtBoxShape = new PolygonShape();
+        hurtBoxShape.setAsBox(5 / 16f, 11 / 16f, new Vector2(0, 0.5f), 0);
+
         atlasManager.add("entities/PlayerAtlas/PlayerAtlas.atlas");
         atlasManager.add("weapons/BasicSword/BasicSword.atlas");
 
@@ -93,7 +96,11 @@ public class Player implements Pausable, Disposable {
                 "Collider",
                 physicsBuilder.addFixture(
                         pC.body, colliderShape, 1f,
-                        Globals.PlayerCategory, Globals.PlayerMask, false));
+                        Globals.PlayerCategory, Globals.ColPlayerMask, false));
+        pC.fixtures.put(
+                "HurtBox",
+                physicsBuilder.addFixture(pC.body, hurtBoxShape,
+                        Globals.PlayerCategory, Globals.HitboxCategory, true));
 
         PolygonShape weaponShape = new PolygonShape();
         weaponShape.set(

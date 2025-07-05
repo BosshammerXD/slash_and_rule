@@ -19,8 +19,11 @@ public class Globals {
         public static final short HitboxCategory = 0x0010;
         public static final short SensorCategory = 0x0020;
 
-        public static final short PlayerMask = EnemyCategory | ItemCategory | WallCategory | SensorCategory;
+        public static final short ColPlayerMask = EnemyCategory | ItemCategory | WallCategory | SensorCategory;
+
         public static final short WallMask = PlayerCategory | EnemyCategory | ItemCategory | HitboxCategory;
+
+        public static final short ColEnemyMask = PlayerCategory | WallCategory;
 
         // endregion
         //

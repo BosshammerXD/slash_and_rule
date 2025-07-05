@@ -70,7 +70,6 @@ public class RoomEntity {
             applyToComponent(Mappers.physicsMapper, utilEntity, physicsActive);
         }
         applyToComponent(Mappers.renderableMapper, entity, comp -> {
-            System.out.println(active + ", " + this);
             for (TextureData textureData : comp.getAllTextures()) {
                 textureData.atlasPath = (active) ? "levels/level_1/levelSprites.atlas" : null;
                 if (!active)

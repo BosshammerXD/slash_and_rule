@@ -2,6 +2,8 @@
 - find out how to implement pause menu
 
 DungeonCrawler:
+  - implement set in Basecreen holds all relevant atlasPaths and is loaded on init and unloads all on switch
+    - maybe only unload no longer neede assets
   - implement controller inputs
   - implement enemy class
   - implement enemy Spawn System

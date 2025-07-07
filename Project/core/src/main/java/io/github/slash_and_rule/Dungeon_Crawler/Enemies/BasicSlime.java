@@ -2,7 +2,6 @@ package io.github.slash_and_rule.Dungeon_Crawler.Enemies;
 
 import java.util.HashMap;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -15,8 +14,8 @@ import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
 public class BasicSlime extends BaseEnemy {
-    public BasicSlime(Vector2 position, PhysicsBuilder physicsBuilder, EntityManager entityManager) {
-        super(position, physicsBuilder, entityManager);
+    public BasicSlime(PhysicsBuilder physicsBuilder, EntityManager entityManager) {
+        super(physicsBuilder, entityManager);
     }
 
     @Override
@@ -34,7 +33,7 @@ public class BasicSlime extends BaseEnemy {
     }
 
     @Override
-    protected void addFixtures(PhysicsComponent fixtures, PhysicsBuilder physicsBuilder) {
+    protected void addFixtures(PhysicsComponent fixtures) {
         Body body = fixtures.body;
         HashMap<String, Fixture> fixtureMap = fixtures.fixtures;
 
@@ -44,5 +43,20 @@ public class BasicSlime extends BaseEnemy {
         fixtureMap.put("Collider",
                 physicsBuilder.addFixture(body, colliderShape, Globals.EnemyCategory, Globals.ColEnemyMask, false));
 
+        CircleShape hurtBoxShape = new CircleShape();
+        hurtBoxShape.setRadius(0.5f);
+
+        fixtureMap.put("HurtBox",
+                physicsBuilder.addFixture(body, hurtBoxShape, Globals.EnemyCategory, Globals.HitboxCategory, true));
+    }
+
+    @Override
+    public int getCost() {
+        return 10;
+    }
+
+    @Override
+    public String getAtlasPath() {
+        return "entities/PlayerAtlas/PlayerAtlas.atlas";
     }
 }

@@ -34,11 +34,17 @@ public abstract class BaseEnemy {
         }
     }
 
-    protected Entity entity;
+    protected PhysicsBuilder physicsBuilder;
+    protected EntityManager entityManager;
 
-    public BaseEnemy(Vector2 position, PhysicsBuilder physicsBuilder, EntityManager entityManager) {
+    public BaseEnemy(PhysicsBuilder physicsBuilder, EntityManager entityManager) {
+        this.physicsBuilder = physicsBuilder;
+        this.entityManager = entityManager;
+    }
+
+    public final Entity makeEntity(Vector2 position) {
         EnemyData data = makeEnemyData(new EnemyData());
-        this.entity = entityManager.reset();
+        Entity entity = entityManager.reset();
 
         TransformComponent transformComponent = new TransformComponent(position.cpy(), 0f);
         MovementComponent movementComponent = new MovementComponent();
@@ -51,7 +57,7 @@ public abstract class BaseEnemy {
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
-        addFixtures(physicsComponent, physicsBuilder);
+        addFixtures(physicsComponent);
 
         WeaponComponent weaponComponent = new WeaponComponent(physicsBuilder, data.plannedFixtures, data.damage,
                 data.weight, data.attackCooldown,
@@ -69,15 +75,17 @@ public abstract class BaseEnemy {
                 enemyComponent);
 
         entityManager.finish();
+
+        return entity;
     }
 
     protected abstract void addTextures(RenderableComponent renderableComponent);
 
-    protected abstract void addFixtures(PhysicsComponent physicsComponent, PhysicsBuilder physicsBuilder);
+    protected abstract void addFixtures(PhysicsComponent physicsComponent);
 
     protected abstract EnemyData makeEnemyData(EnemyData data);
 
-    public final Entity getEntity() {
-        return entity;
-    }
+    public abstract int getCost();
+
+    public abstract String getAtlasPath();
 }

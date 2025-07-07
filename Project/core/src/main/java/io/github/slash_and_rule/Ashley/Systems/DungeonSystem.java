@@ -40,11 +40,13 @@ public class DungeonSystem extends EntitySystem {
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer mapRenderer;
 
+    private PhysicsBuilder physicsBuilder;
+
     public DungeonSystem(int priority, DungeonManager dungeonManager, PhysicsBuilder physicsBuilder,
             OrthographicCamera camera, float scale) {
         super(priority);
+        this.physicsBuilder = physicsBuilder;
         this.dungeonManager = dungeonManager;
-        this.dungeonBuilder = new DungeonBuilder(physicsBuilder);
         this.camera = camera;
         this.mapRenderer = new OrthogonalTiledMapRenderer(null, scale);
         dungeonManager.setOnDungeonGenerated(this::init);
@@ -66,7 +68,7 @@ public class DungeonSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         this.engine = engine;
         this.players = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
-        this.dungeonBuilder.setEntityManager(new EntityManager(engine));
+        this.dungeonBuilder = new DungeonBuilder(physicsBuilder, new EntityManager(engine));
     }
 
     private class DoorHandler implements CollisionHandler {
@@ -121,9 +123,9 @@ public class DungeonSystem extends EntitySystem {
     private void change_room(int direction) {
         schedule.clear();
         // Set the current room inactive and the new room active
-        room.setActive(false);
+        room.setHasSpawners(false);
         room.setOpen(false, neighbours); // close doors so when we move back, the doors are closed
-        neighbours[direction].setActive(true);
+        neighbours[direction].setHasSpawners(true);
         // shift the new room to the current room and the old room to the correct
         // neighbour
         if (neighbours[(direction + 2) % 4] != null)
@@ -190,7 +192,7 @@ public class DungeonSystem extends EntitySystem {
         dungeonManager.getData(myRoom, loader, roomdata -> {
             this.room = dungeonBuilder.makeRoom(roomdata, myRoom.neighbours, new DoorHandler());
             addRoomEntity(room, -1);
-            room.setActive(true);
+            room.setHasSpawners(true);
             room.setOpen(true, neighbours);
             this.mapRenderer.setMap(roomdata.map);
         });

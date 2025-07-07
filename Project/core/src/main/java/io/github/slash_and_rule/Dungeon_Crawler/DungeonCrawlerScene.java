@@ -1,5 +1,7 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -15,9 +17,11 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     private Player player;
     private DungeonManager dungeonManager;
     private DungeonSystem dungeonSystem;
+    private DungeonData dungeonData;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
+        this.dungeonData = new DungeonData(getPhysicsBuilder(), entityManager, atlasManager, assetManager);
         atlasManager.add("levels/level_1/levelSprites.atlas");
 
         this.viewport = new ExtendViewport(16, 9, camera);

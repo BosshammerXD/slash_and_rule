@@ -45,11 +45,8 @@ public class DungeonBuilder {
 
     private PhysicsBuilder physicsBuilder;
 
-    public DungeonBuilder(PhysicsBuilder physicsBuilder) {
+    public DungeonBuilder(PhysicsBuilder physicsBuilder, EntityManager entityManager) {
         this.physicsBuilder = physicsBuilder;
-    }
-
-    public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -57,6 +54,7 @@ public class DungeonBuilder {
         setup(data, collisionHandler);
 
         Entity[] utilEntities = new Entity[data.utils.length];
+        boolean hasSpawners = false;
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -85,13 +83,14 @@ public class DungeonBuilder {
                 utilEntities[index] = makeEntry(util);
             } else if (util.type.equals("spawner")) {
                 utilEntities[index] = makeSpawner(util);
+                hasSpawners = true;
             } else if (util.type.equals("chest")) {
                 utilEntities[index] = makeTreasure(util);
             }
             index++;
         }
 
-        return new RoomEntity(entity, spawnPoints, data.map, utilEntities);
+        return new RoomEntity(entity, spawnPoints, data.map, utilEntities, hasSpawners);
     }
 
     public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
@@ -99,6 +98,7 @@ public class DungeonBuilder {
         schedule.add(() -> setup(data, collisionHandler));
         Entity[] utilEntities = new Entity[data.utils.length];
         int index = 0;
+        boolean[] hasSpawners = { false };
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -128,6 +128,7 @@ public class DungeonBuilder {
                 schedule.add(() -> utilEntities[i] = makeEntry(util));
             } else if (util.type.equals("spawner")) {
                 schedule.add(() -> utilEntities[i] = makeSpawner(util));
+                hasSpawners[0] = true;
             } else if (util.type.equals("chest")) {
                 schedule.add(() -> utilEntities[i] = makeTreasure(util));
             }
@@ -136,7 +137,7 @@ public class DungeonBuilder {
 
         schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, utilEntities));
+                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, utilEntities, hasSpawners[0]));
             }
         });
     }

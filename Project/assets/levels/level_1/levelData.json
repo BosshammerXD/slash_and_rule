@@ -1,0 +1,14 @@
+{
+    "start": "start",
+    "filler": {
+        "filler_0": 1
+    },
+    "leaf": {
+        "leaf_0": 1,
+        "leaf_1": 2
+    },
+    "end": "end",
+    "enemies": [
+        0
+    ]
+}

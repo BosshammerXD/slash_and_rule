@@ -1,5 +1,7 @@
 package io.github.slash_and_rule;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
@@ -60,4 +62,5 @@ public class Globals {
         public static int AttackButton = Buttons.LEFT;
 
         // endregion
+        public static final Random random = new Random();
 }

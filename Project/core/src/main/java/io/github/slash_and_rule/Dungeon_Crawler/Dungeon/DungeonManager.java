@@ -22,7 +22,8 @@ public class DungeonManager implements Initalizable, Disposable {
         public RandomCollection<String> leafRoomsCollection;
         public String endRoom;
 
-        public LevelData(String location, String startRoom, String[] fillerRooms, int[] fillerWeights, String[] leafRooms, int[] leafWeights, String endRoom) {
+        public LevelData(String location, String startRoom, String[] fillerRooms, int[] fillerWeights,
+                String[] leafRooms, int[] leafWeights, String endRoom) {
             this.startRoom = location + startRoom + ".tmx";
             this.fillerRoomsCollection = new RandomCollection<>(random);
             for (int i = 0; i < fillerRooms.length; i++) {
@@ -68,12 +69,12 @@ public class DungeonManager implements Initalizable, Disposable {
         this.screen = screen;
 
         this.levels = new LevelData[] {
-                new LevelData(assetFolder + "/testlevel/", "start", 
-                    new String[] { "filler" }, new int[] {1}, 
-                    new String[] { "leaf" }, new int[] {1}, "end"), 
-                new LevelData(assetFolder + "/level_1/", "start", 
-                    new String[] { "filler_0" }, new int[] {1},
-                    new String[] { "leaf_0", "leaf_1" }, new int[] {1, 2}, "end"), 
+                new LevelData(assetFolder + "/testlevel/", "start",
+                        new String[] { "filler" }, new int[] { 1 },
+                        new String[] { "leaf" }, new int[] { 1 }, "end"),
+                new LevelData(assetFolder + "/level_1/", "start",
+                        new String[] { "filler_0" }, new int[] { 1 },
+                        new String[] { "leaf_0", "leaf_1" }, new int[] { 1, 2 }, "end"),
         };
 
         RoomData.scale = 1 / 32f;
@@ -119,7 +120,7 @@ public class DungeonManager implements Initalizable, Disposable {
         }
         RoomData data = roomCache.get(room.path);
         if (data == null) {
-            roomCache.put(room.path, new RoomData(myScreen, room.path, callback));
+            roomCache.put(room.path, new RoomData(myScreen, room.path, myScreen.getAssetManager(), callback));
         } else {
             data.addCallback(callback);
         }

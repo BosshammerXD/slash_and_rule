@@ -5,7 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
-import io.github.slash_and_rule.Bases.BaseScreen;
+import io.github.slash_and_rule.Bases.GameScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.DungeonCrawlerScene;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
@@ -19,7 +19,7 @@ public class Main extends Game {
     private AtlasManager atlasManager = new AtlasManager(assetManager);
     private LoadingScreen loadingScreen;
 
-    BaseScreen[] screens = new BaseScreen[10];
+    GameScreen[] screens = new GameScreen[10];
 
     @Override
     public void create() {

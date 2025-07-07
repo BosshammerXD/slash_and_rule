@@ -1,21 +1,18 @@
 package io.github.slash_and_rule;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.util.function.Consumer;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.utils.async.AsyncResult;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
-import io.github.slash_and_rule.Interfaces.AsyncLoadable;
-import io.github.slash_and_rule.Interfaces.Initalizable;
+import io.github.slash_and_rule.Bases.GameScreen;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
 public class LoadingScreen extends BaseScreen {
-    public static class MsgRunnable implements Runnable {
+    private static class MsgRunnable implements Runnable {
         public String msg;
         private Runnable runnable;
 
@@ -64,15 +61,17 @@ public class LoadingScreen extends BaseScreen {
         }
     }
 
-    public Stack<ThreadData> threads;
+    public ArrayDeque<ThreadData> threads;
+    private ArrayDeque<MsgRunnable> schedule = new ArrayDeque<>();
 
-    public BaseScreen nextScreen;
-    private BaseScreen defaultScreen;
+    public GameScreen nextScreen;
+    private GameScreen defaultScreen;
     private String msg = "";
 
     private Consumer<Screen> changeScreen;
+    private boolean done = true;
 
-    public LoadingScreen(BaseScreen defaultScreen, AssetManager assetManager, AtlasManager atlasManager,
+    public LoadingScreen(GameScreen defaultScreen, AssetManager assetManager, AtlasManager atlasManager,
             Consumer<Screen> changeScreen) {
         super(assetManager, atlasManager);
         this.nextScreen = null; // Initially, there is no next screen set.
@@ -83,27 +82,19 @@ public class LoadingScreen extends BaseScreen {
 
     @Override
     public void show() {
-        this.threads = new Stack<>();
+        super.show();
+        this.threads = new ArrayDeque<>();
         if (nextScreen != null) {
-            runInits(nextScreen);
-            System.out.println("loading AsyncList: " + this.asyncLoadableObjects.toString());
+            nextScreen.init(this);
         } else {
-            runInits(defaultScreen);
+            defaultScreen.init(this);
             System.out.println("No next screen set, using default screen.");
             nextScreen = defaultScreen;
         }
     }
 
-    private void runInits(BaseScreen screen) {
-        for (Initalizable data : screen.loadableObjects) {
-            data.init(this);
-        }
-    }
-
     @Override
     public void render(float delta) {
-        // super.render(delta);
-        // Additional rendering logic for the loading screen can be added here.
         if (nextScreen == null) {
             System.out.println("No next screen set, cannot proceed with loading.");
             return;
@@ -112,40 +103,22 @@ public class LoadingScreen extends BaseScreen {
             // If the asset manager is still loading assets, we can display a loading
             // message or animation.
             msg = "Loading assets: " + (int) (assetManager.getProgress() * 100) + "%";
-            return;
+            done = false;
         }
+        super.render(delta);
+        if (done) {
+            System.out.println("Loading complete, switching to next screen.");
+            changeScreen.accept(nextScreen);
+        }
+        done = true;
+    }
 
-        while (!asyncLoadableObjects.isEmpty()) {
-            AsyncResult<AsyncLoadable> v = asyncLoadableObjects.pop().schedule(asyncExecutor);
-            if (v != null) {
-                processingQueue.add(v);
-            }
-        }
-
-        if (schedule != null && !schedule.isEmpty()) {
-            schedule.pop().run();
-            if (schedule.peek() instanceof MsgRunnable) {
-                msg = ((MsgRunnable) schedule.peek()).msg;
-            }
-            return;
-        }
-
-        for (int i = 0; i < processingQueue.size(); i++) {
-            AsyncResult<AsyncLoadable> result = processingQueue.poll();
-            if (result != null) {
-                if (result.isDone()) {
-                    AsyncLoadable obj = result.get();
-                    if (obj != null) {
-                        obj.loadDone();
-                    }
-                } else {
-                    processingQueue.add(result);
-                }
-            }
-        }
+    @Override
+    protected void preHalt(float delta) {
 
         msg = "waiting for threads to finish...";
         if (!threads.isEmpty()) {
+            done = false;
             if (threads.peek().thread.isAlive()) {
                 // If there are still threads running, we wait for them to finish.
                 return;
@@ -155,17 +128,26 @@ public class LoadingScreen extends BaseScreen {
             }
         }
 
-        if (!this.processingQueue.isEmpty()) {
-            System.out.println("Processing queue is not empty, waiting for tasks to complete.");
-            return;
+        if (schedule != null && !schedule.isEmpty()) {
+            done = false;
+            schedule.pop().run();
+            if (!schedule.isEmpty())
+                msg = schedule.peek().msg;
         }
-        System.out.println("Loading complete, switching to next screen.");
-        changeScreen.accept(nextScreen);
+
+        if (!this.processingQueue.isEmpty()) {
+            done = false;
+            System.out.println("Processing queue is not empty, waiting for tasks to complete.");
+        }
     }
 
-    @Override
-    public void hide() {
-        // TODO Auto-generated method stub
-        Gdx.input.setInputProcessor(null);
+    public void schedule(String msg, Runnable runnable) {
+        if (runnable != null) {
+            schedule.add(new MsgRunnable(msg, runnable));
+        }
+    }
+
+    public void schedule(Runnable runnable) {
+        schedule("", runnable);
     }
 }

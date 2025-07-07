@@ -1,29 +1,14 @@
 package io.github.slash_and_rule.Bases;
 
-import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.Ashley.EntityManager;
-import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
-import io.github.slash_and_rule.Ashley.Systems.InputSystem;
-import io.github.slash_and_rule.Ashley.Systems.MovementSystem;
-import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
-import io.github.slash_and_rule.Interfaces.Updatetable;
 import io.github.slash_and_rule.Utils.AtlasManager;
-import io.github.slash_and_rule.Utils.Generation;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
-import io.github.slash_and_rule.Interfaces.Displayable;
-import io.github.slash_and_rule.Interfaces.Initalizable;
-import io.github.slash_and_rule.Interfaces.Pausable;
-import io.github.slash_and_rule.Interfaces.SortedDisplayable;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
@@ -31,82 +16,33 @@ import com.badlogic.gdx.utils.async.AsyncResult;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public abstract class BaseScreen implements Screen {
-    private static class GenerationalFunction implements Runnable {
-        private final Generation generation;
-        private final int generationValue;
-        private final Runnable function;
-
-        public GenerationalFunction(Generation generation, Runnable function, int generationValue) {
-            this.generation = generation;
-            this.function = function;
-            this.generationValue = generationValue;
-        }
-
-        public boolean isValid() {
-            return generation.get() == generationValue;
-        }
-
-        @Override
-        public void run() {
-            function.run();
-        }
-    }
 
     public AsyncExecutor asyncExecutor = new AsyncExecutor(1);
 
     public ArrayDeque<AsyncResult<AsyncLoadable>> processingQueue = new ArrayDeque<>();
-
-    protected AssetManager assetManager = null;
-
-    public ArrayList<Initalizable> loadableObjects = new ArrayList<>();
-
-    public ArrayList<Displayable> drawableObjects = new ArrayList<>();
-    public ArrayList<Displayable> backgroundObjects = new ArrayList<>();
-    public ArrayList<SortedDisplayable> sortedDrawableObjects = new ArrayList<>();
-    public ArrayList<Displayable> foregroundObjects = new ArrayList<>();
-
-    public ArrayList<Updatetable> updatableObjects = new ArrayList<>();
-    public ArrayList<Pausable> pausableObjects = new ArrayList<>();
-
-    public ArrayList<Disposable> disposableObjects = new ArrayList<>();
-
     public ArrayDeque<AsyncLoadable> asyncLoadableObjects = new ArrayDeque<>();
+    public ArrayDeque<Disposable> disposableObjects = new ArrayDeque<>();
+
+    protected AssetManager assetManager;
 
     public boolean halt = false;
-
-    protected SpriteBatch batch = new SpriteBatch();
 
     public OrthographicCamera camera = new OrthographicCamera();
     protected Viewport viewport;
 
-    protected Engine engine = new Engine();
-    protected EntityManager entityManager = new EntityManager(engine);
     private AtlasManager atlasManager;
-
-    public ArrayDeque<Runnable> schedule = new ArrayDeque<>();
-
-    private InputSystem inputSystem = new InputSystem(Globals.InputSystemPriority);
 
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
-
-        engine.addSystem(new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
-        engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
-        engine.addSystem(inputSystem);
-        engine.addSystem(new MovementSystem(Globals.MovementSystemPriority));
     }
 
     @Override
     public void show() {
         // This method is called when the screen is shown.
         // Initialize your screen here, such as loading assets or setting up the camera.
-        for (Initalizable data : loadableObjects) {
-            data.show(assetManager);
-        }
         this.viewport.apply();
         camera.update();
-        inputSystem.setInputProcessor(); // Set the input processor for the InputSystem
     }
     // Prepare your screen here.
 
@@ -123,8 +59,6 @@ public abstract class BaseScreen implements Screen {
             }
         }
 
-        handleSchedule();
-
         for (int i = 0; i < processingQueue.size(); i++) {
             AsyncResult<AsyncLoadable> result = processingQueue.poll();
             if (result != null) {
@@ -139,37 +73,14 @@ public abstract class BaseScreen implements Screen {
             }
         }
 
+        preHalt(delta);
+
         if (halt) {
             return; // Skip rendering if the screen is halted
         }
-        for (Updatetable obj : updatableObjects) {
-            obj.update(delta);
-        }
+
         this.viewport.apply();
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
         ScreenUtils.clear(0, 0, 0, 1, true);
-
-        for (Displayable obj : drawableObjects) {
-            obj.draw(batch);
-        }
-
-        engine.update(delta);
-
-        batch.begin();
-        for (Displayable obj : backgroundObjects) {
-            obj.draw(batch);
-        }
-        if (!sortedDrawableObjects.isEmpty()) {
-            sortedDrawableObjects.sort((a, b) -> Float.compare(a.getSortIndex(), b.getSortIndex()));
-            for (SortedDisplayable obj : sortedDrawableObjects) {
-                obj.draw(batch);
-            }
-        }
-        for (Displayable obj : foregroundObjects) {
-            obj.draw(batch);
-        }
-        batch.end();
     }
 
     @Override
@@ -188,23 +99,17 @@ public abstract class BaseScreen implements Screen {
     @Override
     public void pause() {
         // Invoked when your application is paused.
-        for (Pausable obj : pausableObjects) {
-            obj.pause();
-        }
+        halt = true;
     }
 
     @Override
     public void resume() {
         // Invoked when your application is resumed after pause.
-        for (Pausable obj : pausableObjects) {
-            obj.resume();
-        }
+        halt = false;
     }
 
     @Override
     public void hide() {
-        assetManager.clear();
-        Gdx.input.setInputProcessor(null);
     }
 
     @Override
@@ -212,7 +117,7 @@ public abstract class BaseScreen implements Screen {
         for (Disposable obj : disposableObjects) {
             obj.dispose();
         }
-    };
+    }
 
     public void loadAsset(String assetPath, Class<?> assetType) {
         if (assetManager != null) {
@@ -222,32 +127,10 @@ public abstract class BaseScreen implements Screen {
         }
     }
 
+    protected void preHalt(float delta) {
+    }
+
     public AssetManager getAssetManager() {
-        if (assetManager == null) {
-            assetManager = new AssetManager();
-        }
         return assetManager;
-    }
-
-    public void schedule_generation(Runnable callback, Generation generation, int generationValue) {
-        schedule.add(new GenerationalFunction(generation, callback, generationValue));
-    }
-
-    private void handleSchedule() {
-        while (!schedule.isEmpty()) {
-            Runnable task = schedule.pop();
-            if (task instanceof GenerationalFunction && !((GenerationalFunction) task).isValid()) {
-                continue; // Skip invalid GenerationalFunction
-            } else if (task != null) {
-                task.run(); // Execute the task if it's not a GenerationalFunction or is valid
-                break;
-            } else {
-                Gdx.app.error("BaseScreen", "Scheduled task is null.");
-            }
-        }
-    }
-
-    public AtlasManager getAtlasManager() {
-        return atlasManager;
     }
 }

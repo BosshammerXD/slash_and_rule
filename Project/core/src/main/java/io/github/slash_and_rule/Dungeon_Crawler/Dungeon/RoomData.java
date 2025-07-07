@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 import java.util.ArrayDeque;
 import java.util.function.Consumer;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
@@ -109,33 +110,29 @@ public class RoomData implements AsyncLoadable, Disposable {
     public UtilData[] utils;
     public DoorData[] doors;
 
-    private BaseScreen screen;
+    private AssetManager assetManager;
     private String mapFilePath;
 
     private ArrayDeque<Consumer<RoomData>> callBack = new ArrayDeque<>();
 
-    public RoomData(BaseScreen screen, String mapFilePath) {
-        BaseConstructor(screen, mapFilePath);
-    }
-
-    public RoomData(BaseScreen screen, String mapFilePath, Consumer<RoomData> callback) {
-        this.callBack.add(callback);
-        BaseConstructor(screen, mapFilePath);
-    }
-
-    private void BaseConstructor(BaseScreen screen, String mapFilePath) {
+    public RoomData(BaseScreen screen, String mapFilePath, AssetManager assetManager) {
         this.mapFilePath = mapFilePath;
-        this.screen = screen;
+        this.assetManager = assetManager;
         screen.loadAsset(mapFilePath, TiledMap.class);
 
         screen.asyncLoadableObjects.add(this);
         screen.disposableObjects.add(this);
     }
 
+    public RoomData(BaseScreen screen, String mapFilePath, AssetManager assetManager, Consumer<RoomData> callback) {
+        this(screen, mapFilePath, assetManager);
+        this.callBack.add(callback);
+    }
+
     @Override
     public AsyncResult<AsyncLoadable> schedule(AsyncExecutor asyncExecutor) {
         return asyncExecutor.submit(() -> {
-            map = screen.getAssetManager().get(mapFilePath, TiledMap.class);
+            map = assetManager.get(mapFilePath, TiledMap.class);
             genWallData();
             genDoorData();
             genUtilData();

@@ -1,7 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;

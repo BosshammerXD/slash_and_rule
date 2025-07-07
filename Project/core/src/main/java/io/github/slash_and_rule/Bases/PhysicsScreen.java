@@ -11,10 +11,10 @@ import io.github.slash_and_rule.Ashley.Systems.PhysicsSystem;
 import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
-public abstract class PhysicsScreen extends BaseScreen {
+public abstract class PhysicsScreen extends GameScreen {
     protected World world = new World(new Vector2(0, 0), true);
     protected Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-    private PhysicsBuilder physicsBuilder = new PhysicsBuilder(world);
+    protected PhysicsBuilder physicsBuilder = new PhysicsBuilder(world);
 
     public PhysicsScreen(AssetManager assetManager, AtlasManager atlasManager, boolean debug) {
         super(assetManager, atlasManager);

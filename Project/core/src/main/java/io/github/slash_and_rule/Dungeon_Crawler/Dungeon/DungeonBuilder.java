@@ -20,7 +20,6 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundCo
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.SpawnerComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
@@ -53,8 +52,8 @@ public class DungeonBuilder {
     public RoomEntity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
         setup(data, collisionHandler);
 
-        Entity[] utilEntities = new Entity[data.utils.length];
-        boolean hasSpawners = false;
+        ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
+        ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -77,28 +76,25 @@ public class DungeonBuilder {
                 new TransformComponent(),
                 new BackgroundComponent());
 
-        int index = 0;
         for (UtilData util : data.utils) {
             if (util.type.equals("entry")) {
-                utilEntities[index] = makeEntry(util);
+                utilEntities.add(makeEntry(util));
             } else if (util.type.equals("spawner")) {
-                utilEntities[index] = makeSpawner(util);
-                hasSpawners = true;
+                spawnerPositions.add(new Vector2(util.x, util.y));
             } else if (util.type.equals("chest")) {
-                utilEntities[index] = makeTreasure(util);
+                utilEntities.add(makeTreasure(util));
             }
-            index++;
         }
 
-        return new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities, hasSpawners);
+        return new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities.toArray(new Entity[0]),
+                spawnerPositions.toArray(new Vector2[0]));
     }
 
     public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
             CollisionHandler collisionHandler, Consumer<RoomEntity> onFinish) {
         schedule.add(() -> setup(data, collisionHandler));
-        Entity[] utilEntities = new Entity[data.utils.length];
-        int index = 0;
-        boolean[] hasSpawners = { false };
+        ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
+        ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -123,21 +119,19 @@ public class DungeonBuilder {
                 new BackgroundComponent()));
 
         for (UtilData util : data.utils) {
-            final int i = index;
             if (util.type.equals("entry")) {
-                schedule.add(() -> utilEntities[i] = makeEntry(util));
+                schedule.add(() -> utilEntities.add(makeEntry(util)));
             } else if (util.type.equals("spawner")) {
-                schedule.add(() -> utilEntities[i] = makeSpawner(util));
-                hasSpawners[0] = true;
+                schedule.add(() -> spawnerPositions.add(new Vector2(util.x, util.y)));
             } else if (util.type.equals("chest")) {
-                schedule.add(() -> utilEntities[i] = makeTreasure(util));
+                schedule.add(() -> utilEntities.add(makeTreasure(util)));
             }
-            index++;
         }
 
         schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities, hasSpawners[0]));
+                onFinish.accept(new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities.toArray(new Entity[0]),
+                        spawnerPositions.toArray(new Vector2[0])));
             }
         });
     }
@@ -274,13 +268,6 @@ public class DungeonBuilder {
                 physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
 
         return entityManager.makeEntity(pC);
-    }
-
-    private Entity makeSpawner(UtilData spawner) {
-        // TODO
-        return entityManager.makeEntity(
-                new TransformComponent(new Vector2(spawner.x, spawner.y), 0),
-                new SpawnerComponent());
     }
 
     private Entity makeTreasure(UtilData treasure) {

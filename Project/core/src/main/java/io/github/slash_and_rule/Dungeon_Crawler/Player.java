@@ -17,8 +17,6 @@ import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponCompon
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
-import io.github.slash_and_rule.Interfaces.Pausable;
-import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
@@ -29,17 +27,25 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.Disposable;
 
-public class Player implements Pausable, Disposable {
+public class Player {
     private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
     private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
     private TextureData moveTextureData;
     private TextureData capeTextureData;
 
-    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, AtlasManager atlasManager,
-            EntityManager entityManager) {
+    private PhysicsBuilder physicsBuilder;
+    private OrthographicCamera camera;
+    private EntityManager entityManager;
+
+    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, EntityManager entityManager) {
+        this.physicsBuilder = physicsBuilder;
+        this.camera = camera;
+        this.entityManager = entityManager;
+    }
+
+    public void init() {
         CircleShape colliderShape = new CircleShape();
         colliderShape.setRadius(7 / 16f);
 
@@ -82,7 +88,7 @@ public class Player implements Pausable, Disposable {
         };
         rC.addTextureDatas(2, this.capeTextureData);
 
-        ControllableComponent cC = new ControllableComponent(new PlayerInput(camera));
+        ControllableComponent cC = new ControllableComponent(new PlayerInput());
 
         PhysicsComponent pC = new PhysicsComponent();
         pC.body = physicsBuilder.makeBody(
@@ -104,7 +110,7 @@ public class Player implements Pausable, Disposable {
                 new float[] { 7 / 16f, 0f, 1.5f, 1f, 2f, 0f, 1.5f, -1f });
 
         PlannedFixture[] fixtures = new PlannedFixture[] {
-                new PlannedFixture(0.1f, 0.3f, weaponShape, Globals.PlayerCategory)
+                new PlannedFixture(0.1f, 0.3f, weaponShape, Globals.EnemyCategory)
         };
 
         WeaponComponent wC = new WeaponComponent(
@@ -123,12 +129,6 @@ public class Player implements Pausable, Disposable {
     }
 
     private class PlayerInput extends Inputhandler {
-        private OrthographicCamera camera;
-
-        public PlayerInput(OrthographicCamera camera) {
-            this.camera = camera;
-        }
-
         @Override
         public void mouseEvent(MouseInputType type, int screenX, int screenY, int button) {
             if (type == MouseInputType.MOVED || type == MouseInputType.DRAGGED) {
@@ -207,20 +207,5 @@ public class Player implements Pausable, Disposable {
                 comp.changePriority(2, 0, capeTextureData);
             }
         }
-    }
-
-    @Override
-    public void pause() {
-        // Implement pause logic for the player
-    }
-
-    @Override
-    public void resume() {
-        // Implement resume logic for the player
-    }
-
-    @Override
-    public void dispose() {
-        // TODO: Figure out, what we need to dispose here
     }
 }

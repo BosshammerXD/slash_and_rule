@@ -28,7 +28,7 @@ public abstract class BaseEnemy {
         public float weight = 1f;
         public float attackCooldown = 1f;
         public WeaponTextureData weaponTextureData = null;
-        public ProjectileData[] projectiles = null;
+        public ProjectileData[] projectiles = new ProjectileData[0];
 
         public EnemyData() {
         }
@@ -45,8 +45,9 @@ public abstract class BaseEnemy {
     public final Entity makeEntity(Vector2 position) {
         EnemyData data = makeEnemyData(new EnemyData());
         Entity entity = entityManager.reset();
+        Vector2 pos = position.cpy();
 
-        TransformComponent transformComponent = new TransformComponent(position.cpy(), 0f);
+        TransformComponent transformComponent = new TransformComponent(pos, 0f);
         MovementComponent movementComponent = new MovementComponent();
         movementComponent.max_speed = data.max_speed;
 
@@ -56,7 +57,7 @@ public abstract class BaseEnemy {
         addTextures(renderableComponent);
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
-        physicsComponent.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
+        physicsComponent.body = physicsBuilder.makeBody(pos.x, pos.y, BodyType.DynamicBody, 6f, true);
         addFixtures(physicsComponent);
 
         WeaponComponent weaponComponent = new WeaponComponent(physicsBuilder, data.plannedFixtures, data.damage,

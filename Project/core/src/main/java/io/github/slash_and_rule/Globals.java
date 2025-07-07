@@ -62,6 +62,8 @@ public class Globals {
         public static int AttackButton = Buttons.LEFT;
 
         // endregion
+        public static float spawnInterval = 1f;
+        public static float spawnDistance = 1f;
         public static String level = "level_1";
         public static String equippedWeapon = "BasicSword";
         public static final Random random = new Random();

@@ -28,7 +28,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
 
         // Add player and other game objects here
-        player = new Player(getPhysicsBuilder(), camera, atlasManager, entityManager);
+        player = new Player(physicsBuilder, camera, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(6, 16, 1, 3f), 1 / 32f);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physicsBuilder, camera,
                 1 / 32f);
@@ -43,13 +43,15 @@ public class DungeonCrawlerScene extends PhysicsScreen {
             dungeonManager.level = dungeonData.load(Globals.level);
             dungeonManager.init(loader);
         });
+        loader.schedule("loading player", () -> {
+            player.init();
+        });
         super.init(loader);
     }
 
     @Override
     public void hide() {
         super.hide();
-        player.dispose();
         dungeonManager.dispose();
     }
 }

@@ -201,8 +201,8 @@ public class WeaponComponent implements Component {
         }
 
         public WeaponTextureData() {
-            this.atlasPath = "";
-            this.animName = "";
+            this.atlasPath = null;
+            this.animName = null;
             this.frameDuration = 0.1f;
             this.priority = 0;
             this.width = 1f;

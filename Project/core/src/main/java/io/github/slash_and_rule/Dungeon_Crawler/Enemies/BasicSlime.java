@@ -9,6 +9,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.PlannedFixture;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponTextureData;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
@@ -23,6 +25,17 @@ public class BasicSlime extends BaseEnemy {
         data.health = 50;
         data.max_speed = 2f;
         data.attackRange = 1f;
+
+        CircleShape hitBoxShape = new CircleShape();
+        hitBoxShape.setRadius(0.5f);
+        data.plannedFixtures = new PlannedFixture[] {
+                new PlannedFixture(0.5f, 0.6f, hitBoxShape, Globals.PlayerCategory) };
+
+        data.weaponTextureData = new WeaponTextureData();
+
+        data.attackRange = 0.5f;
+        data.attackCooldown = 1f;
+        data.damage = 2;
 
         return data;
     }

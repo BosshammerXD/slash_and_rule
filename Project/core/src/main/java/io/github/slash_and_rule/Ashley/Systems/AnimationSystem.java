@@ -33,6 +33,10 @@ public class AnimationSystem extends IteratingSystem {
                 continue;
             }
             animData.update(deltaTime);
+            if (animData.atlasPath == null || animData.name == null) {
+                textureData.texture = null;
+                continue;
+            }
             TextureRegion[] anim = atlasManager.getAnimation(animData.atlasPath, animData.name);
             if (anim == null || anim.length == 0) {
                 textureData.texture = null;

@@ -16,13 +16,16 @@ import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonRoom;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.EnemyPicker;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomEntity;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonBuilder;
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 
 public class DungeonSystem extends EntitySystem {
@@ -41,6 +44,11 @@ public class DungeonSystem extends EntitySystem {
     private OrthogonalTiledMapRenderer mapRenderer;
 
     private PhysicsBuilder physicsBuilder;
+    private EnemyPicker enemyPicker;
+
+    private ArrayDeque<BaseEnemy> enemies = new ArrayDeque<>();
+    private ArrayDeque<Entity> enemyEntities = new ArrayDeque<>();
+    private float time = 0f;
 
     public DungeonSystem(int priority, DungeonManager dungeonManager, PhysicsBuilder physicsBuilder,
             OrthographicCamera camera, float scale) {
@@ -50,6 +58,7 @@ public class DungeonSystem extends EntitySystem {
         this.camera = camera;
         this.mapRenderer = new OrthogonalTiledMapRenderer(null, scale);
         dungeonManager.setOnDungeonGenerated(this::init);
+        this.enemyPicker = new EnemyPicker();
     }
 
     @Override
@@ -61,6 +70,44 @@ public class DungeonSystem extends EntitySystem {
         if (this.mapRenderer.getMap() != null) {
             this.mapRenderer.setView(camera);
             this.mapRenderer.render();
+        }
+        if (!enemies.isEmpty()) {
+            if (time >= Globals.spawnInterval) {
+                time = 0f;
+                spawnEntity();
+            } else {
+                time += deltaTime;
+            }
+
+        }
+        if (!enemyEntities.isEmpty()) {
+
+        }
+    }
+
+    private void spawnEntity() {
+        Vector2[] spawners = room.getSpawners();
+        for (Vector2 spawner : spawners) {
+            if (spawner == null) {
+                continue;
+            }
+            if (enemies.isEmpty()) {
+                return; // No enemies to spawn
+            }
+            for (Entity player : players) {
+                TransformComponent transformComponent = Mappers.transformMapper.get(player);
+                if (transformComponent == null) {
+                    System.out.println("DungeonSystem: Player does not have a TransformComponent");
+                    continue;
+                }
+                if (spawner.cpy().sub(transformComponent.position).len() < Globals.spawnDistance) {
+                    continue;
+                }
+            }
+            BaseEnemy enemy = enemies.pop();
+            enemy.makeEntity(spawner);
+            System.out.println("Spawned enemy: " + enemy.getClass().getSimpleName());
+            System.out.println("at: " + spawner);
         }
     }
 
@@ -123,9 +170,9 @@ public class DungeonSystem extends EntitySystem {
     private void change_room(int direction) {
         schedule.clear();
         // Set the current room inactive and the new room active
-        room.setHasSpawners(false);
+        room.setActive(false);
         room.setOpen(false, neighbours); // close doors so when we move back, the doors are closed
-        neighbours[direction].setHasSpawners(true);
+        neighbours[direction].setActive(true);
         // shift the new room to the current room and the old room to the correct
         // neighbour
         if (neighbours[(direction + 2) % 4] != null)
@@ -138,7 +185,12 @@ public class DungeonSystem extends EntitySystem {
         removeRoomEntity((direction + 1) % 4);
         removeRoomEntity((direction + 3) % 4);
         // set the doors
-        room.setOpen(dungeonManager.getRoom().cleared, neighbours);
+        boolean open = dungeonManager.getRoom().cleared && room.getSpawners().length > 0;
+        room.setOpen(open, neighbours);
+        if (open) {
+            this.time = Globals.spawnInterval;
+            this.enemies = enemyPicker.pickEnemies(dungeonManager.getRoom().difficulty * 10);
+        }
         // schedule the new rooms for Generation
         DungeonRoom dungeonRoom = dungeonManager.getRoom();
         scheduleRoom(direction, dungeonRoom.neighbours[direction]);
@@ -184,14 +236,14 @@ public class DungeonSystem extends EntitySystem {
     }
 
     public void init(LoadingScreen loader) {
+        enemyPicker.setEnemies(dungeonManager.level.enemies);
         DungeonRoom myRoom = dungeonManager.getRoom();
         DungeonRoom other = myRoom.neighbours[1];
 
-        // Load both rooms in parallel to avoid nested callback timing issues
         dungeonManager.getData(myRoom, loader, roomdata -> {
             this.room = dungeonBuilder.makeRoom(roomdata, myRoom.neighbours, new DoorHandler());
             addRoomEntity(room, -1);
-            room.setHasSpawners(true);
+            room.setActive(true);
             room.setOpen(true, neighbours);
             this.mapRenderer.setMap(roomdata.map);
         });

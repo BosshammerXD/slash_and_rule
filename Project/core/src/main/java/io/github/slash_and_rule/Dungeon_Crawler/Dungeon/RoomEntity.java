@@ -24,7 +24,7 @@ public class RoomEntity {
     private Vector2[] spawnPoints; // 0: left, 1: down, 2: right, 3: up
     private TiledMap tilemap;
     public Entity[] utilEntities;
-    public boolean hasSpawners;
+    private Vector2[] spawners;
 
     private <T extends Component> void applyToComponent(ComponentMapper<T> mapper, Entity entity,
             Consumer<T> callback) {
@@ -39,7 +39,7 @@ public class RoomEntity {
     }
 
     public RoomEntity(Entity entity, Vector2[] spawnPoints, TiledMap tilemap, Entity[] utilEntities,
-            boolean hasSpawners) {
+            Vector2[] spawners) {
         if (entity == null || spawnPoints == null || tilemap == null || utilEntities == null) {
             throw new IllegalArgumentException("Entity, spawnPoints, tilemap, and utilEntities cannot be null");
         } else if (spawnPoints.length != 4) {
@@ -49,7 +49,7 @@ public class RoomEntity {
         this.spawnPoints = spawnPoints;
         this.tilemap = tilemap;
         this.utilEntities = utilEntities;
-        this.hasSpawners = hasSpawners;
+        this.spawners = spawners;
     }
 
     public void add(Engine engine) {
@@ -66,7 +66,7 @@ public class RoomEntity {
         }
     }
 
-    public void setHasSpawners(boolean active) {
+    public void setActive(boolean active) {
         Consumer<PhysicsComponent> physicsActive = physicsActive(active);
         applyToComponent(Mappers.physicsMapper, entity, physicsActive);
         for (Entity utilEntity : utilEntities) {
@@ -148,5 +148,9 @@ public class RoomEntity {
             throw new IllegalArgumentException("Direction must be between 0 and " + (spawnPoints.length - 1));
         }
         return spawnPoints[direction];
+    }
+
+    public Vector2[] getSpawners() {
+        return spawners;
     }
 }

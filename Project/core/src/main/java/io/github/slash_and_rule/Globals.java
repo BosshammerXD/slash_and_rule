@@ -62,5 +62,7 @@ public class Globals {
         public static int AttackButton = Buttons.LEFT;
 
         // endregion
+        public static String level = "level_1";
+        public static String equippedWeapon = "BasicSword";
         public static final Random random = new Random();
 }

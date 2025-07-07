@@ -46,9 +46,6 @@ public class Player implements Pausable, Disposable {
         PolygonShape hurtBoxShape = new PolygonShape();
         hurtBoxShape.setAsBox(5 / 16f, 11 / 16f, new Vector2(0, 0.5f), 0);
 
-        atlasManager.add("entities/PlayerAtlas/PlayerAtlas.atlas");
-        atlasManager.add("weapons/BasicSword/BasicSword.atlas");
-
         entityManager.reset();
 
         TransformComponent tC = new TransformComponent(
@@ -56,7 +53,7 @@ public class Player implements Pausable, Disposable {
 
         RenderableComponent rC = new RenderableComponent();
         MovementAnimData moveAnimData = new MovementAnimData(
-                "entities/PlayerAtlas/PlayerAtlas.atlas",
+                "entities/Player/Player.atlas",
                 () -> new Vector2().set(tC.position).sub(tC.lastPosition),
                 animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
         this.moveTextureData = new TextureData() {
@@ -70,7 +67,7 @@ public class Player implements Pausable, Disposable {
         };
         rC.addTextureDatas(1, this.moveTextureData);
         MovementAnimData capeMoveAnimData = new MovementAnimData(
-                "entities/PlayerAtlas/PlayerAtlas.atlas",
+                "entities/Player/Player.atlas",
                 () -> new Vector2().set(tC.position).sub(tC.lastPosition),
                 capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
 

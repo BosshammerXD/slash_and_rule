@@ -11,14 +11,13 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import com.badlogic.gdx.utils.async.AsyncResult;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 
-public class RoomData implements AsyncLoadable, Disposable {
+public class RoomData implements AsyncLoadable {
     public static class ColliderData {
         public float x, y, width, height;
 
@@ -121,7 +120,6 @@ public class RoomData implements AsyncLoadable, Disposable {
         screen.loadAsset(mapFilePath, TiledMap.class);
 
         screen.asyncLoadableObjects.add(this);
-        screen.disposableObjects.add(this);
     }
 
     public RoomData(BaseScreen screen, String mapFilePath, AssetManager assetManager, Consumer<RoomData> callback) {
@@ -226,12 +224,5 @@ public class RoomData implements AsyncLoadable, Disposable {
         elli.width *= scale / 2f;
         elli.height *= scale / 2f;
         return elli;
-    }
-
-    @Override
-    public void dispose() {
-        if (map != null) {
-            map.dispose();
-        }
     }
 }

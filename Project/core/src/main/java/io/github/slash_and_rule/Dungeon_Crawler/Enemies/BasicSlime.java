@@ -54,9 +54,4 @@ public class BasicSlime extends BaseEnemy {
     public int getCost() {
         return 10;
     }
-
-    @Override
-    public String getAtlasPath() {
-        return "entities/PlayerAtlas/PlayerAtlas.atlas";
-    }
 }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class MyPacker {
     public static void main(String[] args) {
-        TexturePacker.process("Project/assets/levels/level1Raw", "Project/assets/levels/temp",
-                "levelSprites");
+        TexturePacker.process("Project/assets/entities/BasicSlimeRaw", "Project/assets/entities/BasicSlime",
+                "BasicSlime");
     }
 }

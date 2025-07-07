@@ -97,17 +97,23 @@ public class DungeonData {
         loadTileMap(data.end);
     }
 
+    private void loadEntity(String name) {
+        this.atlasManager.add("entities/" + name + "/" + name + ".atlas");
+    }
+
     public LevelData load(String level) {
         this.directory = "levels/" + level + "/";
         FileHandle fileHandle = Gdx.files.internal(directory + "levelData.json");
         JsonData data = json.fromJson(JsonData.class, fileHandle);
         LevelData levelData = new LevelData(data, directory);
 
+        loadEntity("Player");
+        this.atlasManager.add("weapons/" + Globals.equippedWeapon + "/" + Globals.equippedWeapon + ".atlas");
         this.atlasManager.add("levels/" + level + "/levelSprites.atlas");
         loadTileMaps(data);
 
         for (BaseEnemy enemy : levelData.enemies) {
-            this.atlasManager.add(enemy.getAtlasPath());
+            loadEntity(enemy.getClass().getSimpleName());
         }
 
         return levelData;

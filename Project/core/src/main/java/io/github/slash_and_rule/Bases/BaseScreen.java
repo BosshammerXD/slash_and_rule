@@ -30,7 +30,7 @@ public abstract class BaseScreen implements Screen {
     public OrthographicCamera camera = new OrthographicCamera();
     protected Viewport viewport;
 
-    private AtlasManager atlasManager;
+    protected AtlasManager atlasManager;
 
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         this.assetManager = assetManager;

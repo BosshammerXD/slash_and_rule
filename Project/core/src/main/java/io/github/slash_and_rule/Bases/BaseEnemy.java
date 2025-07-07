@@ -86,6 +86,4 @@ public abstract class BaseEnemy {
     protected abstract EnemyData makeEnemyData(EnemyData data);
 
     public abstract int getCost();
-
-    public abstract String getAtlasPath();
 }

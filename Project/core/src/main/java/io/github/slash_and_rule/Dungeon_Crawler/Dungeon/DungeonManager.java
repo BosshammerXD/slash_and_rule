@@ -1,85 +1,63 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
 import java.util.BitSet;
-import java.util.Random;
 import java.util.function.Consumer;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
+import io.github.slash_and_rule.Dungeon_Crawler.DungeonData.LevelData;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.LoadingScreen.ThreadData;
 import io.github.slash_and_rule.Utils.LRUCache;
-import io.github.slash_and_rule.Utils.RandomCollection;
 
 public class DungeonManager implements Initalizable, Disposable {
-    public class LevelData {
-        public String startRoom;
-        public RandomCollection<String> fillerRoomsCollection;
-        public RandomCollection<String> leafRoomsCollection;
-        public String endRoom;
+    public static class DungeonGenerationData {
+        public int depth;
+        public int maxDifficulty;
+        public int branchcap;
+        public float branchmul;
+        private BitSet roomStructure;
 
-        public LevelData(String location, String startRoom, String[] fillerRooms, int[] fillerWeights,
-                String[] leafRooms, int[] leafWeights, String endRoom) {
-            this.startRoom = location + startRoom + ".tmx";
-            this.fillerRoomsCollection = new RandomCollection<>(random);
-            for (int i = 0; i < fillerRooms.length; i++) {
-                this.fillerRoomsCollection.add(fillerWeights[i], location + fillerRooms[i] + ".tmx");
-            }
-            this.leafRoomsCollection = new RandomCollection<>(random);
-            for (int i = 0; i < leafRooms.length; i++) {
-                this.leafRoomsCollection.add(leafWeights[i], location + leafRooms[i] + ".tmx");
-            }
-            this.endRoom = location + endRoom + ".tmx";
+        public DungeonGenerationData(int depth, int maxDifficulty, int branchcap, float branchmul) {
+            this.depth = depth;
+            this.maxDifficulty = maxDifficulty;
+            this.branchcap = branchcap;
+            this.branchmul = branchmul;
+        }
+
+        public void genRoomStructure() {
+            this.roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
+        }
+
+        public BitSet roomStructure() {
+            return this.roomStructure;
         }
     }
 
     private LRUCache<String, RoomData> roomCache = new LRUCache<>(10);
 
-    public int currentLevel;
-    private int depth;
-    private int branchcap;
-    private float branchmul;
-    private int maxDifficulty;
+    private DungeonGenerationData generationData;
     private DungeonRoom dungeon;
 
     private PhysicsScreen screen;
 
-    private LevelData[] levels;
-
-    private Random random = new Random();
+    public LevelData level;
 
     private Consumer<LoadingScreen> onDungeonGenerated;
 
-    public DungeonManager(PhysicsScreen screen,
-            String assetFolder,
-            int depth, int maxDifficulty,
-            int branchcap,
-            float branchmul, int currentLevel) {
+    public DungeonManager(PhysicsScreen screen, DungeonGenerationData generationData, float scale) {
 
-        this.currentLevel = currentLevel;
-        this.depth = depth;
-        this.branchcap = branchcap;
-        this.branchmul = branchmul;
-        this.maxDifficulty = maxDifficulty;
+        this.generationData = generationData;
 
         this.screen = screen;
 
-        this.levels = new LevelData[] {
-                new LevelData(assetFolder + "/testlevel/", "start",
-                        new String[] { "filler" }, new int[] { 1 },
-                        new String[] { "leaf" }, new int[] { 1 }, "end"),
-                new LevelData(assetFolder + "/level_1/", "start",
-                        new String[] { "filler_0" }, new int[] { 1 },
-                        new String[] { "leaf_0", "leaf_1" }, new int[] { 1, 2 }, "end"),
-        };
+        RoomData.scale = scale;
 
-        RoomData.scale = 1 / 32f;
-
-        screen.loadableObjects.add(this);
         screen.disposableObjects.add(this);
     }
 
@@ -95,12 +73,8 @@ public class DungeonManager implements Initalizable, Disposable {
 
     @Override
     public void init(LoadingScreen loader) {
-        System.out
-                .println("DungeonManager: Initializing Dungeon with depth " + depth + ", maxDifficulty " + maxDifficulty
-                        + ", branchcap " + branchcap + ", branchmul " + branchmul);
-        BitSet roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
-        dungeon = new DungeonRoom(depth, maxDifficulty, roomStructure,
-                random, branchcap, branchmul);
+        generationData.genRoomStructure();
+        dungeon = new DungeonRoom(generationData, Globals.random);
         loader.threads.add(new ThreadData(dungeon, () -> {
             System.out.println("Dungeon generated, loading rooms...");
             onDungeonGenerated.accept(loader);
@@ -128,23 +102,21 @@ public class DungeonManager implements Initalizable, Disposable {
 
     private String getPath(int difficulty, byte type) {
         if (type == 0) {
-            return levels[currentLevel].startRoom; // Placeholder for start room
+            return level.startRoom; // Placeholder for start room
         } else if (type == 3) {
-            return levels[currentLevel].endRoom; // Placeholder for end room
+            return level.endRoom; // Placeholder for end room
         }
         if (type == 1) {
-            return levels[currentLevel].fillerRoomsCollection.next();
+            return level.fillerRoomsCollection.next();
         } else {
-            return levels[currentLevel].leafRoomsCollection.next();
+            return level.leafRoomsCollection.next();
         }
     }
 
     @Override
     public void dispose() {
-        for (RoomData room : roomCache.values()) {
-            room.dispose();
-        }
         roomCache.clear();
+        dungeon = null;
         DungeonRoom.numRooms = 0;
     }
 

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Random;
 
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.DungeonGenerationData;
+
 // implement generation on initialization by pushing the generation to the todo Stack
 public class DungeonRoom implements Runnable {
     public static int numRooms = 0;
@@ -19,9 +21,12 @@ public class DungeonRoom implements Runnable {
     public String path = null;
     public boolean cleared = true;
 
-    public DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random,
-            int branchDepthCap, float branchmul) {
-        int[] xy = getStartXY(depth, branchDepthCap);
+    public DungeonRoom(DungeonGenerationData genData, Random random) {
+        int depth = genData.depth;
+        int branchcap = genData.branchcap;
+        BitSet roomStructure = genData.roomStructure();
+
+        int[] xy = getStartXY(depth, branchcap);
         int x = xy[0];
         int y = xy[1];
         this.isMain = true;
@@ -30,7 +35,7 @@ public class DungeonRoom implements Runnable {
         numRooms++;
         this.cleared = true; // Start room is considered cleared
 
-        this.representation = new String[(depth + branchDepthCap) * 2 - 1][3][(depth + branchDepthCap) * 2 + 1];
+        this.representation = new String[(depth + branchcap) * 2 - 1][3][(depth + branchcap) * 2 + 1];
         for (int i = 0; i < representation.length; i++) {
             for (int j = 0; j < representation[i].length; j++) {
                 Arrays.fill(representation[i][j], "   ");
@@ -40,29 +45,28 @@ public class DungeonRoom implements Runnable {
         int arrayLen = 2 * depth;
         flagRoom(roomStructure, x, y, arrayLen);
         flagRoom(roomStructure, x, y + 1, arrayLen);
-        this.runFunc = () -> neighbours[1] = new DungeonRoom(depth, maxDifficulty, roomStructure, random, x,
-                y + 1, true, arrayLen,
-                this, 3, branchDepthCap, branchmul);
+        this.runFunc = () -> neighbours[1] = new DungeonRoom(
+                genData, genData.depth, genData.maxDifficulty,
+                random, x, y + 1, true, arrayLen, this, 3);
     }
 
-    private DungeonRoom(int depth, int maxDifficulty, BitSet roomStructure, Random random, int x,
-            int y, boolean isMain, int arrayLen, DungeonRoom origin, int origin_dir, int branchDepthCap,
-            float branchmul) {
+    private DungeonRoom(DungeonGenerationData genData, int depth, int maxDifficulty, Random random, int x,
+            int y, boolean isMain, int arrayLen, DungeonRoom origin, int origin_dir) {
         this.isMain = isMain;
         numRooms++;
 
         this.type = getType(isMain, depth, random);
         this.neighbours[origin_dir] = origin; // Set the neighbor in the direction of the origin
-        this.difficulty = calcDifficulty(depth, maxDifficulty);
-        generateNeighbors(depth, maxDifficulty, roomStructure, random, x, y, isMain, arrayLen, origin,
-                branchDepthCap, branchmul);
+        this.difficulty = calcDifficulty(depth, genData.maxDifficulty);
+        generateNeighbors(genData, depth, maxDifficulty, random, x, y, isMain, arrayLen, origin);
     }
 
-    private void generateNeighbors(int depth, int maxDifficulty, BitSet roomStructure, Random random,
-            int x, int y, boolean isMain, int arrayLen, DungeonRoom origin, int branchDepthCap, float branchmul) {
+    private void generateNeighbors(DungeonGenerationData genData, int depth, int maxDifficulty, Random random,
+            int x, int y, boolean isMain, int arrayLen, DungeonRoom origin) {
         if (this.type == 2 || this.type == 3) {
             return; // Leaf or boss rooms do not generate further neighbors
         }
+        BitSet roomStructure = genData.roomStructure();
         int[] emptyNeighbours = getEmptyNeighbours(roomStructure, x, y, arrayLen);
         if (emptyNeighbours.length == 0) {
             this.type = 2;
@@ -92,8 +96,8 @@ public class DungeonRoom implements Runnable {
         int count = 0;
         do {
             stuck = false;
-            count = genMain(emptyNeighbours, depth, maxDifficulty, roomStructure, random, x, y, arrayLen,
-                    count, branchDepthCap, branchmul, numNewRooms);
+            count = genMain(emptyNeighbours, genData, depth, random, x, y, arrayLen,
+                    count, numNewRooms);
         } while (count < numNeighbours && stuck);
         if (stuck && isMain) {
             this.isMain = false;
@@ -102,7 +106,7 @@ public class DungeonRoom implements Runnable {
         }
 
         if (isMain) {
-            depth = (int) Math.max(0, depth - branchDepthCap * branchmul) + branchDepthCap;
+            depth = (int) Math.max(0, depth - genData.branchcap * genData.branchmul) + genData.branchcap;
             maxDifficulty = this.difficulty + 1 + depth;
         } else {
             depth -= 1;
@@ -111,16 +115,15 @@ public class DungeonRoom implements Runnable {
         for (int i = count; i < numNewRooms; i++) {
             int neighbourDir = emptyNeighbours[i];
             int[] coords = dirToXY(neighbourDir, x, y);
-            this.neighbours[neighbourDir] = new DungeonRoom(depth, maxDifficulty, roomStructure, random,
-                    coords[0],
-                    coords[1], false,
-                    arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
+            this.neighbours[neighbourDir] = new DungeonRoom(genData, depth, maxDifficulty, random,
+                    coords[0], coords[1], false, arrayLen, this, getOriginDir(neighbourDir));
         }
     }
 
-    private int genMain(int[] Neighbours, int depth, int maxDifficulty, BitSet roomStructure,
+    private int genMain(int[] Neighbours, DungeonGenerationData genData, int depth,
             Random random,
-            int x, int y, int arrayLen, int count, int branchDepthCap, float branchmul, int numNewRooms) {
+            int x, int y, int arrayLen, int count, int numNewRooms) {
+        BitSet roomStructure = genData.roomStructure();
         if (!isMain) {
             return count; // Only generate main rooms
         }
@@ -133,10 +136,8 @@ public class DungeonRoom implements Runnable {
         if (count >= numNewRooms) {
             flagRoom(roomStructure, coords[0], coords[1], arrayLen);
         }
-        this.neighbours[neighbourDir] = new DungeonRoom(depth - 1, maxDifficulty, roomStructure, random,
-                coords[0],
-                coords[1], true,
-                arrayLen, this, getOriginDir(neighbourDir), branchDepthCap, branchmul);
+        this.neighbours[neighbourDir] = new DungeonRoom(genData, depth - 1, genData.maxDifficulty,
+                random, coords[0], coords[1], true, arrayLen, this, getOriginDir(neighbourDir));
 
         return count + 1;
     }

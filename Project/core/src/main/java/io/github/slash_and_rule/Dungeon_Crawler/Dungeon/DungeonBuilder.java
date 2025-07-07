@@ -90,7 +90,7 @@ public class DungeonBuilder {
             index++;
         }
 
-        return new RoomEntity(entity, spawnPoints, data.map, utilEntities, hasSpawners);
+        return new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities, hasSpawners);
     }
 
     public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
@@ -137,7 +137,7 @@ public class DungeonBuilder {
 
         schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(new RoomEntity(entity, spawnPoints, data.map, utilEntities, hasSpawners[0]));
+                onFinish.accept(new RoomEntity(entity, getSpawnPoints(), data.map, utilEntities, hasSpawners[0]));
             }
         });
     }
@@ -296,4 +296,13 @@ public class DungeonBuilder {
         return entityManager.makeEntity(pC);
     }
 
+    private Vector2[] getSpawnPoints() {
+        Vector2[] points = new Vector2[4];
+        for (int i = 0; i < spawnPoints.length; i++) {
+            if (spawnPoints[i] != null) {
+                points[i] = spawnPoints[i].cpy();
+            }
+        }
+        return points;
+    }
 }

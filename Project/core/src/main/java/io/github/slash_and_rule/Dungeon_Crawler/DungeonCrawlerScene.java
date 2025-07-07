@@ -8,8 +8,10 @@ import io.github.slash_and_rule.Ashley.Systems.DungeonSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
+import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.DungeonGenerationData;
 import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.LoadingScreen;
 
 public class DungeonCrawlerScene extends PhysicsScreen {
     private Player player;
@@ -20,7 +22,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
         this.dungeonData = new DungeonData(getPhysicsBuilder(), entityManager, atlasManager, assetManager);
-        atlasManager.add("levels/level_1/levelSprites.atlas");
 
         this.viewport = new ExtendViewport(16, 9, camera);
 
@@ -28,14 +29,21 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         // Add player and other game objects here
         player = new Player(getPhysicsBuilder(), camera, atlasManager, entityManager);
-        System.out.println("Player created: " + player);
-        dungeonManager = new DungeonManager(this, "levels", 6, 16, 1, 3f, 1);
-        dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, getPhysicsBuilder(), camera,
+        dungeonManager = new DungeonManager(this, new DungeonGenerationData(6, 16, 1, 3f), 1 / 32f);
+        dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physicsBuilder, camera,
                 1 / 32f);
 
-        engine.addSystem(dungeonSystem);
-
         System.out.println(Gdx.input.getInputProcessor());
+    }
+
+    @Override
+    public void init(LoadingScreen loader) {
+        addToEngine(loader, dungeonSystem);
+        loader.schedule("loading level", () -> {
+            dungeonManager.level = dungeonData.load(Globals.level);
+            dungeonManager.init(loader);
+        });
+        super.init(loader);
     }
 
     @Override

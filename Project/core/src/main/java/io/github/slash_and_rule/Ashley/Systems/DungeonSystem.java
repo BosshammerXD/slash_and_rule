@@ -150,7 +150,6 @@ public class DungeonSystem extends EntitySystem {
 
         // set the new room as active
         setMap();
-        System.out.println();
     }
 
     private void scheduleRoom(int direction, DungeonRoom room) {

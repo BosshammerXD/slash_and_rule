@@ -44,4 +44,10 @@ public abstract class PhysicsScreen extends GameScreen {
     public PhysicsBuilder getPhysicsBuilder() {
         return physicsBuilder;
     }
+
+    @Override
+    public void hide() {
+        super.hide();
+        world.dispose();
+    }
 }

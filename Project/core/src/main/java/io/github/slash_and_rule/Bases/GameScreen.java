@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Bases;
 import java.util.ArrayDeque;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
@@ -27,11 +28,6 @@ public abstract class GameScreen extends BaseScreen {
 
     public GameScreen(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager);
-
-        engine.addSystem(new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
-        engine.addSystem(new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
-        engine.addSystem(inputSystem);
-        engine.addSystem(new MovementSystem(Globals.MovementSystemPriority));
     }
 
     @Override
@@ -51,13 +47,23 @@ public abstract class GameScreen extends BaseScreen {
 
     @Override
     public void hide() {
+        engine.removeAllEntities();
+        engine.removeAllSystems();
         assetManager.clear();
         Gdx.input.setInputProcessor(null);
     }
 
     public void init(LoadingScreen loader) {
+        addToEngine(loader, new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
+        addToEngine(loader, new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
+        addToEngine(loader, inputSystem);
+        addToEngine(loader, new MovementSystem(Globals.MovementSystemPriority));
         for (Initalizable data : loadableObjects) {
             data.init(loader);
         }
+    }
+
+    protected void addToEngine(LoadingScreen loader, EntitySystem system) {
+        loader.schedule("building Systems", () -> engine.addSystem(system));
     }
 }

@@ -115,7 +115,7 @@ public class Player {
 
         WeaponComponent wC = new WeaponComponent(
                 physicsBuilder, fixtures,
-                10, 1f, 0.5f,
+                10, 10f, 0.5f,
                 new WeaponComponent.WeaponTextureData(
                         "weapons/BasicSword/BasicSword.atlas",
                         "AtkAnim", 0.1f, 0, 3f, 3f, -0.4f, -0.5f));

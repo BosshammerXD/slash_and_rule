@@ -33,34 +33,12 @@ public class PhysicsSystem extends EntitySystem {
                 Family.all(PhysicsComponent.class, MovementComponent.class).get());
 
         engine.addEntityListener(
-                Family.all(PhysicsComponent.class).get(),
-                new EntityListener() {
-                    @Override
-                    public void entityAdded(Entity entity) {
-                        PhysicsComponent component = Mappers.physicsMapper.get(entity);
-                        component.body.setUserData(entity);
-                    }
-
-                    @Override
-                    public void entityRemoved(Entity entity) {
-                        remove(Mappers.physicsMapper.get(entity));
-                    }
-
-                    private void remove(PhysicsComponent component) {
-                        if (component == null || component.body == null)
-                            return;
-                        world.destroyBody(component.body);
-                        component.body = null;
-                        component.fixtures = null;
-                    }
-                });
-
-        engine.addEntityListener(
                 Family.all(WeaponComponent.class, PhysicsComponent.class).get(),
                 new EntityListener() {
                     @Override
                     public void entityAdded(Entity entity) {
                         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+                        weapon.body.setUserData(entity);
                         PhysicsComponent physics = Mappers.physicsMapper.get(entity);
                         RevoluteJointDef jointDef = new RevoluteJointDef();
                         jointDef.initialize(weapon.body, physics.body, physics.body.getPosition());
@@ -83,6 +61,29 @@ public class PhysicsSystem extends EntitySystem {
                         }
                     }
                 });
+
+        engine.addEntityListener(
+                Family.all(PhysicsComponent.class).get(),
+                new EntityListener() {
+                    @Override
+                    public void entityAdded(Entity entity) {
+                        PhysicsComponent component = Mappers.physicsMapper.get(entity);
+                        component.body.setUserData(entity);
+                    }
+
+                    @Override
+                    public void entityRemoved(Entity entity) {
+                        remove(Mappers.physicsMapper.get(entity));
+                    }
+
+                    private void remove(PhysicsComponent component) {
+                        if (component == null || component.body == null)
+                            return;
+                        world.destroyBody(component.body);
+                        component.body = null;
+                        component.fixtures = null;
+                    }
+                });
     }
 
     @Override
@@ -93,15 +94,15 @@ public class PhysicsSystem extends EntitySystem {
             if (collider == null || collider.body == null || movement == null) {
                 continue;
             }
-            Vector2 velocity = collider.body.getLinearVelocity();
-            if (velocity.len() > movement.lastVelocity.len()) {
-                velocity.sub(movement.lastVelocity);
-                movement.lastVelocity.set(movement.velocity);
-                velocity.add(movement.velocity);
-            } else {
-                movement.lastVelocity.set(velocity);
-                velocity.set(movement.velocity);
+            Vector2 velocity = new Vector2(movement.velocity);
+            if (movement.knockback.len() > 0) {
+                velocity.add(movement.knockback);
+                movement.knockback.scl(0.9f);
+                if (movement.knockback.len() < 0.01f) {
+                    movement.knockback.setZero();
+                }
             }
+
             collider.body.setLinearVelocity(velocity);
         }
 

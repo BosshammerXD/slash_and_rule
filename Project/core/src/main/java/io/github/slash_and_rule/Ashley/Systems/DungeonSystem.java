@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
@@ -47,7 +48,7 @@ public class DungeonSystem extends EntitySystem {
     private EnemyPicker enemyPicker;
 
     private ArrayDeque<BaseEnemy> enemies = new ArrayDeque<>();
-    private ArrayDeque<Entity> enemyEntities = new ArrayDeque<>();
+    private ImmutableArray<Entity> enemyEntities;
     private float time = 0f;
 
     public DungeonSystem(int priority, DungeonManager dungeonManager, PhysicsBuilder physicsBuilder,
@@ -71,6 +72,14 @@ public class DungeonSystem extends EntitySystem {
             this.mapRenderer.setView(camera);
             this.mapRenderer.render();
         }
+        for (Entity enemy : enemyEntities) {
+            EnemyComponent enemyComponent = Mappers.enemyMapper.get(enemy);
+            PhysicsComponent physicsComponent = Mappers.physicsMapper.get(enemy);
+            if (enemyComponent.startPos != null) {
+                physicsComponent.body.setTransform(enemyComponent.startPos, 0);
+                enemyComponent.startPos = null;
+            }
+        }
         if (!enemies.isEmpty()) {
             if (time >= Globals.spawnInterval) {
                 time = 0f;
@@ -78,43 +87,49 @@ public class DungeonSystem extends EntitySystem {
             } else {
                 time += deltaTime;
             }
-
-        }
-        if (!enemyEntities.isEmpty()) {
-
+        } else {
+            dungeonManager.getRoom().cleared = true;
+            room.setOpen(false, neighbours);
         }
     }
 
+    // region: Entity spawning
     private void spawnEntity() {
         Vector2[] spawners = room.getSpawners();
         for (Vector2 spawner : spawners) {
-            if (spawner == null) {
+            if (enemies.isEmpty()) {
+                return;
+            }
+            if (spawner == null || checkPlayersToClose(spawner)) {
                 continue;
             }
-            if (enemies.isEmpty()) {
-                return; // No enemies to spawn
-            }
-            for (Entity player : players) {
-                TransformComponent transformComponent = Mappers.transformMapper.get(player);
-                if (transformComponent == null) {
-                    System.out.println("DungeonSystem: Player does not have a TransformComponent");
-                    continue;
-                }
-                if (spawner.cpy().sub(transformComponent.position).len() < Globals.spawnDistance) {
-                    continue;
-                }
-            }
+
             BaseEnemy enemy = enemies.pop();
             enemy.makeEntity(spawner);
-            System.out.println("Spawned enemy: " + enemy.getClass().getSimpleName());
-            System.out.println("at: " + spawner);
+            return; // Spawn one enemy at a time
         }
     }
+
+    private boolean checkPlayersToClose(Vector2 spawner) {
+        for (Entity player : players) {
+            TransformComponent transformComponent = Mappers.transformMapper.get(player);
+            if (transformComponent == null) {
+                System.out.println("DungeonSystem: Player does not have a TransformComponent");
+                continue;
+            }
+            if (spawner.cpy().sub(transformComponent.position).len() < Globals.spawnDistance) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // endregion
 
     @Override
     public void addedToEngine(Engine engine) {
         this.engine = engine;
         this.players = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
+        this.enemyEntities = engine.getEntitiesFor(Family.all(EnemyComponent.class).get());
         this.dungeonBuilder = new DungeonBuilder(physicsBuilder, new EntityManager(engine));
     }
 
@@ -185,9 +200,9 @@ public class DungeonSystem extends EntitySystem {
         removeRoomEntity((direction + 1) % 4);
         removeRoomEntity((direction + 3) % 4);
         // set the doors
-        boolean open = dungeonManager.getRoom().cleared && room.getSpawners().length > 0;
+        boolean open = dungeonManager.getRoom().cleared || room.getSpawners().length == 0;
         room.setOpen(open, neighbours);
-        if (open) {
+        if (!open) {
             this.time = Globals.spawnInterval;
             this.enemies = enemyPicker.pickEnemies(dungeonManager.getRoom().difficulty * 10);
         }

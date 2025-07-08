@@ -8,6 +8,7 @@ import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
@@ -31,4 +32,6 @@ public class Mappers {
                         .getFor(WeaponComponent.class);
         public static ComponentMapper<HealthComponent> healthMapper = ComponentMapper
                         .getFor(HealthComponent.class);
+        public static ComponentMapper<EnemyComponent> enemyMapper = ComponentMapper
+                        .getFor(EnemyComponent.class);
 }

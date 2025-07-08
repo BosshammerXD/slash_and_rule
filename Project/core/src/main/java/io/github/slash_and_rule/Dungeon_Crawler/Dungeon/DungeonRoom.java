@@ -19,7 +19,7 @@ public class DungeonRoom implements Runnable {
     private String[][][] representation;
     private Runnable runFunc;
     public String path = null;
-    public boolean cleared = true;
+    public boolean cleared = false;
 
     public DungeonRoom(DungeonGenerationData genData, Random random) {
         int depth = genData.depth;

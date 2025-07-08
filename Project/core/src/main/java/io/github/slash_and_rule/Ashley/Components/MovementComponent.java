@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
 public class MovementComponent implements Component {
-    public Vector2 lastVelocity = new Vector2(0f, 0f);
+    public Vector2 knockback = new Vector2(0f, 0f);
     public Vector2 velocity;
     public float max_speed;
 

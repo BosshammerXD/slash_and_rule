@@ -5,6 +5,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Ashley.Systems.DungeonSystem;
+import io.github.slash_and_rule.Ashley.Systems.EnemySystem;
+import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
@@ -29,7 +31,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         // Add player and other game objects here
         player = new Player(physicsBuilder, camera, entityManager);
-        dungeonManager = new DungeonManager(this, new DungeonGenerationData(6, 16, 1, 3f), 1 / 32f);
+        dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 3f), 1 / 32f);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physicsBuilder, camera,
                 1 / 32f);
 
@@ -39,6 +41,8 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     @Override
     public void init(LoadingScreen loader) {
         addToEngine(loader, dungeonSystem);
+        addToEngine(loader, new EnemySystem(world, Globals.EnemySystemPriority));
+        addToEngine(loader, new HealthSystem(Globals.HealthSystemPriority));
         loader.schedule("loading level", () -> {
             dungeonManager.level = dungeonData.load(Globals.level);
             dungeonManager.init(loader);

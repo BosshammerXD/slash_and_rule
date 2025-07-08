@@ -22,9 +22,8 @@ public class BasicSlime extends BaseEnemy {
 
     @Override
     protected EnemyData makeEnemyData(EnemyData data) {
-        data.health = 50;
+        data.health = 30;
         data.max_speed = 2f;
-        data.attackRange = 1f;
 
         CircleShape hitBoxShape = new CircleShape();
         hitBoxShape.setRadius(0.5f);
@@ -33,7 +32,7 @@ public class BasicSlime extends BaseEnemy {
 
         data.weaponTextureData = new WeaponTextureData();
 
-        data.attackRange = 0.5f;
+        data.attackRange = 2f;
         data.attackCooldown = 1f;
         data.damage = 2;
 

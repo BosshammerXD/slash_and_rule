@@ -45,11 +45,13 @@ public class WeaponComponent implements Component {
         public float start;
         public float end;
         public Shape shape;
+        public short maskBits;
 
         public PlannedFixture(float start, float end, Shape shape, short maskBits) {
             this.start = start;
             this.end = end;
             this.shape = shape;
+            this.maskBits = maskBits;
         }
     }
 
@@ -88,8 +90,9 @@ public class WeaponComponent implements Component {
     public void buildFixtures(PhysicsBuilder physicsBuilder, PlannedFixture... fixtures) {
         TreeMap<Float, ArrayDeque<Runnable>> fixtureMap = new TreeMap<>();
         for (PlannedFixture fixtureData : fixtures) {
-            Fixture fixture = physicsBuilder.addFixture(this.body, fixtureData.shape, 1f, Globals.HitboxCategory,
-                    (short) 0, true);
+            // Hitboxes starten als inaktiv (categoryBits = 0)
+            Fixture fixture = physicsBuilder.addFixture(this.body, fixtureData.shape, 1f, (short) 0,
+                    fixtureData.maskBits, true);
 
             applyCategory(fixtureMap, fixture, fixtureData.start, Globals.HitboxCategory, physicsBuilder);
             applyCategory(fixtureMap, fixture, fixtureData.end, (short) 0, physicsBuilder);

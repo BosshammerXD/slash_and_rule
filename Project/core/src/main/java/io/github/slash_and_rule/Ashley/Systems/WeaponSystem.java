@@ -28,7 +28,6 @@ public class WeaponSystem extends IteratingSystem {
                 new EntityListener() {
                     @Override
                     public void entityAdded(Entity entity) {
-                        System.out.println("WeaponSystem: Entity added with WeaponComponent: " + entity);
                         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
                         RenderableComponent renderable = Mappers.renderableMapper.get(entity);
                         WeaponTextureData textureData = weapon.textureData;
@@ -77,6 +76,7 @@ public class WeaponSystem extends IteratingSystem {
             if (weapon.time >= weapon.cooldown) {
                 weapon.state = WeaponStates.IDLE;
                 weapon.time = 0f;
+                weapon.index = 0; // Reset index when returning to IDLE
             }
         }
 
@@ -85,6 +85,7 @@ public class WeaponSystem extends IteratingSystem {
 
     private void attack(WeaponComponent weapon) {
         weapon.animData.trigger();
+        weapon.index = 0; // Reset index für neue Hitboxes
     }
 
     private void handleHitboxes(WeaponComponent weapon) {

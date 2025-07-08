@@ -89,7 +89,7 @@ public class DungeonSystem extends EntitySystem {
             }
         } else {
             dungeonManager.getRoom().cleared = true;
-            room.setOpen(false, neighbours);
+            room.setOpen(true, neighbours);
         }
     }
 

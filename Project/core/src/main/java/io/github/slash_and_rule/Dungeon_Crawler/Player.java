@@ -107,7 +107,7 @@ public class Player {
 
         PolygonShape weaponShape = new PolygonShape();
         weaponShape.set(
-                new float[] { 7 / 16f, 0f, 1.5f, 1f, 2f, 0f, 1.5f, -1f });
+                new float[] { 7 / 16f, 0f, 1f, 1f, 1.5f, 0f, 1f, -1f });
 
         PlannedFixture[] fixtures = new PlannedFixture[] {
                 new PlannedFixture(0.1f, 0.3f, weaponShape, Globals.EnemyCategory)
@@ -118,7 +118,7 @@ public class Player {
                 10, 10f, 0.5f,
                 new WeaponComponent.WeaponTextureData(
                         "weapons/BasicSword/BasicSword.atlas",
-                        "AtkAnim", 0.1f, 0, 3f, 3f, -0.4f, -0.5f));
+                        "AtkAnim", 0.1f, 0, 3f, 3f, -0.9f, -0.5f));
         wC.body.setTransform(tC.position, 0);
 
         entityManager.build(new PlayerComponent(), new MidfieldComponent(),

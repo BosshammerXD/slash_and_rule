@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Disposable;
 
-import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
@@ -22,6 +21,7 @@ public class DungeonManager implements Initalizable, Disposable {
         public int branchcap;
         public float branchmul;
         private BitSet roomStructure;
+        private int arrayLength;
 
         public DungeonGenerationData(int depth, int maxDifficulty, int branchcap, float branchmul) {
             this.depth = depth;
@@ -31,11 +31,16 @@ public class DungeonManager implements Initalizable, Disposable {
         }
 
         public void genRoomStructure() {
-            this.roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2 - 1));
+            this.roomStructure = new BitSet(((depth + branchcap) * 2 + 1) * ((depth + branchcap) * 2));
+            this.arrayLength = (depth + branchcap) * 2 + 1;
         }
 
-        public BitSet roomStructure() {
+        public BitSet getRoomStructure() {
             return this.roomStructure;
+        }
+
+        public int getArrayLength() {
+            return this.arrayLength;
         }
     }
 
@@ -74,10 +79,12 @@ public class DungeonManager implements Initalizable, Disposable {
     @Override
     public void init(LoadingScreen loader) {
         generationData.genRoomStructure();
-        dungeon = new DungeonRoom(generationData, Globals.random);
+        dungeon = new DungeonRoom(generationData);
         loader.threads.add(new ThreadData(dungeon, () -> {
             System.out.println("Dungeon generated, loading rooms...");
             onDungeonGenerated.accept(loader);
+            dungeon.print();
+            System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
         }));
     }
 

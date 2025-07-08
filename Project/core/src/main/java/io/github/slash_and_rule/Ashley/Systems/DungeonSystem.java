@@ -87,7 +87,9 @@ public class DungeonSystem extends EntitySystem {
             } else {
                 time += deltaTime;
             }
-        } else {
+        }
+        if (enemyEntities.size() == 0 && enemies.isEmpty() && room != null
+                && !dungeonManager.getRoom().cleared) {
             dungeonManager.getRoom().cleared = true;
             room.setOpen(true, neighbours);
         }

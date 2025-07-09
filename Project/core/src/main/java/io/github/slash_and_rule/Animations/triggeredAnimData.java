@@ -6,8 +6,8 @@ public class triggeredAnimData extends AnimData {
     private int stillframe;
     private boolean triggered = false;
 
-    public triggeredAnimData(String atlasPath, String name, FrameData frames, int stillframe) {
-        super(atlasPath, name, frames);
+    public triggeredAnimData(String atlasPath, FrameData frames, int stillframe) {
+        super(atlasPath, frames);
         this.stillframe = stillframe;
         this.animIndex = stillframe;
     }

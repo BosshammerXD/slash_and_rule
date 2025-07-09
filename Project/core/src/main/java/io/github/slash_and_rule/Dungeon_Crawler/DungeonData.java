@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.utils.Json;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Dungeon_Crawler.Enemies.BasicSlime;
 import io.github.slash_and_rule.Utils.AtlasManager;
@@ -29,8 +29,12 @@ public class DungeonData {
         public List<Integer> enemies;
     }
 
-    private static final List<BiFunction<PhysicsBuilder, EntityManager, BaseEnemy>> enemies = new ArrayList<>(
-            List.of((pB, eM) -> new BasicSlime(pB, eM)));
+    private static interface TriFunction<A, B, C, R> {
+        R apply(A a, B b, C c);
+    }
+
+    private static final List<TriFunction<PhysicsBuilder, WeaponBuilder, EntityManager, BaseEnemy>> enemies = new ArrayList<>(
+            List.of((pB, wB, eM) -> new BasicSlime(pB, wB, eM)));
 
     public class LevelData {
         public String startRoom;
@@ -47,7 +51,8 @@ public class DungeonData {
             this.enemies = new BaseEnemy[data.enemies.size()];
             int i = 0;
             for (int enemyIndex : data.enemies) {
-                this.enemies[i++] = DungeonData.enemies.get(enemyIndex).apply(physicsBuilder, entityManager);
+                this.enemies[i++] = DungeonData.enemies.get(enemyIndex).apply(physicsBuilder, weaponBuilder,
+                        entityManager);
             }
         }
 
@@ -62,17 +67,19 @@ public class DungeonData {
 
     private Random random;
     private PhysicsBuilder physicsBuilder;
+    private WeaponBuilder weaponBuilder;
     private EntityManager entityManager;
     private AtlasManager atlasManager;
     private AssetManager assetManager;
     private Json json = new Json();
     private String directory;
 
-    public DungeonData(PhysicsBuilder physicsBuilder, EntityManager entityManager,
+    public DungeonData(PhysicsBuilder physicsBuilder, WeaponBuilder weaponBuilder, EntityManager entityManager,
             AtlasManager atlasManager,
             AssetManager assetManager) {
         this.random = Globals.random;
         this.physicsBuilder = physicsBuilder;
+        this.weaponBuilder = weaponBuilder;
         this.entityManager = entityManager;
         this.atlasManager = atlasManager;
         this.assetManager = assetManager;

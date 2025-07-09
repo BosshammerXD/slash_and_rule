@@ -5,19 +5,21 @@ import java.util.HashMap;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.PlannedFixture;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponTextureData;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
+import io.github.slash_and_rule.Utils.ShapeBuilder;
 
 public class BasicSlime extends BaseEnemy {
-    public BasicSlime(PhysicsBuilder physicsBuilder, EntityManager entityManager) {
-        super(physicsBuilder, entityManager);
+    public BasicSlime(PhysicsBuilder physicsBuilder, WeaponBuilder weaponBuilder, EntityManager entityManager) {
+        super(physicsBuilder, weaponBuilder, entityManager);
     }
 
     @Override
@@ -25,18 +27,20 @@ public class BasicSlime extends BaseEnemy {
         data.health = 30;
         data.max_speed = 2f;
 
-        CircleShape hitBoxShape = new CircleShape();
-        hitBoxShape.setRadius(0.5f);
-        data.plannedFixtures = new PlannedFixture[] {
-                new PlannedFixture(0.5f, 0.6f, hitBoxShape, Globals.PlayerCategory) };
-
-        data.weaponTextureData = new WeaponTextureData();
-
         data.attackRange = 2f;
-        data.attackCooldown = 1f;
-        data.damage = 2;
 
         return data;
+    }
+
+    @Override
+    protected WeaponComponent makeWeapon() {
+        weaponBuilder.begin(5, 10f, 1f, Globals.PlayerCategory);
+
+        Shape hitbox = ShapeBuilder.circ(0.5f);
+
+        weaponBuilder.addHitbox(0.1f, 0.2f, hitbox);
+
+        return weaponBuilder.end();
     }
 
     @Override

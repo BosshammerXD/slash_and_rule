@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Systems.DungeonSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
@@ -20,17 +21,21 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     private DungeonManager dungeonManager;
     private DungeonSystem dungeonSystem;
     private DungeonData dungeonData;
+    private WeaponBuilder weaponBuilder;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
-        this.dungeonData = new DungeonData(getPhysicsBuilder(), entityManager, atlasManager, assetManager);
+
+        this.weaponBuilder = new WeaponBuilder(physicsBuilder, engine);
+
+        this.dungeonData = new DungeonData(physicsBuilder, weaponBuilder, entityManager, atlasManager, assetManager);
 
         this.viewport = new ExtendViewport(16, 9, camera);
 
         engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
 
         // Add player and other game objects here
-        player = new Player(physicsBuilder, camera, entityManager);
+        player = new Player(physicsBuilder, weaponBuilder, camera, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physicsBuilder, camera,
                 1 / 32f);

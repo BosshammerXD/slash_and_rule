@@ -2,8 +2,10 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.Animations.MovementAnimData;
+import io.github.slash_and_rule.Animations.FrameData;
+import io.github.slash_and_rule.Animations.mobEnAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
@@ -12,37 +14,39 @@ import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.PlannedFixture;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
+import io.github.slash_and_rule.Utils.ShapeBuilder;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class Player {
-    private static String[] animNames = { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" };
-    private static String[] capeAnimNames = { "CapeMoveLeft", "CapeMoveDown", "CapeMoveRight", "CapeMoveUp" };
 
     private TextureData moveTextureData;
     private TextureData capeTextureData;
 
     private PhysicsBuilder physicsBuilder;
+    private WeaponBuilder weaponBuilder;
     private OrthographicCamera camera;
     private EntityManager entityManager;
 
-    public Player(PhysicsBuilder physicsBuilder, OrthographicCamera camera, EntityManager entityManager) {
+    public Player(PhysicsBuilder physicsBuilder, WeaponBuilder weaponBuilder, OrthographicCamera camera,
+            EntityManager entityManager) {
         this.physicsBuilder = physicsBuilder;
         this.camera = camera;
         this.entityManager = entityManager;
+        this.weaponBuilder = weaponBuilder;
     }
 
     public void init() {
@@ -52,16 +56,14 @@ public class Player {
         PolygonShape hurtBoxShape = new PolygonShape();
         hurtBoxShape.setAsBox(5 / 16f, 11 / 16f, new Vector2(0, 0.5f), 0);
 
-        entityManager.reset();
+        Entity entity = entityManager.reset();
 
         TransformComponent tC = new TransformComponent(
                 new Vector2(2, 2), 0f);
 
         RenderableComponent rC = new RenderableComponent();
-        MovementAnimData moveAnimData = new MovementAnimData(
-                "entities/Player/Player.atlas",
-                () -> new Vector2().set(tC.position).sub(tC.lastPosition),
-                animNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
+        mobEnAnimData moveAnimData = new mobEnAnimData(
+                "entities/Player/Player.atlas", playerFrameDatas());
         this.moveTextureData = new TextureData() {
             {
                 animData = moveAnimData;
@@ -72,10 +74,8 @@ public class Player {
             }
         };
         rC.addTextureDatas(1, this.moveTextureData);
-        MovementAnimData capeMoveAnimData = new MovementAnimData(
-                "entities/Player/Player.atlas",
-                () -> new Vector2().set(tC.position).sub(tC.lastPosition),
-                capeAnimNames, new float[] { 0.1f, 0.2f, 0.1f, 0.2f });
+        mobEnAnimData capeMoveAnimData = new mobEnAnimData(
+                "entities/Player/Player.atlas", capeFrameDatas());
 
         this.capeTextureData = new TextureData() {
             {
@@ -105,27 +105,74 @@ public class Player {
                 physicsBuilder.addFixture(pC.body, hurtBoxShape,
                         Globals.PlayerCategory, Globals.HitboxCategory, true));
 
-        PolygonShape weaponShape = new PolygonShape();
-        weaponShape.set(
-                new float[] { 7 / 16f, 0f, 1f, 1f, 1.5f, 0f, 1f, -1f });
-
-        PlannedFixture[] fixtures = new PlannedFixture[] {
-                new PlannedFixture(0.1f, 0.3f, weaponShape, Globals.EnemyCategory)
-        };
-
-        WeaponComponent wC = new WeaponComponent(
-                physicsBuilder, fixtures,
-                10, 10f, 0.5f,
-                new WeaponComponent.WeaponTextureData(
-                        "weapons/BasicSword/BasicSword.atlas",
-                        "AtkAnim", 0.1f, 0, 3f, 3f, -0.9f, -0.5f));
-        wC.body.setTransform(tC.position, 0);
+        makeWeapon(entity);
 
         entityManager.build(new PlayerComponent(), new MidfieldComponent(),
-                rC, tC, cC, pC, wC,
+                rC, tC, cC, pC,
                 new MovementComponent(new Vector2(0f, 0f), 10f),
                 new HealthComponent());
         entityManager.finish();
+    }
+
+    private void makeWeapon(Entity entity) {
+        weaponBuilder.begin(10, 10, 0.5f, Globals.EnemyCategory);
+
+        Shape hitbox = ShapeBuilder.poly(
+                new float[] { 0f, 0f, 0.5f, 0.5f, 1f, 0f, 1.5f, -1f });
+
+        weaponBuilder.addHitbox(.1f, 0.3f, hitbox);
+
+        FrameData frames = new FrameData(4, 0.1f, "AtkAnim");
+
+        weaponBuilder.end(
+                "weapons/BasicSword/BasicSword.atlas", frames, 0,
+                3f, 3f, -0.9f, -0.5f, entity);
+    }
+
+    private FrameData[][] playerFrameDatas() {
+        FrameData[][] frameDatas = new FrameData[3][];
+        frameDatas[0] = new FrameData[] {
+                new FrameData(10, 0.1f, "MoveLeft"),
+                new FrameData(4, 0.2f, "MoveDown"),
+                new FrameData(10, 0.1f, "MoveRight"),
+                new FrameData(4, 0.2f, "MoveUp")
+        };
+        frameDatas[1] = new FrameData[] {
+                new FrameData(10, 0.1f, "MoveLeft"),
+                new FrameData(4, 0.2f, "MoveDown"),
+                new FrameData(10, 0.1f, "MoveRight"),
+                new FrameData(4, 0.2f, "MoveUp")
+        };
+        frameDatas[2] = new FrameData[] {
+                new FrameData(10, 0.1f, "MoveLeft"),
+                new FrameData(4, 0.2f, "MoveDown"),
+                new FrameData(10, 0.1f, "MoveRight"),
+                new FrameData(4, 0.2f, "MoveUp")
+        };
+        return frameDatas;
+    }
+
+    private FrameData[][] capeFrameDatas() {
+        FrameData[][] frameDatas = new FrameData[3][];
+        frameDatas[0] = new FrameData[] {
+                new FrameData(10, 0.1f, "CapeMoveLeft"),
+                new FrameData(4, 0.2f, "CapeMoveDown"),
+                new FrameData(10, 0.1f, "CapeMoveRight"),
+                new FrameData(4, 0.2f, "CapeMoveUp")
+        };
+        frameDatas[1] = new FrameData[] {
+                new FrameData(10, 0.1f, "CapeMoveLeft"),
+                new FrameData(4, 0.2f, "CapeMoveDown"),
+                new FrameData(10, 0.1f, "CapeMoveRight"),
+                new FrameData(4, 0.2f, "CapeMoveUp")
+        };
+        frameDatas[2] = new FrameData[] {
+                new FrameData(10, 0.1f, "CapeMoveLeft"),
+                new FrameData(4, 0.2f, "CapeMoveDown"),
+                new FrameData(10, 0.1f, "CapeMoveRight"),
+                new FrameData(4, 0.2f, "CapeMoveUp")
+        };
+        return frameDatas;
     }
 
     private class PlayerInput extends Inputhandler {
@@ -201,7 +248,7 @@ public class Player {
         }
 
         private void animation(RenderableComponent comp) {
-            if (moveTextureData.animData.name.equals("MoveUp")) {
+            if (moveTextureData.animData.getName().equals("MoveUp")) {
                 comp.changePriority(0, 2, capeTextureData);
             } else {
                 comp.changePriority(2, 0, capeTextureData);

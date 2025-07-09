@@ -18,7 +18,7 @@ public class FrameData {
 
     public float get(int index) {
         if (index < 0 || index >= frameDurations.length) {
-            throw new IndexOutOfBoundsException("Invalid frame index");
+            throw new IndexOutOfBoundsException("Invalid frame index: " + index);
         }
         return frameDurations[index];
     }
@@ -30,7 +30,6 @@ public class FrameData {
     public String getName() {
         return name;
     }
-
 
     public void mult(float factor) {
         for (int i = 0; i < frameDurations.length; i++) {

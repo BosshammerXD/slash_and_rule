@@ -35,7 +35,7 @@ public class AnimationSystem extends IteratingSystem {
             animData.update(deltaTime, entity);
             String atlasPath = animData.getAtlasPath();
             String name = animData.getName();
-            if (atlasPath == null || name == null) {
+            if (atlasPath == null || name == "") {
                 textureData.texture = null;
                 continue;
             }

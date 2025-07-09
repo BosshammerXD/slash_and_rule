@@ -14,12 +14,22 @@ public class AnimData {
     }
 
     public void update(float deltaTime, Entity entity) {
+        if (frames == null || frames.getName() == null) {
+            return;
+        }
         float frameDuration = frames.get(animIndex);
 
         stateTime += deltaTime;
         while (stateTime >= frameDuration) {
             animIndex++;
             stateTime -= frameDuration;
+            if (animIndex >= frames.length()) {
+                overflow();
+                if (animIndex <= 0) {
+                    return;
+                }
+            }
+            frameDuration = frames.get(animIndex);
         }
         if (animIndex < 0) {
             animIndex = 0;
@@ -31,6 +41,9 @@ public class AnimData {
     }
 
     public String getName() {
+        if (frames == null) {
+            return "";
+        }
         return frames.getName();
     }
 
@@ -39,4 +52,3 @@ public class AnimData {
         stateTime = 0f;
     }
 }
-

@@ -51,7 +51,7 @@ public class DungeonRoom implements Runnable {
                 throw new IllegalArgumentException("Invalid direction: " + dir);
             }
             // f(x) = (~x & (1 | (x << 1) & 2)) -1 => f(0)=0, f(1)=1, f(2)=0, f(3)=-1
-            int myY = y + (~dir & (1 | (dir << 1) & 2)) - 1; // binary magic to get the offset correct
+            int myY = y + (~dir & (1 | (dir << 1) & 2)) - 1;
             // f(x) = (x & (1 | (~x << 1) & 2)) -1 => f(0)=-1, f(1)=0, f(2)=1, f(3)=0
             int myX = x + (dir & (1 | (~dir << 1) & 2)) - 1;
             int index = myY * arrayLen + myX;
@@ -179,19 +179,19 @@ public class DungeonRoom implements Runnable {
     private void shuffleArray(int[] array) {
         int indexOf1 = -1;
         int mylen = array.length;
+        if (mylen < 2) {
+            return;
+        }
         for (int i = mylen - 1; i > 0; i--) {
-            int index = Globals.random.nextInt(i + 1);
-            // Swap
-            int temp = array[index];
-            array[index] = array[i];
-            array[i] = temp;
+            int index = Globals.random.nextInt(mylen);
+            swap(array, i, index);
             if (array[i] == 1) {
                 indexOf1 = i; // Store the index of the first 1 found
             } else if (array[index] == 1) {
                 indexOf1 = index; // Store the index of the first 1 found
             }
         }
-        if (!this.isMain || mylen == 1) {
+        if (!this.isMain) {
             return;
         }
         if (indexOf1 != -1) {
@@ -200,9 +200,7 @@ public class DungeonRoom implements Runnable {
             // endroom to be down
             float a = (0.625f * mylen - 0.375f) / mylen;
             if (Globals.random.nextFloat() < a) {
-                int temp = array[indexOf1];
-                array[indexOf1] = array[0];
-                array[0] = temp;
+                swap(array, indexOf1, mylen);
             }
         } else if (array[0] == 3) {
             // here we decrease the cahnce of the main path going up if it would go up and
@@ -210,11 +208,15 @@ public class DungeonRoom implements Runnable {
             if (Globals.random.nextFloat() < 0.25f) {
                 int otherIndex = (mylen == 2) ? 1 : Globals.random.nextInt(mylen - 1) + 1; // Random index from 1 to
                                                                                            // len-1
-                int temp = array[0];
-                array[0] = array[otherIndex];
-                array[otherIndex] = temp;
+                swap(array, 0, otherIndex);
             }
         }
+    }
+
+    private void swap(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 
     private void mainIsStuck() {
@@ -238,8 +240,8 @@ public class DungeonRoom implements Runnable {
     // region Getter
     private int getNumNewRooms(int depth, int numNeighbours) {
         int ret;
-        ret = Globals.random.nextInt(1, numNeighbours + 1);
-        if (ret == numNeighbours) {
+        ret = Globals.random.nextInt(1, numNeighbours);
+        if (ret == numNeighbours - 1) {
             return ret;
         }
         if (isMain && ret < 2) {

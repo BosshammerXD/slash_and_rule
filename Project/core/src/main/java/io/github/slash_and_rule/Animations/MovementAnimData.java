@@ -2,6 +2,7 @@ package io.github.slash_and_rule.Animations;
 
 import java.util.function.Supplier;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 
 public class MovementAnimData extends LoopedAnimData {
@@ -22,7 +23,7 @@ public class MovementAnimData extends LoopedAnimData {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float deltaTime, Entity entity) {
         Vector2 movementVector = this.movementVector.get();
         if (movementVector.isZero() || movementVector.len() < 0.01f) {
             stateTime = 0f;
@@ -57,6 +58,6 @@ public class MovementAnimData extends LoopedAnimData {
         name = animationNames[nameIndex];
         frameDuration = frameDurations[nameIndex];
 
-        super.update(deltaTime);
+        super.update(deltaTime, entity);
     }
 }

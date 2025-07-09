@@ -1,11 +1,13 @@
 package io.github.slash_and_rule.Animations;
 
-public class triggeredAnimData extends LoopedAnimData {
+import com.badlogic.ashley.core.Entity;
+
+public class triggeredAnimData extends AnimData {
     private int stillframe;
     private boolean triggered = false;
 
-    public triggeredAnimData(String atlasPath, String name, float frameDuration, int stillframe) {
-        super(atlasPath, name, frameDuration);
+    public triggeredAnimData(String atlasPath, String name, FrameData frames, int stillframe) {
+        super(atlasPath, name, frames);
         this.stillframe = stillframe;
         this.animIndex = stillframe;
     }
@@ -17,11 +19,11 @@ public class triggeredAnimData extends LoopedAnimData {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float deltaTime, Entity entity) {
         if (!triggered) {
             return;
         }
-        super.update(deltaTime);
+        super.update(deltaTime, entity);
     }
 
     @Override

@@ -1,17 +1,38 @@
 package io.github.slash_and_rule.Animations;
 
-public abstract class AnimData {
-    public String atlasPath;
-    public String name;
+import com.badlogic.ashley.core.Entity;
+
+public class AnimData {
+    private String atlasPath;
     public int animIndex = 0;
     public float stateTime = 0f;
+    protected FrameData frames;
 
-    public AnimData(String atlasPath, String name) {
+    public AnimData(String atlasPath, FrameData frames) {
         this.atlasPath = atlasPath;
-        this.name = name;
+        this.frames = frames;
     }
 
-    public abstract void update(float deltaTime);
+    public void update(float deltaTime, Entity entity) {
+        float frameDuration = frames.get(animIndex);
+
+        stateTime += deltaTime;
+        while (stateTime >= frameDuration) {
+            animIndex++;
+            stateTime -= frameDuration;
+        }
+        if (animIndex < 0) {
+            animIndex = 0;
+        }
+    }
+
+    public String getAtlasPath() {
+        return atlasPath;
+    }
+
+    public String getName() {
+        return frames.getName();
+    }
 
     public void overflow() {
         animIndex = 0;

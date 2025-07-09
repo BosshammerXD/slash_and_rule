@@ -12,7 +12,6 @@ import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.ProjectileData;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 

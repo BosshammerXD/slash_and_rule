@@ -38,8 +38,10 @@ public class PhysicsSystem extends EntitySystem {
                     @Override
                     public void entityAdded(Entity entity) {
                         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
-                        weapon.body.setUserData(entity);
                         PhysicsComponent physics = Mappers.physicsMapper.get(entity);
+                        weapon.body.setUserData(entity);
+                        weapon.body.setTransform(physics.body.getPosition(), 0f);
+
                         RevoluteJointDef jointDef = new RevoluteJointDef();
                         jointDef.initialize(weapon.body, physics.body, physics.body.getPosition());
                         jointDef.collideConnected = false;

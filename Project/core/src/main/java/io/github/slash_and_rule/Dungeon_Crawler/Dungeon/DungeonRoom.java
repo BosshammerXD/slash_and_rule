@@ -200,7 +200,7 @@ public class DungeonRoom implements Runnable {
             // endroom to be down
             float a = (0.625f * mylen - 0.375f) / mylen;
             if (Globals.random.nextFloat() < a) {
-                swap(array, indexOf1, mylen);
+                swap(array, indexOf1, mylen - 1);
             }
         } else if (array[0] == 3) {
             // here we decrease the cahnce of the main path going up if it would go up and

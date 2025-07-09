@@ -118,7 +118,7 @@ public class Player {
         weaponBuilder.begin(10, 10, 0.5f, Globals.EnemyCategory);
 
         Shape hitbox = ShapeBuilder.poly(
-                new float[] { 0f, 0f, 0.5f, 0.5f, 1f, 0f, 1.5f, -1f });
+                new float[] { 0.5f, 0f, 1.2f, 1f, 1.7f, 0f, 1.2f, -1f });
 
         weaponBuilder.addHitbox(.1f, 0.3f, hitbox);
 
@@ -190,10 +190,10 @@ public class Player {
         private void mouseMoved(int x, int y) {
             // Convert screen coordinates to world coordinates
             Vector3 worldCoords = camera.unproject(new Vector3(x, y, 0));
-            apply(Mappers.weaponMapper, comp -> {
-                Vector2 weaponPos = comp.body.getPosition();
-                comp.target = new Vector2(worldCoords.x - weaponPos.x, worldCoords.y - weaponPos.y);
-            });
+            apply(Mappers.weaponMapper, comp1 -> apply(Mappers.physicsMapper, comp2 -> {
+                Vector2 pos = comp2.body.getPosition();
+                comp1.target.set(worldCoords.x - pos.x, worldCoords.y - pos.y);
+            }));
         }
 
         private void mousePressed() {

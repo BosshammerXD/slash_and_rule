@@ -70,6 +70,9 @@ public class WeaponSystem extends IteratingSystem {
             return;
         }
         weapon.body.setTransform(weapon.body.getPosition(), weapon.target.angleRad());
+        if (weapon.texture == null) {
+            return;
+        }
         weapon.texture.angle = weapon.target.angleDeg() - 45f;
     }
 }

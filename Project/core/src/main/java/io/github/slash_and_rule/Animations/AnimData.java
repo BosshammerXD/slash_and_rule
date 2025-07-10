@@ -7,32 +7,24 @@ public class AnimData {
     public int animIndex = 0;
     public float stateTime = 0f;
     protected FrameData frames;
+    private float frameDuration = 0f;
 
     public AnimData(String atlasPath, FrameData frames) {
         this.atlasPath = atlasPath;
         this.frames = frames;
+        frameDuration = frames.get(animIndex);
     }
 
     public void update(float deltaTime, Entity entity) {
-        if (frames == null || frames.getName() == null) {
-            return;
-        }
-        float frameDuration = frames.get(animIndex);
-
         stateTime += deltaTime;
-        while (stateTime >= frameDuration) {
+        while (stateTime >= frameDuration && animIndex >= 0) {
             animIndex++;
             stateTime -= frameDuration;
             if (animIndex >= frames.length()) {
                 overflow();
-                if (animIndex <= 0) {
-                    return;
-                }
+            } else {
+                frameDuration = frames.get(animIndex);
             }
-            frameDuration = frames.get(animIndex);
-        }
-        if (animIndex < 0) {
-            animIndex = 0;
         }
     }
 
@@ -50,5 +42,6 @@ public class AnimData {
     public void overflow() {
         animIndex = 0;
         stateTime = 0f;
+        frameDuration = frames.get(animIndex);
     }
 }

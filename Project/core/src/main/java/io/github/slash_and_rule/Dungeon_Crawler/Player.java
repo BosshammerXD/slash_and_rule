@@ -132,10 +132,10 @@ public class Player {
     private FrameData[][] playerFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
         frameDatas[0] = new FrameData[] {
-                new FrameData(10, 0.1f, "MoveLeft"),
-                new FrameData(4, 0.2f, "MoveDown"),
-                new FrameData(10, 0.1f, "MoveRight"),
-                new FrameData(4, 0.2f, "MoveUp")
+                new FrameData(1, 0.1f, "MoveLeft"),
+                new FrameData(1, 0.2f, "MoveDown"),
+                new FrameData(1, 0.1f, "MoveRight"),
+                new FrameData(1, 0.2f, "MoveUp")
         };
         frameDatas[1] = new FrameData[] {
                 new FrameData(10, 0.1f, "MoveLeft"),
@@ -155,10 +155,10 @@ public class Player {
     private FrameData[][] capeFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
         frameDatas[0] = new FrameData[] {
-                new FrameData(10, 0.1f, "CapeMoveLeft"),
-                new FrameData(4, 0.2f, "CapeMoveDown"),
-                new FrameData(10, 0.1f, "CapeMoveRight"),
-                new FrameData(4, 0.2f, "CapeMoveUp")
+                new FrameData(1, 0.1f, "CapeMoveLeft"),
+                new FrameData(1, 0.2f, "CapeMoveDown"),
+                new FrameData(1, 0.1f, "CapeMoveRight"),
+                new FrameData(1, 0.2f, "CapeMoveUp")
         };
         frameDatas[1] = new FrameData[] {
                 new FrameData(10, 0.1f, "CapeMoveLeft"),

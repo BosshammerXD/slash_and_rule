@@ -239,6 +239,9 @@ public class DungeonRoom implements Runnable {
 
     // region Getter
     private int getNumNewRooms(int depth, int numNeighbours) {
+        if (numNeighbours == 1) {
+            return 1;
+        }
         int ret;
         ret = Globals.random.nextInt(1, numNeighbours);
         if (ret == numNeighbours - 1) {

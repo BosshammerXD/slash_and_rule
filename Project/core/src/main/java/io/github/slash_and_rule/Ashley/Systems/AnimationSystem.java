@@ -35,7 +35,7 @@ public class AnimationSystem extends IteratingSystem {
             animData.update(deltaTime, entity);
             String atlasPath = animData.getAtlasPath();
             String name = animData.getName();
-            if (atlasPath == null || name == "") {
+            if (atlasPath == null || name == "" || animData.animIndex < 0) {
                 textureData.texture = null;
                 continue;
             }
@@ -43,9 +43,6 @@ public class AnimationSystem extends IteratingSystem {
             if (anim == null || anim.length == 0) {
                 textureData.texture = null;
                 continue;
-            }
-            if (animData.animIndex > anim.length - 1) {
-                animData.overflow();
             }
             if (animData.animIndex < 0) {
                 textureData.texture = null;

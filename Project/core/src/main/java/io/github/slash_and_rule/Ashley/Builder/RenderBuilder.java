@@ -16,6 +16,7 @@ public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
 
     public TextureData add(String atlasPath, String name, int priority, float width, float height,
                            float offsetX, float offsetY) {
+        checkBuilding();
         TextureData textureData = comp.new TextureData(priority);
 
         textureData.atlasPath = atlasPath;
@@ -29,9 +30,9 @@ public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
         return textureData;
     }
 
-    public TextureData add(int priority, float width, float height,
+    public TextureData add(String atlasPath, int priority, float width, float height,
                            float offsetX, float offsetY) {
-        return add(null, null, priority, width, height, offsetX, offsetY);
+        return add(atlasPath, null, priority, width, height, offsetX, offsetY);
     }
 
     @Override

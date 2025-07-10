@@ -17,7 +17,9 @@ import com.badlogic.gdx.physics.box2d.MassData;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.FrameData;
 import io.github.slash_and_rule.Animations.triggeredAnimData;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
 import io.github.slash_and_rule.Bases.BaseCompBuilder;
@@ -47,7 +49,6 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
     }
 
     private PhysicsBuilder physicsBuilder;
-    private RenderBuilder renderBuilder = new RenderBuilder();
     private short maskBits;
     private TreeMap<Float, ArrayDeque<Runnable>> hitboxes = new TreeMap<>();
     private HashMap<WeaponComponent, WeaponTextureData> weaponTextures = new HashMap<>();
@@ -55,25 +56,29 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
     public WeaponBuilder(PhysicsBuilder physicsBuilder, Engine engine) {
         this.physicsBuilder = physicsBuilder;
 
-        engine.addEntityListener(Family.all(WeaponComponent.class, RenderableComponent.class).get(),
+        engine.addEntityListener(Family.all(WeaponComponent.class, RenderableComponent.class, AnimatedComponent.class).get(),
                 new EntityListener() {
                     public void entityAdded(Entity entity) {
                         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
                         RenderableComponent renderable = Mappers.renderableMapper.get(entity);
+                        AnimatedComponent animated = Mappers.animatedMapper.get(entity);
+
                         WeaponTextureData textureData = weaponTextures.get(weapon);
-                        if (weapon == null || renderable == null || textureData == null) {
+                        if (weapon == null || textureData == null) {
                             return;
                         }
-                        renderBuilder.begin();
-                        weapon.texture = renderBuilder.add(
-                            textureData.priority,
-                            textureData.width,
-                            textureData.height,
-                            textureData.offsetX,
-                            textureData.offsetY
-                        );
+                        TextureData[] textures = new TextureData[renderable.textures.length + 1];
+                        System.arraycopy(renderable.textures, 0, textures, 0, renderable.textures.length);
+                        weapon.texture = renderable.new TextureData(textureData.priority);
+                        weapon.texture.atlasPath = textureData.atlasPath;
+                        weapon.texture.width = textureData.width;
+                        weapon.texture.height = textureData.height;
+                        weapon.texture.offsetX = textureData.offsetX;
+                        weapon.texture.offsetY = textureData.offsetY;
+                        textures[renderable.textures.length] = weapon.texture;
+                        renderable.textures = textures;
                         weapon.animData = new triggeredAnimData(textureData.frames, -1, weapon.texture);
-                        renderBuilder.end(entity);
+                        animated.animations.put("Atk", weapon.animData);
                     };
 
                     public void entityRemoved(Entity entity) {
@@ -109,16 +114,11 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
         applyCategory(fixture, start, Globals.HitboxCategory);
     }
 
-    public WeaponComponent end(String atlasPath, FrameData frames, int priority, float width,
+    public void setAnimation(String atlasPath, FrameData frames, int priority, float width,
             float height, float offsetX, float offsetY) {
+        checkBuilding();
         weaponTextures.put(comp,
                 new WeaponTextureData(atlasPath, frames, priority, width, height, offsetX, offsetY));
-        return end();
-    }
-
-    public void end(String atlasPath, FrameData frames, int priority, float width,
-            float height, float offsetX, float offsetY, Entity entity) {
-        entity.add(this.end(atlasPath, frames, priority, width, height, offsetX, offsetY));
     }
 
     @Override

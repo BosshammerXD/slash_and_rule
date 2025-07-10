@@ -98,7 +98,6 @@ public class RenderSystem extends EntitySystem {
             Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
                     .preTranslate(transform.position.x, transform.position.y)
                     .translate(textureData.offsetX, textureData.offsetY);
-
             batch.draw(textureData.texture,
                     textureData.width, textureData.height,
                     transformMatrix);

@@ -33,8 +33,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class Player {
-
-    private TextureData moveTextureData;
     private MovingEntityAnimData moveAnimData;
     private TextureData capeTextureData;
 
@@ -56,22 +54,20 @@ public class Player {
         Entity entity = entityManager.reset();
 
         TransformComponent tC = CompBuilders.buildTransform(new Vector2(2,2), 0).get();
-        AnimatedComponent AC = new AnimatedComponent();
+
+        String atlasPath = UtilFuncs.getEnAtlas("Player");
 
         renderBuilder.begin();
-        this.moveTextureData = renderBuilder.add(1, 2f, 2f, -1f, -0.5f);
-        this.moveAnimData = new MovingEntityAnimData(
-                "entities/Player/Player.atlas", playerFrameDatas(), moveTextureData);
-        
-
-        this.capeTextureData = renderBuilder.add(2, 2f, 2f, -1f, -0.5f);
-        MovingEntityAnimData capeMoveAnimData = new MovingEntityAnimData(
-                "entities/Player/Player.atlas", capeFrameDatas(), capeTextureData);
-        
+        TextureData moveTextureData = renderBuilder.add(atlasPath, 1, 2f, 2f, -1f, -0.5f);
+        this.capeTextureData = renderBuilder.add(atlasPath, 2, 2f, 2f, -1f, -0.5f);
         renderBuilder.end(entity);
 
-        AC.animations.put("Move", moveAnimData);
-        AC.animations.put("CapeMove", capeMoveAnimData);
+        this.moveAnimData = new MovingEntityAnimData(atlasPath, playerFrameDatas(), moveTextureData);
+
+        AnimatedComponent aC = new AnimatedComponent();
+        aC.animations.put("Move", moveAnimData);
+        aC.animations.put("CapeMove", 
+            new MovingEntityAnimData(atlasPath, capeFrameDatas(), capeTextureData));
 
         ControllableComponent cC = new ControllableComponent(new PlayerInput());
 
@@ -83,8 +79,9 @@ public class Player {
         CompBuilders.buildHealth(100).add(entity);
 
         entityManager.build(new PlayerComponent(), new MidfieldComponent(),
-                tC, cC);
+                tC, cC, aC);
         entityManager.finish();
+        System.out.println(entity.getComponents().toString());
     }
 
     private void makeWeapon(Entity entity) {
@@ -97,9 +94,10 @@ public class Player {
 
         FrameData frames = new FrameData(4, 0.1f, "AtkAnim");
 
-        weaponBuilder.end(
-                "weapons/BasicSword/BasicSword.atlas", frames, 0,
-                3f, 3f, -0.9f, -0.5f, entity);
+        weaponBuilder.setAnimation("weapons/BasicSword/BasicSword.atlas", frames, 0,
+                3f, 3f, -0.9f, -0.5f);
+
+        weaponBuilder.end(entity);
     }
 
     public void makePhysComp(Entity entity, TransformComponent tC) {
@@ -114,6 +112,17 @@ public class Player {
         physCompBuilder.add(
             "Collider", colliderShape, 1f, Globals.PlayerCategory, Globals.ColPlayerMask, false).add(
             "HurtBox", hurtBoxShape, Globals.PlayerCategory, Globals.HitboxCategory, true).end(entity);
+    }
+
+    public void makeAnimation(Entity entity) {
+        AnimatedComponent animatedComponent = Mappers.animatedMapper.get(entity);
+        if (animatedComponent == null) {
+            System.out.println("Player: Entity does not have an AnimatedComponent");
+            return;
+        }
+        animatedComponent.animations.put("Move", moveAnimData);
+        animatedComponent.animations.put("CapeMove", 
+            new MovingEntityAnimData(UtilFuncs.getEnAtlas("Player"), capeFrameDatas(), capeTextureData));
     }
 
     private FrameData[][] playerFrameDatas() {

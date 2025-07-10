@@ -22,7 +22,7 @@ public abstract class BaseCompBuilder<T extends Component> {
     }
 
     public final void end(Entity entity) {
-        entity.add(comp);
+        entity.add(end());
     }
 
     protected void finish() {

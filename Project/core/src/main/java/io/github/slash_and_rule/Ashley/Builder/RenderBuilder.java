@@ -1,0 +1,42 @@
+package io.github.slash_and_rule.Ashley.Builder;
+
+import java.util.ArrayDeque;
+import java.util.Arrays;
+
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+import io.github.slash_and_rule.Bases.BaseCompBuilder;
+
+public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
+    private ArrayDeque<TextureData> textureDataQueue = new ArrayDeque<>();
+
+    public void begin() {
+        begin(new RenderableComponent()); 
+    }
+
+    public TextureData add(String atlasPath, String name, int priority, float width, float height,
+                           float offsetX, float offsetY) {
+        TextureData textureData = comp.new TextureData(priority);
+
+        textureData.atlasPath = atlasPath;
+        textureData.name = name;
+        textureData.width = width;
+        textureData.height = height;
+        textureData.offsetX = offsetX;
+        textureData.offsetY = offsetY;
+
+        textureDataQueue.add(textureData);
+        return textureData;
+    }
+
+    public TextureData add(int priority, float width, float height,
+                           float offsetX, float offsetY) {
+        return add(null, null, priority, width, height, offsetX, offsetY);
+    }
+
+    @Override
+    protected void finish() {
+        comp.textures = textureDataQueue.toArray(new TextureData[0]);
+        Arrays.sort(comp.textures);
+    }
+}

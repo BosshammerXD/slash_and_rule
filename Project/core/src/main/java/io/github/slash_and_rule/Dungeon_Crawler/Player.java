@@ -3,14 +3,16 @@ package io.github.slash_and_rule.Dungeon_Crawler;
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.FrameData;
-import io.github.slash_and_rule.Animations.mobEnAnimData;
+import io.github.slash_and_rule.Animations.MovingEntityAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.CompBuilders;
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
+import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
@@ -33,10 +35,12 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class Player {
 
     private TextureData moveTextureData;
+    private MovingEntityAnimData moveAnimData;
     private TextureData capeTextureData;
 
     private PhysCompBuilder physCompBuilder;
     private WeaponBuilder weaponBuilder;
+    private RenderBuilder renderBuilder = new RenderBuilder();
     private OrthographicCamera camera;
     private EntityManager entityManager;
 
@@ -52,33 +56,22 @@ public class Player {
         Entity entity = entityManager.reset();
 
         TransformComponent tC = CompBuilders.buildTransform(new Vector2(2,2), 0).get();
+        AnimatedComponent AC = new AnimatedComponent();
 
-        RenderableComponent rC = new RenderableComponent();
-        mobEnAnimData moveAnimData = new mobEnAnimData(
-                "entities/Player/Player.atlas", playerFrameDatas());
-        this.moveTextureData = new TextureData() {
-            {
-                animData = moveAnimData;
-                width = 2f;
-                height = 2f;
-                offsetX = -1f;
-                offsetY = -0.5f;
-            }
-        };
-        rC.addTextureDatas(1, this.moveTextureData);
-        mobEnAnimData capeMoveAnimData = new mobEnAnimData(
-                "entities/Player/Player.atlas", capeFrameDatas());
+        renderBuilder.begin();
+        this.moveTextureData = renderBuilder.add(1, 2f, 2f, -1f, -0.5f);
+        this.moveAnimData = new MovingEntityAnimData(
+                "entities/Player/Player.atlas", playerFrameDatas(), moveTextureData);
+        
 
-        this.capeTextureData = new TextureData() {
-            {
-                animData = capeMoveAnimData;
-                width = 2f;
-                height = 2f;
-                offsetX = -1f;
-                offsetY = -0.5f;
-            }
-        };
-        rC.addTextureDatas(2, this.capeTextureData);
+        this.capeTextureData = renderBuilder.add(2, 2f, 2f, -1f, -0.5f);
+        MovingEntityAnimData capeMoveAnimData = new MovingEntityAnimData(
+                "entities/Player/Player.atlas", capeFrameDatas(), capeTextureData);
+        
+        renderBuilder.end(entity);
+
+        AC.animations.put("Move", moveAnimData);
+        AC.animations.put("CapeMove", capeMoveAnimData);
 
         ControllableComponent cC = new ControllableComponent(new PlayerInput());
 
@@ -90,7 +83,7 @@ public class Player {
         CompBuilders.buildHealth(100).add(entity);
 
         entityManager.build(new PlayerComponent(), new MidfieldComponent(),
-                rC, tC, cC);
+                tC, cC);
         entityManager.finish();
     }
 
@@ -224,10 +217,10 @@ public class Player {
         }
 
         private void animation(RenderableComponent comp) {
-            if (moveTextureData.animData.getName().equals("MoveUp")) {
-                comp.changePriority(0, 2, capeTextureData);
+            if (moveAnimData.getName().equals("MoveUp")) {
+                capeTextureData.setPriority(2);
             } else {
-                comp.changePriority(2, 0, capeTextureData);
+                capeTextureData.setPriority(0);
             }
         }
     }

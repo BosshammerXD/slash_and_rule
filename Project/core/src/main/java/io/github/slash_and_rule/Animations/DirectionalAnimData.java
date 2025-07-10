@@ -3,12 +3,14 @@ package io.github.slash_and_rule.Animations;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
+
 public abstract class DirectionalAnimData extends AnimData {
     private int index = 0;
     protected FrameData[] frameDatas;
 
-    public DirectionalAnimData(String atlasPath, FrameData[] frameDatas) {
-        super(atlasPath, frameDatas[0]);
+    public DirectionalAnimData(FrameData[] frameDatas, TextureData textureData) {
+        super(frameDatas[0], textureData);
         this.frameDatas = frameDatas;
     }
 

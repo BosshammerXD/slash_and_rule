@@ -4,10 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
-public class mobEnAnimData extends DirectionalAnimData {
+public class MovingEntityAnimData extends DirectionalAnimData {
     private enum States {
         IDLE(0), WALKING(1), ATTACKING(2);
 
@@ -23,8 +24,8 @@ public class mobEnAnimData extends DirectionalAnimData {
     private FrameData[][] stateFrameDatas;
     private boolean looped = true;
 
-    public mobEnAnimData(String atlasPath, FrameData[][] stateFrameDatas) {
-        super(atlasPath, stateFrameDatas[0]);
+    public MovingEntityAnimData(String atlasPath, FrameData[][] stateFrameDatas, TextureData textureData) {
+        super(stateFrameDatas[0], textureData);
         this.stateFrameDatas = stateFrameDatas;
     }
 

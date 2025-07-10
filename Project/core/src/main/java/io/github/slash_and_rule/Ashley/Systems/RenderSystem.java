@@ -82,23 +82,26 @@ public class RenderSystem extends EntitySystem {
         RenderableComponent renderable = Mappers.renderableMapper.get(entities);
         TransformComponent transform = Mappers.transformMapper.get(entities);
 
-        for (Integer key : renderable.textures.keySet()) {
-            for (TextureData textureData : renderable.textures.get(key)) {
-                if (textureData.texture == null) {
-                    if (textureData.name == null || textureData.atlasPath == null) {
-                        continue;
-                    }
-                    textureData.texture = atlasManager.getTexture(textureData.atlasPath, textureData.name);
+        if (renderable.dirty) {
+            Arrays.sort(renderable.textures);
+            renderable.dirty = false;
+        }
+
+        for (TextureData textureData : renderable.textures) {
+            if (textureData.texture == null) {
+                if (textureData.name == null || textureData.atlasPath == null) {
+                    continue;
                 }
-
-                Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
-                        .preTranslate(transform.position.x, transform.position.y)
-                        .translate(textureData.offsetX, textureData.offsetY);
-
-                batch.draw(textureData.texture,
-                        textureData.width, textureData.height,
-                        transformMatrix);
+                textureData.texture = atlasManager.getTexture(textureData.atlasPath, textureData.name);
             }
+
+            Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
+                    .preTranslate(transform.position.x, transform.position.y)
+                    .translate(textureData.offsetX, textureData.offsetY);
+
+            batch.draw(textureData.texture,
+                    textureData.width, textureData.height,
+                    transformMatrix);
         }
     }
 

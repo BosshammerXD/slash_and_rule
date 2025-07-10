@@ -6,6 +6,7 @@ import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
@@ -34,4 +35,6 @@ public class Mappers {
                         .getFor(HealthComponent.class);
         public static ComponentMapper<EnemyComponent> enemyMapper = ComponentMapper
                         .getFor(EnemyComponent.class);
+        public static ComponentMapper<AnimatedComponent> animatedMapper = ComponentMapper
+                        .getFor(AnimatedComponent.class);
 }

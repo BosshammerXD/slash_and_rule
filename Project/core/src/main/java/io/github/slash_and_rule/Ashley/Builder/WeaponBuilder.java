@@ -47,6 +47,7 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
     }
 
     private PhysicsBuilder physicsBuilder;
+    private RenderBuilder renderBuilder = new RenderBuilder();
     private short maskBits;
     private TreeMap<Float, ArrayDeque<Runnable>> hitboxes = new TreeMap<>();
     private HashMap<WeaponComponent, WeaponTextureData> weaponTextures = new HashMap<>();
@@ -63,21 +64,16 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
                         if (weapon == null || renderable == null || textureData == null) {
                             return;
                         }
-
-                        weapon.animData = new triggeredAnimData(
-                                textureData.atlasPath, textureData.frames, -1);
-
-                        weapon.texture = new RenderableComponent.TextureData() {
-                            {
-                                texture = null;
-                                animData = weapon.animData;
-                                width = textureData.width;
-                                height = textureData.height;
-                                offsetX = textureData.offsetX;
-                                offsetY = textureData.offsetY;
-                            }
-                        };
-                        renderable.addTextureDatas(textureData.priority, weapon.texture);
+                        renderBuilder.begin();
+                        weapon.texture = renderBuilder.add(
+                            textureData.priority,
+                            textureData.width,
+                            textureData.height,
+                            textureData.offsetX,
+                            textureData.offsetY
+                        );
+                        weapon.animData = new triggeredAnimData(textureData.frames, -1, weapon.texture);
+                        renderBuilder.end(entity);
                     };
 
                     public void entityRemoved(Entity entity) {

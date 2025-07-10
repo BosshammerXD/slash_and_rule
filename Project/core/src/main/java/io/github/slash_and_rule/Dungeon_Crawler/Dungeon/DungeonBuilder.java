@@ -15,10 +15,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
-import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
@@ -43,6 +43,7 @@ public class DungeonBuilder {
     private Vector2[] spawnPoints = new Vector2[4]; // 0: left, 1: down, 2: right, 3: up
 
     private PhysicsBuilder physicsBuilder;
+    private RenderBuilder renderBuilder = new RenderBuilder();
 
     public DungeonBuilder(PhysicsBuilder physicsBuilder, EntityManager entityManager) {
         this.physicsBuilder = physicsBuilder;
@@ -219,16 +220,11 @@ public class DungeonBuilder {
             default:
                 return;
         }
-        TextureData textureData = new TextureData();
-        textureData.name = spriteName;
-        textureData.width = wall.width * 2f;
-        textureData.height = wall.height * 2f;
-        textureData.offsetX = wall.x - wall.width;
-        textureData.offsetY = wall.y - wall.height;
-        if (direction == 3) {
-            textureData.height *= 2;
-        }
-        renderableComponent.addTextureDatas(0, textureData);
+        renderBuilder.begin();
+        // TODO
+        renderBuilder.add(null , spriteName, direction, direction, direction, direction, direction);
+        renderBuilder.end(entity);
+        
     }
 
     private void makeDoor(DoorData door, Object[] neighbours, Body body) {

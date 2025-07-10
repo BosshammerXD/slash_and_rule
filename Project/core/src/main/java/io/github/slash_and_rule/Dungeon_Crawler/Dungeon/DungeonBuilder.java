@@ -262,7 +262,7 @@ public class DungeonBuilder {
         Shape shape = makeCircleShape(entry);
 
         PhysicsComponent pC = new PhysicsComponent();
-        pC.body = physicsBuilder.makeBody(0, 0, BodyType.StaticBody, 0f, false);
+        pC.body = physicsBuilder.makeBody(BodyType.StaticBody, 0f, false);
         pC.fixtures.put(
                 "Sensor",
                 physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));
@@ -275,7 +275,7 @@ public class DungeonBuilder {
         Shape shape = makeCircleShape(treasure);
 
         PhysicsComponent pC = new PhysicsComponent();
-        pC.body = physicsBuilder.makeBody(0, 0, BodyType.StaticBody, 0f, false);
+        pC.body = physicsBuilder.makeBody(BodyType.StaticBody, 0f, false);
         pC.fixtures.put(
                 "Sensor",
                 physicsBuilder.addFixture(pC.body, shape, Globals.SensorCategory, Globals.PlayerCategory, true));

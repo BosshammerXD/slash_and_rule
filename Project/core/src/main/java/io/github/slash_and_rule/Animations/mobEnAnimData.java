@@ -21,6 +21,7 @@ public class mobEnAnimData extends DirectionalAnimData {
     private States state = States.IDLE;
     private States lastState = States.IDLE;
     private FrameData[][] stateFrameDatas;
+    private boolean looped = true;
 
     public mobEnAnimData(String atlasPath, FrameData[][] stateFrameDatas) {
         super(atlasPath, stateFrameDatas[0]);
@@ -49,11 +50,14 @@ public class mobEnAnimData extends DirectionalAnimData {
     }
 
     private void calcState(Entity entity) {
+        if (state == States.ATTACKING && !looped) {
+            return;
+        }
         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
 
         if (weapon != null && weapon.time == 0f && weapon.state == WeaponComponent.WeaponStates.COOLDOWN) {
+            looped = false;
             state = States.ATTACKING;
-            System.out.println("Mob is attacking");
             return;
         }
         MovementComponent movement = Mappers.movementMapper.get(entity);
@@ -70,8 +74,14 @@ public class mobEnAnimData extends DirectionalAnimData {
         this.frameDatas = stateFrameDatas[state.value];
         if (lastState != state) {
             lastState = state;
-            overflow();
+            super.overflow();
         }
         super.update(deltaTime, entity);
+    }
+
+    @Override
+    public void overflow() {
+        looped = true;
+        super.overflow();
     }
 }

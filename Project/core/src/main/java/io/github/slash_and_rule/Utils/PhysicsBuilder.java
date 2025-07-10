@@ -2,6 +2,7 @@ package io.github.slash_and_rule.Utils;
 
 import java.util.function.Consumer;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -17,11 +18,11 @@ public class PhysicsBuilder {
         this.world = world;
     }
 
-    public Body makeBody(float start_x, float start_y, BodyType BodyType, float friction,
+    public Body makeBody(Vector2 position, BodyType bodyType, float friction,
             boolean isActive) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(start_x, start_y);
-        bodyDef.type = BodyType;
+        bodyDef.position.set(position);
+        bodyDef.type = bodyType;
         bodyDef.active = isActive;
 
         Body body = world.createBody(bodyDef);
@@ -30,8 +31,8 @@ public class PhysicsBuilder {
         return body;
     }
 
-    public Body makeBody(BodyType BodyType, float friction, boolean isActive) {
-        return makeBody(0f, 0f, BodyType, friction, isActive);
+    public Body makeBody(BodyType bodyType, float friction, boolean isActive) {
+        return makeBody(Vector2.Zero, bodyType, friction, isActive);
     }
 
     public Fixture addFixture(Body body, Shape shape, float density, float friction, float restitution, short category,

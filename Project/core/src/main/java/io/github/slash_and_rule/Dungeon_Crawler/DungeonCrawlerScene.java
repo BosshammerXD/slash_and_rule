@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Systems.DungeonSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystem;
@@ -22,9 +23,12 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     private DungeonSystem dungeonSystem;
     private DungeonData dungeonData;
     private WeaponBuilder weaponBuilder;
+    private PhysCompBuilder physCompBuilder;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
+
+        this.physCompBuilder = new PhysCompBuilder(physicsBuilder);
 
         this.weaponBuilder = new WeaponBuilder(physicsBuilder, engine);
 
@@ -35,7 +39,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
 
         // Add player and other game objects here
-        player = new Player(physicsBuilder, weaponBuilder, camera, entityManager);
+        player = new Player(physCompBuilder, weaponBuilder, camera, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
         dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physicsBuilder, camera,
                 1 / 32f);

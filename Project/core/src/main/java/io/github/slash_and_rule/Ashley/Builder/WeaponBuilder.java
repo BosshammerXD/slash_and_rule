@@ -20,10 +20,11 @@ import io.github.slash_and_rule.Animations.triggeredAnimData;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
+import io.github.slash_and_rule.Bases.BaseCompBuilder;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
-public class WeaponBuilder {
+public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
     public static class WeaponTextureData {
         public String atlasPath;
         public FrameData frames;
@@ -46,8 +47,6 @@ public class WeaponBuilder {
     }
 
     private PhysicsBuilder physicsBuilder;
-    private WeaponComponent weapon;
-    private boolean building = false;
     private short maskBits;
     private TreeMap<Float, ArrayDeque<Runnable>> hitboxes = new TreeMap<>();
     private HashMap<WeaponComponent, WeaponTextureData> weaponTextures = new HashMap<>();
@@ -91,15 +90,13 @@ public class WeaponBuilder {
         this.weaponTextures.clear();
         this.maskBits = maskBits;
 
-        weapon = new WeaponComponent();
-        weapon.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
+        begin(new WeaponComponent());
+        comp.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
 
-        weapon.damage = damage;
-        weapon.weight = weight;
-        weapon.cooldown = cooldown;
-        weapon.chargetime = chargetime;
-
-        building = true;
+        comp.damage = damage;
+        comp.weight = weight;
+        comp.cooldown = cooldown;
+        comp.chargetime = chargetime;
     }
 
     public void begin(int damage, float weight, float cooldown, short maskBits) {
@@ -111,18 +108,16 @@ public class WeaponBuilder {
         if (shape == null) {
             throw new IllegalArgumentException("Shape cannot be null.");
         }
-        Fixture fixture = physicsBuilder.addFixture(weapon.body, shape, 1f, (short) 0, maskBits, true);
+        Fixture fixture = physicsBuilder.addFixture(comp.body, shape, 1f, (short) 0, maskBits, true);
         applyCategory(fixture, end, maskBits);
         applyCategory(fixture, start, Globals.HitboxCategory);
     }
 
     public WeaponComponent end(String atlasPath, FrameData frames, int priority, float width,
             float height, float offsetX, float offsetY) {
-        weaponTextures.put(weapon,
+        weaponTextures.put(comp,
                 new WeaponTextureData(atlasPath, frames, priority, width, height, offsetX, offsetY));
-        buildFixtures();
-        building = false;
-        return weapon;
+        return end();
     }
 
     public void end(String atlasPath, FrameData frames, int priority, float width,
@@ -130,34 +125,23 @@ public class WeaponBuilder {
         entity.add(this.end(atlasPath, frames, priority, width, height, offsetX, offsetY));
     }
 
-    public WeaponComponent end() {
+    @Override
+    protected void finish() {
         buildFixtures();
-        building = false;
-        return weapon;
-    }
-
-    public void end(Entity entity) {
-        entity.add(this.end());
-    }
-
-    private void checkBuilding() {
-        if (!building) {
-            throw new IllegalStateException("You can only access the weaponbuilder between begin() and end().");
-        }
     }
 
     private void buildFixtures() {
-        weapon.fixtures = new timedActions[hitboxes.size()];
+        comp.fixtures = new timedActions[hitboxes.size()];
         var indexWrapper = new Object() {
             int value = 0;
         };
         hitboxes.forEach((time, actionQueue) -> {
             Runnable[] actions = actionQueue.toArray(new Runnable[0]);
-            weapon.fixtures[indexWrapper.value++] = new timedActions(time, actions);
+            comp.fixtures[indexWrapper.value++] = new timedActions(time, actions);
         });
-        MassData massData = weapon.body.getMassData();
+        MassData massData = comp.body.getMassData();
         massData.mass = 0.001f;
-        weapon.body.setMassData(massData);
+        comp.body.setMassData(massData);
     }
 
     private void applyCategory(Fixture fixture, float time, short categoryBits) {

@@ -5,21 +5,20 @@ import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.FrameData;
 import io.github.slash_and_rule.Animations.mobEnAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.CompBuilders;
+import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
-import io.github.slash_and_rule.Ashley.Components.HealthComponent;
-import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
-import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Utils.Mappers;
-import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Utils.ShapeBuilder;
+import io.github.slash_and_rule.Utils.UtilFuncs;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
@@ -36,30 +35,23 @@ public class Player {
     private TextureData moveTextureData;
     private TextureData capeTextureData;
 
-    private PhysicsBuilder physicsBuilder;
+    private PhysCompBuilder physCompBuilder;
     private WeaponBuilder weaponBuilder;
     private OrthographicCamera camera;
     private EntityManager entityManager;
 
-    public Player(PhysicsBuilder physicsBuilder, WeaponBuilder weaponBuilder, OrthographicCamera camera,
+    public Player(PhysCompBuilder physCompBuilder, WeaponBuilder weaponBuilder, OrthographicCamera camera,
             EntityManager entityManager) {
-        this.physicsBuilder = physicsBuilder;
+        this.physCompBuilder = physCompBuilder;
         this.camera = camera;
         this.entityManager = entityManager;
         this.weaponBuilder = weaponBuilder;
     }
 
     public void init() {
-        CircleShape colliderShape = new CircleShape();
-        colliderShape.setRadius(7 / 16f);
-
-        PolygonShape hurtBoxShape = new PolygonShape();
-        hurtBoxShape.setAsBox(5 / 16f, 11 / 16f, new Vector2(0, 0.5f), 0);
-
         Entity entity = entityManager.reset();
 
-        TransformComponent tC = new TransformComponent(
-                new Vector2(2, 2), 0f);
+        TransformComponent tC = CompBuilders.buildTransform(new Vector2(2,2), 0).get();
 
         RenderableComponent rC = new RenderableComponent();
         mobEnAnimData moveAnimData = new mobEnAnimData(
@@ -90,27 +82,15 @@ public class Player {
 
         ControllableComponent cC = new ControllableComponent(new PlayerInput());
 
-        PhysicsComponent pC = new PhysicsComponent();
-        pC.body = physicsBuilder.makeBody(
-                tC.position.x, tC.position.y,
-                BodyType.DynamicBody, 7.5f, true);
-        pC.body.setFixedRotation(true);
-        pC.fixtures.put(
-                "Collider",
-                physicsBuilder.addFixture(
-                        pC.body, colliderShape, 1f,
-                        Globals.PlayerCategory, Globals.ColPlayerMask, false));
-        pC.fixtures.put(
-                "HurtBox",
-                physicsBuilder.addFixture(pC.body, hurtBoxShape,
-                        Globals.PlayerCategory, Globals.HitboxCategory, true));
+        makePhysComp(entity, tC);
 
         makeWeapon(entity);
 
+        CompBuilders.buildMovement(10f).add(entity);
+        CompBuilders.buildHealth(100).add(entity);
+
         entityManager.build(new PlayerComponent(), new MidfieldComponent(),
-                rC, tC, cC, pC,
-                new MovementComponent(new Vector2(0f, 0f), 10f),
-                new HealthComponent());
+                rC, tC, cC);
         entityManager.finish();
     }
 
@@ -129,49 +109,45 @@ public class Player {
                 3f, 3f, -0.9f, -0.5f, entity);
     }
 
+    public void makePhysComp(Entity entity, TransformComponent tC) {
+        CircleShape colliderShape = new CircleShape();
+        colliderShape.setRadius(7 / 16f);
+
+        PolygonShape hurtBoxShape = new PolygonShape();
+        hurtBoxShape.setAsBox(5 / 16f, 11 / 16f, new Vector2(0, 0.5f), 0);
+
+        physCompBuilder.begin(tC.position, BodyType.DynamicBody, 7.5f, true);
+        physCompBuilder.getBody().setFixedRotation(true);
+        physCompBuilder.add(
+            "Collider", colliderShape, 1f, Globals.PlayerCategory, Globals.ColPlayerMask, false).add(
+            "HurtBox", hurtBoxShape, Globals.PlayerCategory, Globals.HitboxCategory, true).end(entity);
+    }
+
     private FrameData[][] playerFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
-        frameDatas[0] = new FrameData[] {
-                new FrameData(1, 0.1f, "MoveLeft"),
-                new FrameData(1, 0.2f, "MoveDown"),
-                new FrameData(1, 0.1f, "MoveRight"),
-                new FrameData(1, 0.2f, "MoveUp")
-        };
-        frameDatas[1] = new FrameData[] {
-                new FrameData(10, 0.1f, "MoveLeft"),
-                new FrameData(4, 0.2f, "MoveDown"),
-                new FrameData(10, 0.1f, "MoveRight"),
-                new FrameData(4, 0.2f, "MoveUp")
-        };
-        frameDatas[2] = new FrameData[] {
-                new FrameData(10, 0.1f, "MoveLeft"),
-                new FrameData(4, 0.2f, "MoveDown"),
-                new FrameData(10, 0.1f, "MoveRight"),
-                new FrameData(4, 0.2f, "MoveUp")
-        };
+        frameDatas[0] = FrameData.createMultiple(new int[] {1,1,1,1}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[0][1].mult(2);
+        frameDatas[0][3].mult(2);
+        frameDatas[1] = FrameData.createMultiple(new int[] {10,14,10,14}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[1][1].mult(2);
+        frameDatas[1][3].mult(2);
+        frameDatas[2] = FrameData.createMultiple(new int[] {10,4,10,4}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[2][1].mult(2);
+        frameDatas[2][3].mult(2);
         return frameDatas;
     }
 
     private FrameData[][] capeFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
-        frameDatas[0] = new FrameData[] {
-                new FrameData(1, 0.1f, "CapeMoveLeft"),
-                new FrameData(1, 0.2f, "CapeMoveDown"),
-                new FrameData(1, 0.1f, "CapeMoveRight"),
-                new FrameData(1, 0.2f, "CapeMoveUp")
-        };
-        frameDatas[1] = new FrameData[] {
-                new FrameData(10, 0.1f, "CapeMoveLeft"),
-                new FrameData(4, 0.2f, "CapeMoveDown"),
-                new FrameData(10, 0.1f, "CapeMoveRight"),
-                new FrameData(4, 0.2f, "CapeMoveUp")
-        };
-        frameDatas[2] = new FrameData[] {
-                new FrameData(10, 0.1f, "CapeMoveLeft"),
-                new FrameData(4, 0.2f, "CapeMoveDown"),
-                new FrameData(10, 0.1f, "CapeMoveRight"),
-                new FrameData(4, 0.2f, "CapeMoveUp")
-        };
+        frameDatas[0] = FrameData.createMultiple(new int[] {1,1,1,1}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[0][1].mult(2);
+        frameDatas[0][3].mult(2);
+        frameDatas[1] = FrameData.createMultiple(new int[] {10,14,10,14}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[1][1].mult(2);
+        frameDatas[1][3].mult(2);
+        frameDatas[2] = FrameData.createMultiple(new int[] {10,4,10,4}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[2][1].mult(2);
+        frameDatas[2][3].mult(2);
         return frameDatas;
     }
 

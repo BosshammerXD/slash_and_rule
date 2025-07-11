@@ -5,6 +5,7 @@ import java.util.BitSet;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.DungeonGenerationData;
+import io.github.slash_and_rule.Utils.QuadData;
 
 // implement generation on initialization by pushing the generation to the todo Stack
 public class DungeonRoom implements Runnable {
@@ -64,7 +65,7 @@ public class DungeonRoom implements Runnable {
     // start = 0; filler = 1; leaf = 2; boss = 3
     public byte type;
     public int difficulty;
-    public DungeonRoom[] neighbours = new DungeonRoom[4]; // 0: left, 1: right, 2: top, 3: bottom
+    public QuadData<DungeonRoom> neighbours = new QuadData<>(); // 0: left, 1: right, 2: top, 3: bottom
     private boolean stuck = false;
     private boolean visited = false;
     private String[][][] representation;
@@ -226,15 +227,15 @@ public class DungeonRoom implements Runnable {
     private void makeNewMain(DungeonGenerationData genData, int depth, int maxDiff, Coord coord, int dir) {
         DungeonRoom newRoom = new DungeonRoom(genData, depth, maxDiff, coord, true, this);
         System.out.println(newRoom);
-        this.neighbours[dir] = newRoom;
-        newRoom.neighbours[(dir + 2) % 4] = this;
+        this.neighbours.set(dir, newRoom);
+        newRoom.neighbours.set((dir + 2) % 4, this);
     }
 
     private void makeNewDungeonRoom(DungeonGenerationData genData, int depth, int maxDifficulty, Coord coord, int dir) {
         // Create a new DungeonRoom with the given parameters
         DungeonRoom newRoom = new DungeonRoom(genData, depth, maxDifficulty, coord, false, this);
-        this.neighbours[dir] = newRoom;
-        newRoom.neighbours[(dir + 2) % 4] = this;
+        this.neighbours.set(dir, newRoom);
+        newRoom.neighbours.set((dir + 2) % 4, this);
     }
 
     // region Getter
@@ -325,10 +326,10 @@ public class DungeonRoom implements Runnable {
             return; // If already visited, do not process again
         }
         this.visited = true;
-        rooms[y][0][x] = "\u250C" + ((neighbours[3] == null) ? "\u2500" : "d") + "\u2510";
-        rooms[y][1][x] = ((neighbours[0] == null) ? "\u2502" : "d") + this.type
-                + ((neighbours[2] == null) ? "\u2502" : "d");
-        rooms[y][2][x] = "\u2514" + ((neighbours[1] == null) ? "\u2500" : "d") + "\u2518";
+        rooms[y][0][x] = "\u250C" + ((neighbours.get(3) == null) ? "\u2500" : "d") + "\u2510";
+        rooms[y][1][x] = ((neighbours.get(0) == null) ? "\u2502" : "d") + this.type
+                + ((neighbours.get(2) == null) ? "\u2502" : "d");
+        rooms[y][2][x] = "\u2514" + ((neighbours.get(1) == null) ? "\u2500" : "d") + "\u2518";
         int index = 0;
         for (DungeonRoom neighbor : neighbours) {
             if (neighbor != null) {

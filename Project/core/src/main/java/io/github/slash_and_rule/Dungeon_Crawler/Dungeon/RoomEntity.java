@@ -16,12 +16,13 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableCo
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.Mappers;
+import io.github.slash_and_rule.Utils.QuadData;
 
 public class RoomEntity {
     private boolean[] doorsWaiting = { false, false, false, false }; // 0: left, 1: down, 2: right, 3: up
 
     public Entity entity;
-    private Vector2[] spawnPoints; // 0: left, 1: down, 2: right, 3: up
+    private QuadData<Vector2> spawnPoints; // 0: left, 1: down, 2: right, 3: up
     private TiledMap tilemap;
     public Entity[] utilEntities;
     private Vector2[] spawners;
@@ -38,12 +39,10 @@ public class RoomEntity {
         return physicsComponent -> physicsComponent.body.setActive(active);
     }
 
-    public RoomEntity(Entity entity, Vector2[] spawnPoints, TiledMap tilemap, Entity[] utilEntities,
+    public RoomEntity(Entity entity, QuadData<Vector2> spawnPoints, TiledMap tilemap, Entity[] utilEntities,
             Vector2[] spawners) {
         if (entity == null || spawnPoints == null || tilemap == null || utilEntities == null) {
             throw new IllegalArgumentException("Entity, spawnPoints, tilemap, and utilEntities cannot be null");
-        } else if (spawnPoints.length != 4) {
-            throw new IllegalArgumentException("Spawn points must have exactly 4 elements (left, down, right, up)");
         }
         this.entity = entity;
         this.spawnPoints = spawnPoints;
@@ -93,12 +92,12 @@ public class RoomEntity {
         }
     }
 
-    public void setOpen(boolean open, Object[] neighbours) {
-        if (neighbours == null || neighbours.length != 4) {
-            throw new IllegalArgumentException("Neighbours must have exactly 4 elements (left, down, right, up)");
+    public void setOpen(boolean open, QuadData<?> neighbours) {
+        if (neighbours == null) {
+            throw new IllegalArgumentException("Neighbours cannot be null");
         }
         for (int i = 0; i < 4; i++) {
-            if (neighbours[i] == null) {
+            if (!neighbours.isSet(i)) {
                 doorsWaiting[i] = open;
             } else {
                 setOpenDoor(i, open);
@@ -112,7 +111,7 @@ public class RoomEntity {
             System.out.println("RoomEntity: Entity does not have a DungeonComponent");
             return;
         }
-        Fixture[] doorComponents = dungeonComponent.doors[direction];
+        Fixture[] doorComponents = dungeonComponent.doors.get(direction);
         if (doorComponents == null) {
             System.out.println("RoomEntity: No door in Direction: " + direction);
             return;
@@ -146,10 +145,7 @@ public class RoomEntity {
     }
 
     public Vector2 getSpawnPoint(int direction) {
-        if (direction < 0 || direction >= spawnPoints.length) {
-            throw new IllegalArgumentException("Direction must be between 0 and " + (spawnPoints.length - 1));
-        }
-        return spawnPoints[direction];
+        return spawnPoints.get(direction);
     }
 
     public Vector2[] getSpawners() {

@@ -22,6 +22,7 @@ import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.DoorData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.UtilData;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
+import io.github.slash_and_rule.Utils.QuadData;
 import io.github.slash_and_rule.Utils.ShapeBuilder;
 
 public class DungeonBuilder {
@@ -32,7 +33,7 @@ public class DungeonBuilder {
         this.physicsCompBuilder = physCompBuilder;
     }
 
-    public RoomEntity makeRoom(RoomData data, Object[] neighbours, CollisionHandler collisionHandler) {
+    public RoomEntity makeRoom(RoomData data, QuadData<?> neighbours, CollisionHandler collisionHandler) {
         ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
         ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
 
@@ -40,8 +41,8 @@ public class DungeonBuilder {
         DungeonComponent dungeonComponent = new DungeonComponent();
         PhysicsComponent physicsComp = physicsCompBuilder.make(BodyType.StaticBody, 0f, false);
         int[] index = { 0 };
-        Fixture[][] doorFixtures = new Fixture[4][];
-        Vector2[] spawnPoints = new Vector2[4];
+        QuadData<Fixture[]> doorFixtures = new QuadData<>();
+        QuadData<Vector2> spawnPoints = new QuadData<>();
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -77,7 +78,7 @@ public class DungeonBuilder {
                 spawnerPositions.toArray(new Vector2[0]));
     }
 
-    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, Object[] neighbours,
+    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, QuadData<?> neighbours,
             CollisionHandler collisionHandler, Consumer<RoomEntity> onFinish) {
         ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
         ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
@@ -88,8 +89,8 @@ public class DungeonBuilder {
                 false);
 
         final int[] index = { 0 }; // Used to keep track of wall indices
-        final Fixture[][] doorFixtures = new Fixture[4][];
-        final Vector2[] spawnPoints = new Vector2[4]; // 0: left, 1: down, 2: right, 3: up
+        final QuadData<Fixture[]> doorFixtures = new QuadData<>();
+        final QuadData<Vector2> spawnPoints = new QuadData<>(); // 0: left, 1: down, 2: right, 3: up
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -127,7 +128,6 @@ public class DungeonBuilder {
 
         schedule.add(() -> {
             if (onFinish != null) {
-                System.out.println("Final room body position: " + physicsComponent.body.getPosition());
                 onFinish.accept(new RoomEntity(entity, getSpawnPoints(spawnPoints), data.map,
                         utilEntities.toArray(new Entity[0]),
                         spawnerPositions.toArray(new Vector2[0])));
@@ -182,32 +182,33 @@ public class DungeonBuilder {
         renderBuilder.add(null, spriteName, 0, width, height, x, y);
     }
 
-    private void makeDoor(DoorData door, Object[] neighbours, PhysicsComponent comp, int[] i, Fixture[][] doorFixtures,
-            Vector2[] spawnPoints) {
+    private void makeDoor(DoorData door, QuadData<?> neighbours, PhysicsComponent comp, int[] i,
+            QuadData<Fixture[]> doorFixtures, QuadData<Vector2> spawnPoints) {
         // TODO: Add the picture of the door
         int index = dirToIndex(door.type);
-        Object neighbour = neighbours[index];
+        Object neighbour = neighbours.get(index);
         if (neighbour == null) {
             addWallSprite(door.collider, index);
             buildWall(door.collider, comp, i);
             return;
         }
 
-        doorFixtures[index] = new Fixture[2];
+        Fixture[] fixtures = new Fixture[2];
 
         ColliderData doorWall = door.collider;
-        doorFixtures[index][0] = buildWall(doorWall, comp, i);
+        fixtures[0] = buildWall(doorWall, comp, i);
 
         ColliderData doorSensor = door.sensor;
         Shape doorShape = ShapeBuilder.rect(doorSensor.x, doorSensor.y, doorSensor.width * 2f, doorSensor.height * 2f);
-        doorFixtures[index][1] = physicsCompBuilder.asyncAdd(comp, "door_" + index, doorShape, Globals.SensorCategory,
+        fixtures[1] = physicsCompBuilder.asyncAdd(comp, "door_" + index, doorShape, Globals.SensorCategory,
                 (short) 0, true);
 
         // Set the door direction as UserData so the collision handler knows which door
         // was touched
-        doorFixtures[index][1].setUserData(index);
+        fixtures[1].setUserData(index);
+        doorFixtures.set(index, fixtures);
 
-        spawnPoints[index] = new Vector2(door.spawnPoint[0], door.spawnPoint[1]);
+        spawnPoints.set(index, new Vector2(door.spawnPoint[0], door.spawnPoint[1]));
     }
 
     private Entity makeEntry(UtilData entry) {
@@ -236,13 +237,14 @@ public class DungeonBuilder {
         return entity;
     }
 
-    private Vector2[] getSpawnPoints(Vector2[] spawnPoints) {
-        Vector2[] points = new Vector2[4];
-        for (int i = 0; i < spawnPoints.length; i++) {
-            if (spawnPoints[i] != null) {
-                points[i] = spawnPoints[i].cpy();
+    private QuadData<Vector2> getSpawnPoints(QuadData<Vector2> spawnPoints) {
+        QuadData<Vector2> points = spawnPoints.copy();
+        points.map(point -> {
+            if (point == null) {
+                return null;
             }
-        }
+            return point.cpy();
+        });
         return points;
     }
 }

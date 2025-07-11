@@ -4,11 +4,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
+import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class MovingEntityAnimData extends DirectionalAnimData {
+    private Vector2 lastPos = new Vector2(0f, 0f);
+
     private enum States {
         IDLE(0), WALKING(1), ATTACKING(2);
 
@@ -72,6 +75,15 @@ public class MovingEntityAnimData extends DirectionalAnimData {
     @Override
     public void update(float deltaTime, Entity entity) {
         calcState(entity);
+        TransformComponent transform = Mappers.transformMapper.get(entity);
+        Vector2 move = Vector2.Zero.cpy();
+        if (transform != null) {
+            move.set(transform.position).sub(lastPos);
+            lastPos.set(transform.position);
+        }
+        if (state != States.ATTACKING && move.len() < 0.01f) {
+            state = States.IDLE;
+        }
         this.frameDatas = stateFrameDatas[state.value];
         if (lastState != state) {
             lastState = state;

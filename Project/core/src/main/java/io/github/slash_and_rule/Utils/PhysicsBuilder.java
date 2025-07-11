@@ -32,7 +32,7 @@ public class PhysicsBuilder {
     }
 
     public Body makeBody(BodyType bodyType, float friction, boolean isActive) {
-        return makeBody(Vector2.Zero, bodyType, friction, isActive);
+        return makeBody(Vector2.Zero.cpy(), bodyType, friction, isActive);
     }
 
     public Fixture addFixture(Body body, Shape shape, float density, float friction, float restitution, short category,

@@ -53,7 +53,7 @@ public class Player {
     public void init() {
         Entity entity = entityManager.reset();
 
-        TransformComponent tC = CompBuilders.buildTransform(new Vector2(2,2), 0).get();
+        TransformComponent tC = CompBuilders.buildTransform(new Vector2(2, 2), 0).get();
 
         String atlasPath = UtilFuncs.getEnAtlas("Player");
 
@@ -66,8 +66,8 @@ public class Player {
 
         AnimatedComponent aC = new AnimatedComponent();
         aC.animations.put("Move", moveAnimData);
-        aC.animations.put("CapeMove", 
-            new MovingEntityAnimData(atlasPath, capeFrameDatas(), capeTextureData));
+        aC.animations.put("CapeMove",
+                new MovingEntityAnimData(atlasPath, capeFrameDatas(), capeTextureData));
 
         ControllableComponent cC = new ControllableComponent(new PlayerInput());
 
@@ -109,9 +109,9 @@ public class Player {
 
         physCompBuilder.begin(tC.position, BodyType.DynamicBody, 7.5f, true);
         physCompBuilder.getBody().setFixedRotation(true);
-        physCompBuilder.add(
-            "Collider", colliderShape, 1f, Globals.PlayerCategory, Globals.ColPlayerMask, false).add(
-            "HurtBox", hurtBoxShape, Globals.PlayerCategory, Globals.HitboxCategory, true).end(entity);
+        physCompBuilder.add("Collider", colliderShape, 1f, Globals.PlayerCategory, Globals.ColPlayerMask, false);
+        physCompBuilder.add("HurtBox", hurtBoxShape, Globals.PlayerCategory, Globals.HitboxCategory, true);
+        physCompBuilder.end(entity);
     }
 
     public void makeAnimation(Entity entity) {
@@ -121,19 +121,19 @@ public class Player {
             return;
         }
         animatedComponent.animations.put("Move", moveAnimData);
-        animatedComponent.animations.put("CapeMove", 
-            new MovingEntityAnimData(UtilFuncs.getEnAtlas("Player"), capeFrameDatas(), capeTextureData));
+        animatedComponent.animations.put("CapeMove",
+                new MovingEntityAnimData(UtilFuncs.getEnAtlas("Player"), capeFrameDatas(), capeTextureData));
     }
 
     private FrameData[][] playerFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
-        frameDatas[0] = FrameData.createMultiple(new int[] {1,1,1,1}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[0] = FrameData.createMultiple(new int[] { 1, 1, 1, 1 }, UtilFuncs.getDirs("Move"), 0.1f);
         frameDatas[0][1].mult(2);
         frameDatas[0][3].mult(2);
-        frameDatas[1] = FrameData.createMultiple(new int[] {10,14,10,14}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[1] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("Move"), 0.1f);
         frameDatas[1][1].mult(2);
         frameDatas[1][3].mult(2);
-        frameDatas[2] = FrameData.createMultiple(new int[] {10,4,10,4}, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[2] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("Move"), 0.1f);
         frameDatas[2][1].mult(2);
         frameDatas[2][3].mult(2);
         return frameDatas;
@@ -141,13 +141,13 @@ public class Player {
 
     private FrameData[][] capeFrameDatas() {
         FrameData[][] frameDatas = new FrameData[3][];
-        frameDatas[0] = FrameData.createMultiple(new int[] {1,1,1,1}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[0] = FrameData.createMultiple(new int[] { 1, 1, 1, 1 }, UtilFuncs.getDirs("CapeMove"), 0.1f);
         frameDatas[0][1].mult(2);
         frameDatas[0][3].mult(2);
-        frameDatas[1] = FrameData.createMultiple(new int[] {10,14,10,14}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[1] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("CapeMove"), 0.1f);
         frameDatas[1][1].mult(2);
         frameDatas[1][3].mult(2);
-        frameDatas[2] = FrameData.createMultiple(new int[] {10,4,10,4}, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[2] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("CapeMove"), 0.1f);
         frameDatas[2][1].mult(2);
         frameDatas[2][3].mult(2);
         return frameDatas;

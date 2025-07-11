@@ -12,7 +12,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 
-import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
@@ -24,7 +24,6 @@ import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.EnemyPicker;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomEntity;
 import io.github.slash_and_rule.Interfaces.CollisionHandler;
 import io.github.slash_and_rule.Utils.Mappers;
-import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonBuilder;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
@@ -44,17 +43,17 @@ public class DungeonSystem extends EntitySystem {
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer mapRenderer;
 
-    private PhysicsBuilder physicsBuilder;
+    private PhysCompBuilder physCompBuilder;
     private EnemyPicker enemyPicker;
 
     private ArrayDeque<BaseEnemy> enemies = new ArrayDeque<>();
     private ImmutableArray<Entity> enemyEntities;
     private float time = 0f;
 
-    public DungeonSystem(int priority, DungeonManager dungeonManager, PhysicsBuilder physicsBuilder,
+    public DungeonSystem(int priority, DungeonManager dungeonManager, PhysCompBuilder physicsBuilder,
             OrthographicCamera camera, float scale) {
         super(priority);
-        this.physicsBuilder = physicsBuilder;
+        this.physCompBuilder = physicsBuilder;
         this.dungeonManager = dungeonManager;
         this.camera = camera;
         this.mapRenderer = new OrthogonalTiledMapRenderer(null, scale);
@@ -132,7 +131,7 @@ public class DungeonSystem extends EntitySystem {
         this.engine = engine;
         this.players = engine.getEntitiesFor(Family.all(PlayerComponent.class).get());
         this.enemyEntities = engine.getEntitiesFor(Family.all(EnemyComponent.class).get());
-        this.dungeonBuilder = new DungeonBuilder(physicsBuilder, new EntityManager(engine));
+        this.dungeonBuilder = new DungeonBuilder(physCompBuilder);
     }
 
     private class DoorHandler implements CollisionHandler {
@@ -186,10 +185,10 @@ public class DungeonSystem extends EntitySystem {
 
     private void change_room(int direction) {
         schedule.clear();
-        // Set the current room inactive and the new room active
+        // Set the current room inactive first
         room.setActive(false);
         room.setOpen(false, neighbours); // close doors so when we move back, the doors are closed
-        neighbours[direction].setActive(true);
+
         // shift the new room to the current room and the old room to the correct
         // neighbour
         if (neighbours[(direction + 2) % 4] != null)
@@ -198,6 +197,9 @@ public class DungeonSystem extends EntitySystem {
         room = neighbours[direction];
         neighbours[direction] = null;
         dungeonManager.move(direction);
+
+        // Now activate the new room (after the reference swap)
+        room.setActive(true);
         // clear the rest of the neighbours
         removeRoomEntity((direction + 1) % 4);
         removeRoomEntity((direction + 3) % 4);
@@ -237,14 +239,29 @@ public class DungeonSystem extends EntitySystem {
             PhysicsComponent physicsComponent = Mappers.physicsMapper.get(player);
             TransformComponent transformComponent = Mappers.transformMapper.get(player);
             if (physicsComponent == null || transformComponent == null) {
-                System.out.println("DungeonSystem: Player does not have a PhysicsComponent");
+                System.out.println("DungeonSystem: Player does not have a PhysicsComponent or TransformComponent");
                 continue;
             }
+
+            // Get the target spawn point
+            Vector2 spawnPoint = room.getSpawnPoint(direction);
+            if (spawnPoint == null) {
+                System.out.println("DungeonSystem: No spawn point found for direction: " + direction);
+                continue;
+            }
+
+            // Clear any existing velocity before teleporting
+            physicsComponent.body.setLinearVelocity(0, 0);
+            physicsComponent.body.setAngularVelocity(0);
+
             // Teleport the player to the new room
-            Vector2 oldPos = new Vector2(physicsComponent.body.getPosition());
-            physicsComponent.body.setTransform(room.getSpawnPoint(direction), 0f);
-            transformComponent.position.set(physicsComponent.body.getPosition());
-            transformComponent.lastPosition.add(physicsComponent.body.getPosition()).sub(oldPos);
+            physicsComponent.body.setTransform(spawnPoint, 0f);
+
+            // Update transform component to match new physics position
+            transformComponent.position.set(spawnPoint);
+            transformComponent.lastPosition.set(spawnPoint);
+
+            System.out.println("DungeonSystem: Teleported player to new room at " + spawnPoint);
         }
     }
 

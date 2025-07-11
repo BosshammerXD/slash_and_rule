@@ -75,8 +75,10 @@ public class RoomEntity {
         applyToComponent(Mappers.renderableMapper, entity, comp -> {
             for (TextureData textureData : comp.textures) {
                 textureData.atlasPath = (active) ? "levels/level_1/levelSprites.atlas" : null;
-                if (!active)
+                if (!active) {
                     textureData.texture = null;
+                    System.out.println("RoomEntity: Texture set to null for inactive room");
+                }
             }
         });
     }

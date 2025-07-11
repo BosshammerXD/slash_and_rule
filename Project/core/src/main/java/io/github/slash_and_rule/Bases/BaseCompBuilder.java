@@ -18,6 +18,8 @@ public abstract class BaseCompBuilder<T extends Component> {
     public T end() {
         finish();
         building = false;
+        T comp = this.comp;
+        this.comp = null;
         return comp;
     }
 
@@ -30,7 +32,8 @@ public abstract class BaseCompBuilder<T extends Component> {
 
     protected void checkBuilding() {
         if (!building) {
-            throw new IllegalStateException("You can only access the " + getClass().getSimpleName() + " between begin() and end().");
+            throw new IllegalStateException(
+                    "You can only access the " + getClass().getSimpleName() + " between begin() and end().");
         }
     }
 }

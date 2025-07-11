@@ -26,6 +26,12 @@ public class EntityManager {
         return obj_entity;
     }
 
+    public static void build(Entity entity, Component... components) {
+        for (Component component : components) {
+            entity.add(component);
+        }
+    }
+
     public void finish() {
         if (engine == null) {
             throw new IllegalStateException(

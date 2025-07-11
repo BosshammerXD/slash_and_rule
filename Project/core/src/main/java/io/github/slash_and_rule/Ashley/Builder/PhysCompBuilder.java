@@ -22,23 +22,57 @@ public class PhysCompBuilder extends BaseCompBuilder<PhysicsComponent> {
         comp.body = physicsBuilder.makeBody(position, bodyType, friction, isActive);
     }
 
+    public void begin(BodyType bodyType, float friction, boolean isActive) {
+        begin(new PhysicsComponent());
+        comp.body = physicsBuilder.makeBody(bodyType, friction, isActive);
+    }
+
     public Body getBody() {
         checkBuilding();
         return comp.body;
     }
 
-    public PhysCompBuilder add(String name, Shape shape, float density, float restitution, short category, short mask, boolean isSensor) {
+    public Fixture add(String name, Shape shape, float density, float restitution, short category, short mask,
+            boolean isSensor) {
         checkBuilding();
         Fixture fixture = physicsBuilder.addFixture(comp.body, shape, density, restitution, category, mask, isSensor);
         comp.fixtures.put(name, fixture);
-        return this;
+        return fixture;
     }
 
-    public PhysCompBuilder add(String name, Shape shape, float density, short category, short mask, boolean isSensor) {
+    public Fixture add(String name, Shape shape, float density, short category, short mask, boolean isSensor) {
         return add(name, shape, density, 0f, category, mask, isSensor);
     }
 
-    public PhysCompBuilder add(String name, Shape shape, short category, short mask, boolean isSensor) {
+    public Fixture add(String name, Shape shape, short category, short mask, boolean isSensor) {
         return add(name, shape, 0f, 0f, category, mask, isSensor);
+    }
+
+    public Fixture asyncAdd(PhysicsComponent comp, String name, Shape shape, float density, float restitution,
+            short category, short mask,
+            boolean isSensor) {
+        Fixture fixture = physicsBuilder.addFixture(comp.body, shape, density, restitution, category, mask, isSensor);
+        comp.fixtures.put(name, fixture);
+        return fixture;
+    }
+
+    public Fixture asyncAdd(PhysicsComponent comp, String name, Shape shape, float density, short category, short mask,
+            boolean isSensor) {
+        return asyncAdd(comp, name, shape, density, 0f, category, mask, isSensor);
+    }
+
+    public Fixture asyncAdd(PhysicsComponent comp, String name, Shape shape, short category, short mask,
+            boolean isSensor) {
+        return asyncAdd(comp, name, shape, 0f, 0f, category, mask, isSensor);
+    }
+
+    public PhysicsComponent make(Vector2 position, BodyType bodyType, float friction, boolean isActive) {
+        begin(position, bodyType, friction, isActive);
+        return end();
+    }
+
+    public PhysicsComponent make(BodyType bodyType, float friction, boolean isActive) {
+        begin(bodyType, friction, isActive);
+        return end();
     }
 }

@@ -2,14 +2,18 @@ package io.github.slash_and_rule.Utils;
 
 import com.badlogic.ashley.core.ComponentMapper;
 
+import io.github.slash_and_rule.Ashley.Components.ChildComponent;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
+import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
@@ -43,4 +47,10 @@ public class Mappers {
                         .getFor(StateComponent.class);
         public static ComponentMapper<InactiveComponent> inactiveMapper = ComponentMapper
                         .getFor(InactiveComponent.class);
+        public static ComponentMapper<ParentComponent> parentMapper = ComponentMapper
+                        .getFor(ParentComponent.class);
+        public static ComponentMapper<ChildComponent> childMapper = ComponentMapper
+                        .getFor(ChildComponent.class);
+        public static ComponentMapper<DoorComponent> doorMapper = ComponentMapper
+                        .getFor(DoorComponent.class);
 }

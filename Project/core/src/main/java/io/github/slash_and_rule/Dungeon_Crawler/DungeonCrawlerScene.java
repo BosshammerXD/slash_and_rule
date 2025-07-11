@@ -6,7 +6,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
-import io.github.slash_and_rule.Ashley.Systems.DungeonSystem;
+import io.github.slash_and_rule.Ashley.Systems.DoorSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonRoomSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
@@ -20,10 +21,10 @@ import io.github.slash_and_rule.LoadingScreen;
 public class DungeonCrawlerScene extends PhysicsScreen {
     private Player player;
     private DungeonManager dungeonManager;
-    private DungeonSystem dungeonSystem;
     private DungeonData dungeonData;
     private WeaponBuilder weaponBuilder;
     private PhysCompBuilder physCompBuilder;
+    private DungeonRoomSystem dungeonRoomSystem;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
@@ -41,18 +42,23 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         // Add player and other game objects here
         player = new Player(physCompBuilder, weaponBuilder, camera, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
-        dungeonSystem = new DungeonSystem(Globals.DungeonSystemPriority, dungeonManager, physCompBuilder, camera,
-                1 / 32f);
+        // dungeonSystem = new DungeonSystem(Globals.DungeonRoomSystemPriority,
+        // dungeonManager, physCompBuilder, camera, 1 / 32f);
 
         System.out.println(Gdx.input.getInputProcessor());
     }
 
     @Override
     public void init(LoadingScreen loader) {
-        addToEngine(loader, dungeonSystem);
+        // addToEngine(loader, dungeonSystem);
         addToEngine(loader, new EnemySystem(world, Globals.EnemySystemPriority));
         addToEngine(loader, new HealthSystem(Globals.HealthSystemPriority));
+        addToEngine(loader, new WeaponSystem(Globals.WeaponSystemPriority));
+        addToEngine(loader, dungeonRoomSystem = new DungeonRoomSystem(physCompBuilder, dungeonManager,
+                Globals.DungeonRoomSystemPriority, camera));
+        addToEngine(loader, new DoorSystem(dungeonManager::move, Globals.DoorSystemPriority));
         loader.schedule("loading level", () -> {
+            dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);
             dungeonManager.init(loader);
         });

@@ -13,15 +13,19 @@ import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
+import io.github.slash_and_rule.Ashley.Components.ParentComponent;
+import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent.DoorType;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.ColliderData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.DoorData;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.RoomData.UtilData;
-import io.github.slash_and_rule.Interfaces.CollisionHandler;
 import io.github.slash_and_rule.Utils.QuadData;
 import io.github.slash_and_rule.Utils.ShapeBuilder;
 
@@ -33,64 +37,72 @@ public class DungeonBuilder {
         this.physicsCompBuilder = physCompBuilder;
     }
 
-    public RoomEntity makeRoom(RoomData data, QuadData<?> neighbours, CollisionHandler collisionHandler) {
-        ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
-        ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
+    public Entity makeRoom(RoomData data, QuadData<?> neighbours, int balance) {
+        final ArrayDeque<Entity> children = new ArrayDeque<>();
+        final ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
 
-        Entity entity = new Entity();
-        DungeonComponent dungeonComponent = new DungeonComponent();
-        PhysicsComponent physicsComp = physicsCompBuilder.make(BodyType.StaticBody, 0f, false);
-        int[] index = { 0 };
-        QuadData<Fixture[]> doorFixtures = new QuadData<>();
-        QuadData<Vector2> spawnPoints = new QuadData<>();
+        final Entity entity = new Entity();
+        final DungeonComponent dungeonComponent = new DungeonComponent();
+        final PhysicsComponent physicsComponent = physicsCompBuilder.make(BodyType.StaticBody, 0f, false);
+
+        final int[] index = { 0 }; // Used to keep track of wall indices
+        final QuadData<Vector2> spawnPoints = new QuadData<>();
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
-            buildWall(wall, physicsComp, index);
+            buildWall(wall, physicsComponent, index);
         }
 
         renderBuilder.begin();
         for (DoorData door : data.doors) {
-            makeDoor(door, neighbours, physicsComp, index, doorFixtures, spawnPoints);
+            makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, -2, null);
         }
         renderBuilder.end(entity);
 
-        dungeonComponent.doors = doorFixtures;
-
-        EntityManager.build(entity,
-                physicsComp,
-                dungeonComponent,
-                new SensorComponent(collisionHandler),
-                new TransformComponent(),
-                new BackgroundComponent());
-
         for (UtilData util : data.utils) {
             if (util.type.equals("entry")) {
-                utilEntities.add(makeEntry(util));
+                children.add(makeEntry(util));
             } else if (util.type.equals("spawner")) {
                 spawnerPositions.add(new Vector2(util.x, util.y));
             } else if (util.type.equals("chest")) {
-                utilEntities.add(makeTreasure(util));
+                children.add(makeTreasure(util));
             }
         }
 
-        return new RoomEntity(entity, getSpawnPoints(spawnPoints), data.map, utilEntities.toArray(new Entity[0]),
-                spawnerPositions.toArray(new Vector2[0]));
+        dungeonComponent.spawnPoints = getSpawnPoints(spawnPoints);
+        dungeonComponent.spawnerPositions = spawnerPositions.toArray(new Vector2[0]);
+        dungeonComponent.map = data.map;
+        dungeonComponent.balance = balance;
+
+        final ParentComponent parentComponent = new ParentComponent();
+        parentComponent.children = children.toArray(new Entity[0]);
+
+        final StateComponent stateComponent = new StateComponent();
+        stateComponent.state = StateComponent.State.INACTIVE;
+
+        EntityManager.build(entity,
+                physicsComponent,
+                dungeonComponent,
+                new TransformComponent(),
+                new BackgroundComponent(),
+                parentComponent,
+                stateComponent,
+                new InactiveComponent());
+
+        return entity;
     }
 
-    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, QuadData<?> neighbours,
-            CollisionHandler collisionHandler, Consumer<RoomEntity> onFinish) {
-        ArrayDeque<Entity> utilEntities = new ArrayDeque<>();
-        ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
+    public void scheduledMakeRoom(ArrayDeque<Runnable> schedule, RoomData data, int direction, Entity origin,
+            int balance, QuadData<?> neighbours, Consumer<Entity> onFinish) {
+        final ArrayDeque<Entity> children = new ArrayDeque<>();
+        final ArrayDeque<Vector2> spawnerPositions = new ArrayDeque<>();
 
         final Entity entity = new Entity();
         final DungeonComponent dungeonComponent = new DungeonComponent();
-        final PhysicsComponent physicsComponent = physicsCompBuilder.make(BodyType.StaticBody, 0f,
-                false);
+        final PhysicsComponent physicsComponent = physicsCompBuilder.make(BodyType.StaticBody, 0f, false);
 
         final int[] index = { 0 }; // Used to keep track of wall indices
-        final QuadData<Fixture[]> doorFixtures = new QuadData<>();
-        final QuadData<Vector2> spawnPoints = new QuadData<>(); // 0: left, 1: down, 2: right, 3: up
+        final QuadData<Vector2> spawnPoints = new QuadData<>();
 
         for (int i = 0; i < data.walls.length; i++) {
             ColliderData wall = data.walls[i];
@@ -100,51 +112,60 @@ public class DungeonBuilder {
         schedule.add(() -> {
             renderBuilder.begin();
             for (DoorData door : data.doors) {
-                makeDoor(door, neighbours, physicsComponent, index, doorFixtures, spawnPoints);
+                makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, direction, origin);
             }
             renderBuilder.end(entity);
         });
 
-        schedule.add(() -> {
-            dungeonComponent.doors = doorFixtures;
-        });
-
-        schedule.add(() -> EntityManager.build(entity,
-                dungeonComponent,
-                physicsComponent,
-                new SensorComponent(collisionHandler),
-                new TransformComponent(),
-                new BackgroundComponent()));
-
         for (UtilData util : data.utils) {
             if (util.type.equals("entry")) {
-                schedule.add(() -> utilEntities.add(makeEntry(util)));
+                schedule.add(() -> children.add(makeEntry(util)));
             } else if (util.type.equals("spawner")) {
                 schedule.add(() -> spawnerPositions.add(new Vector2(util.x, util.y)));
             } else if (util.type.equals("chest")) {
-                schedule.add(() -> utilEntities.add(makeTreasure(util)));
+                schedule.add(() -> children.add(makeTreasure(util)));
             }
         }
 
         schedule.add(() -> {
+            dungeonComponent.spawnPoints = getSpawnPoints(spawnPoints);
+            dungeonComponent.spawnerPositions = spawnerPositions.toArray(new Vector2[0]);
+            dungeonComponent.map = data.map;
+            dungeonComponent.balance = balance;
+        });
+
+        schedule.add(() -> {
+            final ParentComponent parentComponent = new ParentComponent();
+            parentComponent.children = children.toArray(new Entity[0]);
+            final StateComponent stateComponent = new StateComponent();
+            stateComponent.state = StateComponent.State.INACTIVE;
+            EntityManager.build(entity,
+                    physicsComponent,
+                    dungeonComponent,
+                    new TransformComponent(),
+                    new BackgroundComponent(),
+                    parentComponent,
+                    stateComponent,
+                    new InactiveComponent());
+        });
+
+        schedule.add(() -> {
             if (onFinish != null) {
-                onFinish.accept(new RoomEntity(entity, getSpawnPoints(spawnPoints), data.map,
-                        utilEntities.toArray(new Entity[0]),
-                        spawnerPositions.toArray(new Vector2[0])));
+                onFinish.accept(entity);
             }
         });
     }
 
-    private int dirToIndex(String direction) {
+    private DoorType dirToDoorType(String direction) {
         switch (direction.toLowerCase()) {
             case "left":
-                return 0;
+                return DoorType.LEFT;
             case "bottom":
-                return 1;
+                return DoorType.BOTTOM;
             case "right":
-                return 2;
+                return DoorType.RIGHT;
             case "top":
-                return 3;
+                return DoorType.TOP;
             default:
                 throw new IllegalArgumentException("Invalid direction: " + direction);
         }
@@ -156,59 +177,73 @@ public class DungeonBuilder {
                 false);
     }
 
-    private void addWallSprite(ColliderData wall, int direction) {
+    private void addWallSprite(ColliderData wall, DoorType doorType) {
         String spriteName;
         float width = wall.width * 2;
         float height = wall.height * 2;
         float x = wall.x - wall.width;
         float y = wall.y - wall.height;
-        switch (direction) {
-            case 0:
+        switch (doorType) {
+            case DoorType.LEFT:
                 spriteName = "Dungeon_Wall_Left";
                 break;
-            case 1:
+            case DoorType.BOTTOM:
                 spriteName = "Dungeon_Wall_Bottom";
                 break;
-            case 2:
+            case DoorType.RIGHT:
                 spriteName = "Dungeon_Wall_Right";
                 break;
-            case 3:
+            case DoorType.TOP:
                 spriteName = "Dungeon_Wall_Top";
                 height *= 2;
                 break;
             default:
                 return;
         }
-        renderBuilder.add(null, spriteName, 0, width, height, x, y);
+        renderBuilder.add("levels/" + Globals.level + "/levelSprites.atlas", spriteName, 0, width, height, x, y);
     }
 
     private void makeDoor(DoorData door, QuadData<?> neighbours, PhysicsComponent comp, int[] i,
-            QuadData<Fixture[]> doorFixtures, QuadData<Vector2> spawnPoints) {
+            QuadData<Vector2> spawnPoints, ArrayDeque<Entity> children, int dir, Entity origin) {
         // TODO: Add the picture of the door
-        int index = dirToIndex(door.type);
-        Object neighbour = neighbours.get(index);
+        DoorType doorType = dirToDoorType(door.type);
+        Object neighbour = neighbours.get(doorType.value);
         if (neighbour == null) {
-            addWallSprite(door.collider, index);
+            addWallSprite(door.collider, doorType);
             buildWall(door.collider, comp, i);
             return;
         }
 
-        Fixture[] fixtures = new Fixture[2];
+        children.add(buildDoor(door, dirToDoorType(door.type), i, dir, origin));
 
-        ColliderData doorWall = door.collider;
-        fixtures[0] = buildWall(doorWall, comp, i);
+        spawnPoints.set(doorType.value, new Vector2(door.spawnPoint[0], door.spawnPoint[1]));
+    }
+
+    private Entity buildDoor(DoorData door, DoorType doorType, int[] i, int dir, Entity origin) {
+        Entity entity = new Entity();
+
+        PhysicsComponent physComp = physicsCompBuilder.make(BodyType.StaticBody, 0f, false);
+
+        ColliderData wall = door.collider;
+        Shape shape = ShapeBuilder.rect(wall.x, wall.y, wall.width * 2f, wall.height * 2f);
+        physicsCompBuilder.asyncAdd(physComp, "Wall", shape, Globals.WallCategory, Globals.WallMask, false);
 
         ColliderData doorSensor = door.sensor;
         Shape doorShape = ShapeBuilder.rect(doorSensor.x, doorSensor.y, doorSensor.width * 2f, doorSensor.height * 2f);
-        fixtures[1] = physicsCompBuilder.asyncAdd(comp, "door_" + index, doorShape, Globals.SensorCategory,
-                (short) 0, true);
+        physicsCompBuilder.asyncAdd(physComp, "Sensor", doorShape, Globals.SensorCategory, (short) 0, true);
 
-        // Set the door direction as UserData so the collision handler knows which door
-        // was touched
-        fixtures[1].setUserData(index);
-        doorFixtures.set(index, fixtures);
+        StateComponent stateComp = new StateComponent();
+        stateComp.state = StateComponent.State.INACTIVE;
 
-        spawnPoints.set(index, new Vector2(door.spawnPoint[0], door.spawnPoint[1]));
+        DoorComponent doorComp = new DoorComponent();
+        doorComp.type = doorType;
+        if (doorType.value == dir) {
+            doorComp.neighbour = origin;
+        }
+
+        EntityManager.build(entity, physComp, new SensorComponent(), stateComp, new InactiveComponent(), doorComp);
+
+        return entity;
     }
 
     private Entity makeEntry(UtilData entry) {
@@ -218,8 +253,11 @@ public class DungeonBuilder {
         physicsCompBuilder.begin(BodyType.StaticBody, 0f, false);
         physicsCompBuilder.add("Sensor", shape, Globals.SensorCategory, Globals.PlayerCategory, true);
 
+        StateComponent stateComp = new StateComponent();
+        stateComp.state = StateComponent.State.INACTIVE;
+
         Entity entity = new Entity();
-        EntityManager.build(entity, physicsCompBuilder.end());
+        EntityManager.build(entity, physicsCompBuilder.end(), stateComp, new InactiveComponent());
 
         return entity;
     }
@@ -231,8 +269,11 @@ public class DungeonBuilder {
         physicsCompBuilder.begin(BodyType.StaticBody, 0f, false);
         physicsCompBuilder.add("Sensor", shape, Globals.SensorCategory, Globals.PlayerCategory, true);
 
+        StateComponent stateComp = new StateComponent();
+        stateComp.state = StateComponent.State.INACTIVE;
+
         Entity entity = new Entity();
-        EntityManager.build(entity, physicsCompBuilder.end());
+        EntityManager.build(entity, physicsCompBuilder.end(), stateComp, new InactiveComponent());
 
         return entity;
     }

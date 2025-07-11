@@ -1,11 +1,13 @@
 package io.github.slash_and_rule.Ashley.Systems;
 
 import java.util.ArrayDeque;
-import java.util.function.Function;
+import java.util.HashMap;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -13,39 +15,16 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
-import io.github.slash_and_rule.Globals;
-import io.github.slash_and_rule.Ashley.Components.HealthComponent;
-import io.github.slash_and_rule.Ashley.Components.MovementComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
-import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent.CollisionData;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class CollisionSystem extends EntitySystem {
-    private static class Tuple<A> {
-        public A first;
-        public A second;
-
-        public Tuple(A first, A second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        public <B> Tuple<B> map(Function<A, B> function) {
-            return new Tuple<>(function.apply(first), function.apply(second));
-        }
-
-        public Tuple<A> flip() {
-            A temp = first;
-            first = second;
-            second = temp;
-            return this;
-        }
-    }
-
     private static class GameContactListener implements ContactListener {
-        private ArrayDeque<Tuple<Fixture>> contacts = new ArrayDeque<>();
-        private ArrayDeque<Tuple<Fixture>> leaved = new ArrayDeque<>();
+        private HashMap<Entity, ArrayDeque<CollisionData>> contacts = new HashMap<>();
+        private HashMap<Entity, ArrayDeque<CollisionData>> leaved = new HashMap<>();
+        private ArrayDeque<CollisionData> emptyDeque = new ArrayDeque<>();
 
         @Override
         public void postSolve(Contact contact, ContactImpulse impulse) {
@@ -59,158 +38,88 @@ public class CollisionSystem extends EntitySystem {
 
         @Override
         public void beginContact(Contact contact) {
-            contacts.add(new Tuple<Fixture>(contact.getFixtureA(), contact.getFixtureB()));
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+            Object userDataA = fixtureA.getBody().getUserData();
+            Object userDataB = fixtureB.getBody().getUserData();
+            if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
+                return;
+            }
+            Entity entityA = (Entity) userDataA;
+            Entity entityB = (Entity) userDataB;
+            if (Mappers.sensorMapper.has(entityA)) {
+                contacts.putIfAbsent(entityA, new ArrayDeque<>());
+                contacts.get(entityA).add(new CollisionData(fixtureA, fixtureB, entityB));
+            }
+            if (Mappers.sensorMapper.has(entityB)) {
+                contacts.putIfAbsent(entityB, new ArrayDeque<>());
+                contacts.get(entityB).add(new CollisionData(fixtureB, fixtureA, entityA));
+            }
         }
 
         @Override
         public void endContact(Contact contact) {
-            leaved.add(new Tuple<Fixture>(contact.getFixtureA(), contact.getFixtureB()));
+            Fixture fixtureA = contact.getFixtureA();
+            Fixture fixtureB = contact.getFixtureB();
+            Object userDataA = fixtureA.getBody().getUserData();
+            Object userDataB = fixtureB.getBody().getUserData();
+            if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
+                return;
+            }
+            Entity entityA = (Entity) userDataA;
+            Entity entityB = (Entity) userDataB;
+            if (Mappers.sensorMapper.has(entityA)) {
+                leaved.putIfAbsent(entityA, new ArrayDeque<>());
+                leaved.get(entityA).add(new CollisionData(fixtureA, fixtureB, entityB));
+            }
+            if (Mappers.sensorMapper.has(entityB)) {
+                leaved.putIfAbsent(entityB, new ArrayDeque<>());
+                leaved.get(entityB).add(new CollisionData(fixtureB, fixtureA, entityA));
+            }
         }
 
-        public ArrayDeque<Tuple<Fixture>> getContacts() {
-            return contacts;
+        public ArrayDeque<CollisionData> getContacts(Entity entity) {
+            return contacts.getOrDefault(entity, emptyDeque);
         }
 
-        public ArrayDeque<Tuple<Fixture>> getLeaved() {
-            return leaved;
+        public ArrayDeque<CollisionData> getLeaved(Entity entity) {
+            return leaved.getOrDefault(entity, emptyDeque);
         }
 
-        public void clearContacts() {
+        public void clear() {
             contacts.clear();
+            leaved.clear();
         }
     };
 
     private final GameContactListener contactListener = new GameContactListener();
+    private ImmutableArray<Entity> sensors;
 
     public CollisionSystem(int priority, World world) {
         super(priority);
         world.setContactListener(contactListener);
     }
 
-    // region: handlers
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+        sensors = engine.getEntitiesFor(Family.all(SensorComponent.class)
+                .exclude(InactiveComponent.class).get());
+    }
+
     @Override
     public void update(float deltaTime) {
-        for (Tuple<Fixture> fixtures : contactListener.getContacts()) {
-            handleContactStarted(getEntities(fixtures), fixtures);
+        for (Entity sensor : sensors) {
+            SensorComponent sensorComp = Mappers.sensorMapper.get(sensor);
+
+            ArrayDeque<CollisionData> contactsStarted = contactListener.getContacts(sensor);
+            ArrayDeque<CollisionData> contactsEnded = contactListener.getLeaved(sensor);
+
+            sensorComp.contactsStarted.clear();
+            sensorComp.contactsStarted.addAll(contactsStarted);
+            sensorComp.contactsEnded.clear();
+            sensorComp.contactsEnded.addAll(contactsEnded);
         }
-        contactListener.clearContacts();
-        for (Tuple<Fixture> fixtures : contactListener.getLeaved()) {
-            handleContactEnd(getEntities(fixtures), fixtures);
-        }
+        contactListener.clear();
     }
-
-    private void handleContactStarted(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
-        if (entities == null || Mappers.inactiveMapper.has(entities.first)
-                || Mappers.inactiveMapper.has(entities.second)) {
-            return;
-        }
-
-        handleWeapons(entities, fixtures);
-
-        handleSensorsEnter(entities, fixtures);
-    }
-
-    private void handleContactEnd(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
-        if (entities == null || Mappers.inactiveMapper.has(entities.first)
-                || Mappers.inactiveMapper.has(entities.second)) {
-            return;
-        }
-        handleSensorLeave(entities);
-    }
-
-    // endregion
-    //
-    //
-    //
-    // region: Weapon handling
-    private void handleWeapons(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
-        Tuple<WeaponComponent> weapons = entities.map(Mappers.weaponMapper::get);
-
-        Tuple<HealthComponent> healths = entities.map(Mappers.healthMapper::get);
-
-        Tuple<PhysicsComponent> physics = entities.map(Mappers.physicsMapper::get);
-
-        if (fixtures.first.getFilterData().categoryBits == Globals.HitboxCategory) {
-            MovementComponent move = Mappers.movementMapper.get(entities.second);
-            handleHit(weapons.first, healths.second, physics, move);
-        } else if (fixtures.second.getFilterData().categoryBits == Globals.HitboxCategory) {
-            MovementComponent move = Mappers.movementMapper.get(entities.first);
-            handleHit(weapons.second, healths.first, physics.flip(), move);
-        }
-    }
-
-    private void handleHit(WeaponComponent weapon, HealthComponent health, Tuple<PhysicsComponent> physics,
-            MovementComponent move) {
-        if (weapon == null || health == null) {
-            return;
-        }
-
-        int damage = weapon.damage;
-        if (weapon.chargeVal > 0f) {
-            damage *= weapon.chargetime / weapon.chargeVal;
-        }
-        health.appliedDamage += damage;
-
-        applyKnockback(physics, move, weapon.weight);
-    }
-
-    private void applyKnockback(Tuple<PhysicsComponent> physics, MovementComponent move, float knockback) {
-        if (physics.first == null || physics.second == null || move == null) {
-            return;
-        }
-        Vector2 srcPos = physics.first.body.getPosition();
-        Vector2 targetPos = physics.second.body.getPosition();
-        Vector2 direction = targetPos.cpy().sub(srcPos).nor();
-        Vector2 knockbackForce = direction.scl(knockback);
-        move.knockback.add(knockbackForce);
-    }
-
-    // endregion
-    //
-    //
-    //
-    // region: Sensor handling
-    private void handleSensorsEnter(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
-        Tuple<SensorComponent> sensors = entities.map(Mappers.sensorMapper::get);
-
-        if (sensors.first != null) {
-            sensorEnter(sensors.first, entities, fixtures);
-        } else if (sensors.second != null) {
-            sensorEnter(sensors.second, entities.flip(), fixtures.flip());
-            entities.flip();
-            fixtures.flip();
-        }
-    }
-
-    private void sensorEnter(SensorComponent sensor, Tuple<Entity> entities, Tuple<Fixture> fixtures) {
-        sensor.collisionHandler.handleCollision(entities.first, fixtures.first, entities.second, fixtures.second);
-        sensor.isTriggered = true;
-    }
-
-    private void handleSensorLeave(Tuple<Entity> entities) {
-        Tuple<SensorComponent> sensors = entities.map(Mappers.sensorMapper::get);
-
-        if (sensors.first != null) {
-            sensors.first.isTriggered = false;
-        } else if (sensors.second != null) {
-            sensors.second.isTriggered = false;
-        }
-    }
-
-    // endregion
-    //
-    //
-    //
-    // region: Helper Methods
-    private Tuple<Entity> getEntities(Tuple<Fixture> fixtures) {
-        Object userDataA = fixtures.first.getBody().getUserData();
-        Object userDataB = fixtures.second.getBody().getUserData();
-        if (!(userDataA instanceof Entity) || !(userDataB instanceof Entity)) {
-            return null;
-        }
-        Entity entityA = (Entity) userDataA;
-        Entity entityB = (Entity) userDataB;
-        return new Tuple<>(entityA, entityB);
-    }
-    // endregion
 }

@@ -17,11 +17,11 @@ import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class EnemySystem extends EntitySystem {
     private World world;
-    private Engine engine;
     private ImmutableArray<Entity> enemies;
     private ImmutableArray<Entity> players;
 
@@ -50,7 +50,6 @@ public class EnemySystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        this.engine = engine;
         this.enemies = engine.getEntitiesFor(Family
                 .all(MovementComponent.class, TransformComponent.class, EnemyComponent.class, HealthComponent.class)
                 .exclude(InactiveComponent.class).get());
@@ -61,11 +60,19 @@ public class EnemySystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         for (Entity enemy : enemies) {
+            EnemyComponent enemyComp = Mappers.enemyMapper.get(enemy);
+            PhysicsComponent physComp = Mappers.physicsMapper.get(enemy);
+
             moveTo(enemy, getVecToClosestPlayer(enemy));
 
             HealthComponent health = Mappers.healthMapper.get(enemy);
             if (health.health <= 0) {
-                engine.removeEntity(enemy);
+                getEngine().removeEntity(enemy);
+            }
+
+            if (enemyComp.startPos != null) {
+                physComp.body.setTransform(enemyComp.startPos, 0);
+                enemyComp.startPos = null;
             }
         }
     }

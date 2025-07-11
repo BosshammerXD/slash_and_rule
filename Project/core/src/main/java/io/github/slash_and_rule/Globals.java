@@ -39,12 +39,13 @@ public class Globals {
         public static final int RenderSystemPriority = 100;
         public static final int AnimationSystemPriority = 90;
         public static final int MovementSystemPriority = 70;
-        public static final int DungeonSystemPriority = 80;
+        public static final int DoorSystemPriority = 90;
+        public static final int EnemySystemPriority = 85;
+        public static final int DungeonRoomSystemPriority = 80;
         public static final int HealthSystemPriority = 60;
         public static final int CollisionSystemPriority = 50;
         public static final int PhysicsSystemPriority = 40;
         public static final int WeaponSystemPriority = 30;
-        public static final int EnemySystemPriority = 20;
         public static final int InputSystemPriority = 10;
         public static final int StateSystemPriority = 0;
 
@@ -66,7 +67,7 @@ public class Globals {
 
         // endregion
         public static float spawnInterval = 1f;
-        public static float spawnDistance = 1f;
+        public static float spawnDistance2 = 1f;
         public static String level = "level_1";
         public static String equippedWeapon = "BasicSword";
         public static final Random random = new Random();

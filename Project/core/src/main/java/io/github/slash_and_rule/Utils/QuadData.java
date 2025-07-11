@@ -170,4 +170,23 @@ public class QuadData<T> implements Iterable<T> {
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "QuadData{" +
+                "left=" + left +
+                ", down=" + down +
+                ", right=" + right +
+                ", up=" + up +
+                '}';
+    }
+
+    public String toString(Function<T, String> toStringFunction) {
+        return "QuadData{" +
+                "left=" + ((left == null) ? "null" : toStringFunction.apply(left)) +
+                ", down=" + ((down == null) ? "null" : toStringFunction.apply(down)) +
+                ", right=" + ((right == null) ? "null" : toStringFunction.apply(right)) +
+                ", up=" + ((up == null) ? "null" : toStringFunction.apply(up)) +
+                '}';
+    }
 }

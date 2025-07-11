@@ -13,6 +13,7 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableCo
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
 public abstract class BaseEnemy {
@@ -69,7 +70,8 @@ public abstract class BaseEnemy {
                 renderableComponent,
                 physicsComponent,
                 weaponComponent,
-                enemyComponent);
+                enemyComponent,
+                new SensorComponent());
 
         entityManager.finish();
 

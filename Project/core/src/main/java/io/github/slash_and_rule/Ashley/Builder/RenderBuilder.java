@@ -11,11 +11,11 @@ public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
     private ArrayDeque<TextureData> textureDataQueue = new ArrayDeque<>();
 
     public void begin() {
-        begin(new RenderableComponent()); 
+        begin(new RenderableComponent());
     }
 
     public TextureData add(String atlasPath, String name, int priority, float width, float height,
-                           float offsetX, float offsetY) {
+            float offsetX, float offsetY) {
         checkBuilding();
         TextureData textureData = comp.new TextureData(priority);
 
@@ -31,7 +31,7 @@ public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
     }
 
     public TextureData add(String atlasPath, int priority, float width, float height,
-                           float offsetX, float offsetY) {
+            float offsetX, float offsetY) {
         return add(atlasPath, null, priority, width, height, offsetX, offsetY);
     }
 
@@ -39,5 +39,6 @@ public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
     protected void finish() {
         comp.textures = textureDataQueue.toArray(new TextureData[0]);
         Arrays.sort(comp.textures);
+        textureDataQueue.clear();
     }
 }

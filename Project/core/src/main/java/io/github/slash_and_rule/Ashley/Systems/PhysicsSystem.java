@@ -11,10 +11,12 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class PhysicsSystem extends EntitySystem {
@@ -31,6 +33,7 @@ public class PhysicsSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         moveables = engine.getEntitiesFor(
+                Family.all(PhysicsComponent.class, MovementComponent.class).exclude(InactiveComponent.class).get());
                 Family.all(PhysicsComponent.class, MovementComponent.class).exclude(InactiveComponent.class).get());
 
         engine.addEntityListener(
@@ -107,8 +110,41 @@ public class PhysicsSystem extends EntitySystem {
             }
 
             collider.body.setLinearVelocity(velocity);
+
+            handleCollisions(entity, movement, collider);
         }
 
         world.step(deltaTime, 6, 2);
+    }
+
+    private void handleCollisions(Entity entity, MovementComponent moveComp, PhysicsComponent physComp) {
+        SensorComponent sensComp = Mappers.sensorMapper.get(entity);
+        if (sensComp == null || sensComp.contactsStarted.isEmpty()) {
+            return;
+        }
+        for (SensorComponent.CollisionData data : sensComp.contactsStarted) {
+            if (!data.myFixture.isSensor()) {
+                continue;
+            }
+            applyKnockback(data, moveComp, physComp);
+
+        }
+    }
+
+    private void applyKnockback(SensorComponent.CollisionData data, MovementComponent moveComp,
+            PhysicsComponent physComp) {
+        if (data.otherFixture.getFilterData().categoryBits != Globals.HitboxCategory) {
+            return;
+        }
+        Entity other = data.entity;
+        WeaponComponent weaponComp = Mappers.weaponMapper.get(other);
+        PhysicsComponent otherPhysComp = Mappers.physicsMapper.get(other);
+        // TODO: expandd for Projectiles later
+        if (weaponComp == null || physComp == null || physComp.body == null) {
+            return;
+        }
+        Vector2 direction = new Vector2(physComp.body.getPosition());
+        direction.sub(otherPhysComp.body.getPosition()).nor().scl(weaponComp.weight);
+        moveComp.knockback.add(direction);
     }
 }

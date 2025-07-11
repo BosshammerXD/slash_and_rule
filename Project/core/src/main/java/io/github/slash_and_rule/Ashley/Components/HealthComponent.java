@@ -3,7 +3,6 @@ package io.github.slash_and_rule.Ashley.Components;
 import com.badlogic.ashley.core.Component;
 
 public class HealthComponent implements Component {
-    public int appliedDamage = 0;
     public int health;
     public int maxHealth;
     public float time = -1f;

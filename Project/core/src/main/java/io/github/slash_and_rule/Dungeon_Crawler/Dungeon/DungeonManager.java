@@ -1,6 +1,7 @@
 package io.github.slash_and_rule.Dungeon_Crawler.Dungeon;
 
 import java.util.BitSet;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -53,7 +54,12 @@ public class DungeonManager implements Initalizable, Disposable {
 
     public LevelData level;
 
-    private Consumer<LoadingScreen> onDungeonGenerated;
+    @FunctionalInterface
+    public static interface DungeonGeneratedCallback {
+        void onDungeonGenerated(DungeonRoom startRoomData, DungeonRoom secondRoomData);
+    }
+
+    private BiConsumer<LoadingScreen, DungeonRoom> onDungeonGenerated;
 
     public DungeonManager(PhysicsScreen screen, DungeonGenerationData generationData, float scale) {
 
@@ -66,7 +72,7 @@ public class DungeonManager implements Initalizable, Disposable {
         screen.disposableObjects.add(this);
     }
 
-    public void setOnDungeonGenerated(Consumer<LoadingScreen> onDungeonGenerated) {
+    public void setOnDungeonGenerated(BiConsumer<LoadingScreen, DungeonRoom> onDungeonGenerated) {
         this.onDungeonGenerated = onDungeonGenerated;
     }
 
@@ -82,7 +88,7 @@ public class DungeonManager implements Initalizable, Disposable {
         dungeon = new DungeonRoom(generationData);
         loader.threads.add(new ThreadData(dungeon, () -> {
             System.out.println("Dungeon generated, loading rooms...");
-            onDungeonGenerated.accept(loader);
+            onDungeonGenerated.accept(loader, dungeon);
             dungeon.print();
             System.out.println("Dungeon generated with " + DungeonRoom.numRooms + " rooms.");
         }));

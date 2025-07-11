@@ -11,6 +11,7 @@ public class StateComponent implements Component {
     }
 
     public State state = State.ACTIVATE;
+    public boolean stateChanged = false;
 
     public StateComponent() {
     }

@@ -205,7 +205,6 @@ public class RoomData implements AsyncLoadable {
         }
 
         utils = utilStack.toArray(new UtilData[0]);
-        System.out.println(utilStack.toString());
     }
 
     private Rectangle getRect(RectangleMapObject rectObject) {

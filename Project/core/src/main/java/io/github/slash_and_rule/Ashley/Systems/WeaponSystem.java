@@ -5,13 +5,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem(int priority) {
-        super(Family.all(WeaponComponent.class).get(), priority);
+        super(Family.all(WeaponComponent.class).exclude(InactiveComponent.class).get(), priority);
     }
 
     @Override

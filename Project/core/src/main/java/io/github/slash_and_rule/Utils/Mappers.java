@@ -4,7 +4,9 @@ import com.badlogic.ashley.core.ComponentMapper;
 
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
+import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
@@ -37,4 +39,8 @@ public class Mappers {
                         .getFor(EnemyComponent.class);
         public static ComponentMapper<AnimatedComponent> animatedMapper = ComponentMapper
                         .getFor(AnimatedComponent.class);
+        public static ComponentMapper<StateComponent> stateMapper = ComponentMapper
+                        .getFor(StateComponent.class);
+        public static ComponentMapper<InactiveComponent> inactiveMapper = ComponentMapper
+                        .getFor(InactiveComponent.class);
 }

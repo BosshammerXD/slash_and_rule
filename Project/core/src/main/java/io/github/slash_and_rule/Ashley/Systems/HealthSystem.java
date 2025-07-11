@@ -5,11 +5,12 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class HealthSystem extends IteratingSystem {
     public HealthSystem(int priority) {
-        super(Family.all(HealthComponent.class).get(), priority);
+        super(Family.all(HealthComponent.class).exclude(InactiveComponent.class).get(), priority);
     }
 
     @Override

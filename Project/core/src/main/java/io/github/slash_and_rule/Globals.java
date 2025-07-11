@@ -46,6 +46,7 @@ public class Globals {
         public static final int WeaponSystemPriority = 30;
         public static final int EnemySystemPriority = 20;
         public static final int InputSystemPriority = 10;
+        public static final int StateSystemPriority = 0;
 
         // endregion
         //

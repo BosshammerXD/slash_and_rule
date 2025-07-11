@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
@@ -52,8 +53,9 @@ public class EnemySystem extends EntitySystem {
         this.engine = engine;
         this.enemies = engine.getEntitiesFor(Family
                 .all(MovementComponent.class, TransformComponent.class, EnemyComponent.class, HealthComponent.class)
-                .get());
-        this.players = engine.getEntitiesFor(Family.all(TransformComponent.class, PlayerComponent.class).get());
+                .exclude(InactiveComponent.class).get());
+        this.players = engine.getEntitiesFor(
+                Family.all(TransformComponent.class, PlayerComponent.class).exclude(InactiveComponent.class).get());
     }
 
     @Override

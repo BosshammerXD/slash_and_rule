@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -30,7 +31,7 @@ public class PhysicsSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         moveables = engine.getEntitiesFor(
-                Family.all(PhysicsComponent.class, MovementComponent.class).get());
+                Family.all(PhysicsComponent.class, MovementComponent.class).exclude(InactiveComponent.class).get());
 
         engine.addEntityListener(
                 Family.all(WeaponComponent.class, PhysicsComponent.class).get(),

@@ -3,17 +3,23 @@ package io.github.slash_and_rule.Bases;
 import java.util.ArrayDeque;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Components.ChildComponent;
+import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem;
 import io.github.slash_and_rule.Ashley.Systems.MovementSystem;
 import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
+import io.github.slash_and_rule.Ashley.Systems.StateSystem;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
@@ -28,6 +34,31 @@ public abstract class GameScreen extends BaseScreen {
 
     public GameScreen(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager);
+        engine.addEntityListener(Family.all(ParentComponent.class).get(), new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+                ParentComponent parentComponent = entity.getComponent(ParentComponent.class);
+                for (Entity child : parentComponent.children) {
+                    if (child == null) {
+                        continue;
+                    }
+                    ChildComponent childComponent = new ChildComponent();
+                    childComponent.parent = entity;
+                    child.add(childComponent);
+                    engine.addEntity(child);
+                }
+            }
+
+            @Override
+            public void entityRemoved(Entity entity) {
+                for (Entity child : entity.getComponent(ParentComponent.class).children) {
+                    if (child == null) {
+                        continue;
+                    }
+                    engine.removeEntity(child);
+                }
+            }
+        });
     }
 
     @Override
@@ -58,6 +89,7 @@ public abstract class GameScreen extends BaseScreen {
         addToEngine(loader, new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
         addToEngine(loader, inputSystem);
         addToEngine(loader, new MovementSystem(Globals.MovementSystemPriority));
+        addToEngine(loader, new StateSystem(Globals.StateSystemPriority));
         for (Initalizable data : loadableObjects) {
             data.init(loader);
         }

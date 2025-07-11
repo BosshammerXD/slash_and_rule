@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Affine2;
 
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.ForegroundComponent;
@@ -42,13 +43,16 @@ public class RenderSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         backgroundEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, RenderableComponent.class, BackgroundComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, BackgroundComponent.class)
+                        .exclude(InactiveComponent.class).get());
 
         midfieldEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, RenderableComponent.class, MidfieldComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, MidfieldComponent.class)
+                        .exclude(InactiveComponent.class).get());
 
         foregroundEntities = engine.getEntitiesFor(
-                Family.all(TransformComponent.class, RenderableComponent.class, ForegroundComponent.class).get());
+                Family.all(TransformComponent.class, RenderableComponent.class, ForegroundComponent.class)
+                        .exclude(InactiveComponent.class).get());
     }
 
     @Override

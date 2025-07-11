@@ -99,21 +99,23 @@ public class CollisionSystem extends EntitySystem {
         }
     }
 
-    private void handleContactStarted(Tuple<Entity> contact, Tuple<Fixture> fixtures) {
-        if (contact == null) {
+    private void handleContactStarted(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
+        if (entities == null || Mappers.inactiveMapper.has(entities.first)
+                || Mappers.inactiveMapper.has(entities.second)) {
             return;
         }
 
-        handleWeapons(contact, fixtures);
+        handleWeapons(entities, fixtures);
 
-        handleSensorsEnter(contact, fixtures);
+        handleSensorsEnter(entities, fixtures);
     }
 
-    private void handleContactEnd(Tuple<Entity> contact, Tuple<Fixture> fixtures) {
-        if (contact == null) {
+    private void handleContactEnd(Tuple<Entity> entities, Tuple<Fixture> fixtures) {
+        if (entities == null || Mappers.inactiveMapper.has(entities.first)
+                || Mappers.inactiveMapper.has(entities.second)) {
             return;
         }
-        handleSensorLeave(contact);
+        handleSensorLeave(entities);
     }
 
     // endregion

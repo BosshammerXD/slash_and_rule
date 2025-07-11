@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Ashley.Systems;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -11,7 +12,8 @@ import io.github.slash_and_rule.Utils.Mappers;
 public class MovementSystem extends IteratingSystem {
 
     public MovementSystem(int priority) {
-        super(Family.all(MovementComponent.class, TransformComponent.class).get(), priority);
+        super(Family.all(MovementComponent.class, TransformComponent.class).exclude(InactiveComponent.class).get(),
+                priority);
     }
 
     @Override

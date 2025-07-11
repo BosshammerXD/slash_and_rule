@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -33,7 +34,8 @@ public class InputSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        controllables = engine.getEntitiesFor(Family.all(ControllableComponent.class).get());
+        controllables = engine
+                .getEntitiesFor(Family.all(ControllableComponent.class).exclude(InactiveComponent.class).get());
     }
 
     @Override

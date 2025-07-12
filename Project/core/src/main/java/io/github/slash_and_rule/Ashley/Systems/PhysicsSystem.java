@@ -34,7 +34,6 @@ public class PhysicsSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         moveables = engine.getEntitiesFor(
                 Family.all(PhysicsComponent.class, MovementComponent.class).exclude(InactiveComponent.class).get());
-                Family.all(PhysicsComponent.class, MovementComponent.class).exclude(InactiveComponent.class).get());
 
         engine.addEntityListener(
                 Family.all(WeaponComponent.class, PhysicsComponent.class).get(),

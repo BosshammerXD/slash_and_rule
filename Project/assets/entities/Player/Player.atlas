@@ -13,6 +13,13 @@ CapeMoveDown
   index: 0
 CapeMoveDown
   rotate: false
+  xy: 2, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+CapeMoveDown
+  rotate: false
   xy: 2, 36
   size: 32, 32
   orig: 32, 32
@@ -20,18 +27,11 @@ CapeMoveDown
   index: 1
 CapeMoveDown
   rotate: false
-  xy: 2, 36
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 3
-CapeMoveDown
-  rotate: false
   xy: 36, 70
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 2
+  index: 3
 CapeMoveLeft
   rotate: false
   xy: 2, 2
@@ -181,6 +181,13 @@ CapeMoveUp
   index: 0
 CapeMoveUp
   rotate: false
+  xy: 274, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+CapeMoveUp
+  rotate: false
   xy: 240, 2
   size: 32, 32
   orig: 32, 32
@@ -188,18 +195,11 @@ CapeMoveUp
   index: 1
 CapeMoveUp
   rotate: false
-  xy: 240, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 3
-CapeMoveUp
-  rotate: false
   xy: 274, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 2
+  index: 3
 MoveDown
   rotate: false
   xy: 308, 70
@@ -209,6 +209,13 @@ MoveDown
   index: 0
 MoveDown
   rotate: false
+  xy: 308, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+MoveDown
+  rotate: false
   xy: 274, 2
   size: 32, 32
   orig: 32, 32
@@ -216,18 +223,11 @@ MoveDown
   index: 1
 MoveDown
   rotate: false
-  xy: 274, 2
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 3
-MoveDown
-  rotate: false
   xy: 308, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 2
+  index: 3
 MoveLeft
   rotate: false
   xy: 342, 70
@@ -377,6 +377,13 @@ MoveUp
   index: 0
 MoveUp
   rotate: false
+  xy: 546, 36
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+MoveUp
+  rotate: false
   xy: 580, 70
   size: 32, 32
   orig: 32, 32
@@ -384,15 +391,8 @@ MoveUp
   index: 1
 MoveUp
   rotate: false
-  xy: 580, 70
-  size: 32, 32
-  orig: 32, 32
-  offset: 0, 0
-  index: 3
-MoveUp
-  rotate: false
   xy: 546, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 2
+  index: 3

@@ -60,11 +60,11 @@ public class BasicSlime extends BaseEnemy {
 
         FrameData[][] frames = new FrameData[3][];
         frames[0] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
-                new String[] { "Slime_Idle", "Slime_Idle", "Slime_Idle", "Slime_Idle" }, 0.1f);
+                new String[] { "Idle", "Idle", "Idle", "Idle" }, 0.1f);
         frames[1] = FrameData.createMultiple(new int[] { 6, 4, 6, 4 },
                 new String[] { "Move_Left", "Move_Down", "Move_Right", "Move_Up" }, 0.1f);
         frames[2] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
-                new String[] { "Slime_Attack_Left", "Slime_Attack_Left", "Slime_Attack_Right", "Slime_Attack_Right" },
+                new String[] { "AtkLeft", "AtkLeft", "AtkRight", "AtkRight" },
                 0.1f);
 
         MovingEntityAnimData animData = new MovingEntityAnimData("entities/BasicSlime/BasicSlime.atlas", frames, data);

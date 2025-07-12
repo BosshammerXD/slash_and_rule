@@ -92,9 +92,9 @@ public class EnemySystem extends EntitySystem {
             enemy.add(enemyComp.atkComponent);
             moveComp.velocity.setZero();
         } else if (distance < enemyComp.attackRange) {
-            moveComp.velocity.set(direction.nor().scl(-moveComp.max_speed));
             enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
             enemy.add(enemyComp.atkComponent);
+            moveComp.velocity.set(direction.nor().scl(-moveComp.max_speed));
         } else {
             moveComp.velocity.set(direction.nor().scl(moveComp.max_speed));
             enemyComp.state = EnemyComponent.EnemyState.CHASING;

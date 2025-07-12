@@ -14,9 +14,9 @@ import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
-import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.ShapeBuilder;
@@ -38,7 +38,7 @@ public class Player {
 
     private PhysCompBuilder physCompBuilder;
     private WeaponBuilder weaponBuilder;
-    private RenderBuilder renderBuilder = new RenderBuilder();
+    private RenderBuilder<MidfieldComponent> renderBuilder = new RenderBuilder<MidfieldComponent>();
     private OrthographicCamera camera;
     private EntityManager entityManager;
 
@@ -57,7 +57,7 @@ public class Player {
 
         String atlasPath = UtilFuncs.getEnAtlas("Player");
 
-        renderBuilder.begin();
+        renderBuilder.begin(MidfieldComponent.class);
         TextureData moveTextureData = renderBuilder.add(atlasPath, 1, 2f, 2f, -1f, -0.5f);
         this.capeTextureData = renderBuilder.add(atlasPath, 2, 2f, 2f, -1f, -0.5f);
         renderBuilder.end(entity);
@@ -78,8 +78,7 @@ public class Player {
         CompBuilders.buildMovement(10f).add(entity);
         CompBuilders.buildHealth(100).add(entity);
 
-        entityManager.build(new PlayerComponent(), new MidfieldComponent(),
-                tC, cC, aC);
+        entityManager.build(new PlayerComponent(), new SensorComponent(), tC, cC, aC);
         entityManager.finish();
         System.out.println(entity.getComponents().toString());
     }
@@ -202,7 +201,7 @@ public class Player {
             apply(Mappers.transformMapper, comp -> {
                 camera.position.set(comp.position.x, comp.position.y, 0);
             });
-            apply(Mappers.renderableMapper, this::animation);
+            apply(Mappers.midfieldMapper, this::animation);
         }
 
         private void movement() {
@@ -225,7 +224,7 @@ public class Player {
             });
         }
 
-        private void animation(RenderableComponent comp) {
+        private void animation(MidfieldComponent comp) {
             if (moveAnimData.getName().equals("MoveUp")) {
                 capeTextureData.setPriority(2);
             } else {

@@ -9,6 +9,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
@@ -18,8 +19,9 @@ import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Systems.AnimationSystem;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem;
 import io.github.slash_and_rule.Ashley.Systems.MovementSystem;
-import io.github.slash_and_rule.Ashley.Systems.RenderSystem;
 import io.github.slash_and_rule.Ashley.Systems.StateSystem;
+import io.github.slash_and_rule.Ashley.Systems.RenderSystems.BGRenderSystem;
+import io.github.slash_and_rule.Ashley.Systems.RenderSystems.MFRenderSystem;
 import io.github.slash_and_rule.Interfaces.Initalizable;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
@@ -86,10 +88,12 @@ public abstract class GameScreen extends BaseScreen {
 
     public void init(LoadingScreen loader) {
         addToEngine(loader, new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
-        addToEngine(loader, new RenderSystem(Globals.RenderSystemPriority, camera, atlasManager));
         addToEngine(loader, inputSystem);
         addToEngine(loader, new MovementSystem(Globals.MovementSystemPriority));
         addToEngine(loader, new StateSystem(Globals.StateSystemPriority));
+        addToEngine(loader,
+                new BGRenderSystem((ExtendViewport) viewport, camera, atlasManager, Globals.BGRenderSystemPriority));
+        addToEngine(loader, new MFRenderSystem(camera, atlasManager, Globals.MFRenderSystemPriority));
         for (Initalizable data : loadableObjects) {
             data.init(loader);
         }

@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
-import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
@@ -44,7 +44,7 @@ public class BasicSlime extends BaseEnemy {
     }
 
     @Override
-    protected void addTextures(RenderableComponent renderableComponent) {
+    protected void addTextures(MidfieldComponent renderableComponent) {
 
     }
 

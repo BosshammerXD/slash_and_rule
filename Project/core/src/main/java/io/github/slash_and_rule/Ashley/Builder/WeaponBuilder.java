@@ -18,7 +18,7 @@ import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.FrameData;
 import io.github.slash_and_rule.Animations.triggeredAnimData;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
-import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
@@ -56,11 +56,12 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
     public WeaponBuilder(PhysicsBuilder physicsBuilder, Engine engine) {
         this.physicsBuilder = physicsBuilder;
 
-        engine.addEntityListener(Family.all(WeaponComponent.class, RenderableComponent.class, AnimatedComponent.class).get(),
+        engine.addEntityListener(
+                Family.all(WeaponComponent.class, MidfieldComponent.class, AnimatedComponent.class).get(),
                 new EntityListener() {
                     public void entityAdded(Entity entity) {
                         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
-                        RenderableComponent renderable = Mappers.renderableMapper.get(entity);
+                        MidfieldComponent renderable = Mappers.midfieldMapper.get(entity);
                         AnimatedComponent animated = Mappers.animatedMapper.get(entity);
 
                         WeaponTextureData textureData = weaponTextures.get(weapon);

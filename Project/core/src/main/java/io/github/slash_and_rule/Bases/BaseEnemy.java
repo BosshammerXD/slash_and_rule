@@ -9,7 +9,7 @@ import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
-import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -51,8 +51,8 @@ public abstract class BaseEnemy {
 
         HealthComponent healthComponent = new HealthComponent(data.health);
 
-        RenderableComponent renderableComponent = new RenderableComponent();
-        addTextures(renderableComponent);
+        MidfieldComponent mfComp = new MidfieldComponent();
+        addTextures(mfComp);
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
         physicsComponent.body = physicsBuilder.makeBody(pos, BodyType.DynamicBody, 6f, true);
@@ -66,7 +66,7 @@ public abstract class BaseEnemy {
                 transformComponent,
                 movementComponent,
                 healthComponent,
-                renderableComponent,
+                mfComp,
                 physicsComponent,
                 weaponComponent,
                 enemyComponent,
@@ -79,7 +79,7 @@ public abstract class BaseEnemy {
 
     protected abstract WeaponComponent makeWeapon();
 
-    protected abstract void addTextures(RenderableComponent renderableComponent);
+    protected abstract void addTextures(MidfieldComponent renderableComponent);
 
     protected abstract void addFixtures(PhysicsComponent physicsComponent);
 

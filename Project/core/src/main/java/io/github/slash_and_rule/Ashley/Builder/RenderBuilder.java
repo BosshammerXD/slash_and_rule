@@ -7,11 +7,16 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableCo
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Bases.BaseCompBuilder;
 
-public class RenderBuilder extends BaseCompBuilder<RenderableComponent> {
+public class RenderBuilder<T extends RenderableComponent> extends BaseCompBuilder<T> {
     private ArrayDeque<TextureData> textureDataQueue = new ArrayDeque<>();
 
-    public void begin() {
-        begin(new RenderableComponent());
+    public void begin(Class<T> comp) {
+        try {
+            T instance = comp.getDeclaredConstructor().newInstance();
+            begin(instance);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not instantiate component: " + comp.getSimpleName(), e);
+        }
     }
 
     public TextureData add(String atlasPath, String name, int priority, float width, float height,

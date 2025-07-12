@@ -31,7 +31,7 @@ import io.github.slash_and_rule.Utils.ShapeBuilder;
 
 public class DungeonBuilder {
     private PhysCompBuilder physicsCompBuilder;
-    private RenderBuilder renderBuilder = new RenderBuilder();
+    private RenderBuilder<BackgroundComponent> renderBuilder = new RenderBuilder<BackgroundComponent>();
 
     public DungeonBuilder(PhysCompBuilder physCompBuilder) {
         this.physicsCompBuilder = physCompBuilder;
@@ -53,7 +53,7 @@ public class DungeonBuilder {
             buildWall(wall, physicsComponent, index);
         }
 
-        renderBuilder.begin();
+        renderBuilder.begin(BackgroundComponent.class);
         for (DoorData door : data.doors) {
             makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, -2, null);
         }
@@ -84,7 +84,6 @@ public class DungeonBuilder {
                 physicsComponent,
                 dungeonComponent,
                 new TransformComponent(),
-                new BackgroundComponent(),
                 parentComponent,
                 stateComponent,
                 new InactiveComponent());
@@ -110,7 +109,7 @@ public class DungeonBuilder {
         }
 
         schedule.add(() -> {
-            renderBuilder.begin();
+            renderBuilder.begin(BackgroundComponent.class);
             for (DoorData door : data.doors) {
                 makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, direction, origin);
             }
@@ -143,7 +142,6 @@ public class DungeonBuilder {
                     physicsComponent,
                     dungeonComponent,
                     new TransformComponent(),
-                    new BackgroundComponent(),
                     parentComponent,
                     stateComponent,
                     new InactiveComponent());

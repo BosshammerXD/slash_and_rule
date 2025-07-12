@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 import io.github.slash_and_rule.Bases.EntityScreen;
+import io.github.slash_and_rule.CityBuilder.CityBuilderScene;
 import io.github.slash_and_rule.Dungeon_Crawler.DungeonCrawlerScene;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
@@ -25,10 +26,12 @@ public class Main extends Game {
     public void create() {
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
 
-        screens[0] = new DungeonCrawlerScene(assetManager, atlasManager);
+        CityBuilderScene cbs = new CityBuilderScene(assetManager, atlasManager);
 
-        loadingScreen = new LoadingScreen(screens[0], assetManager, atlasManager, this::setScreen);
+        loadingScreen = new LoadingScreen(cbs, assetManager, atlasManager, this::setScreen);
 
-        loadingScreen.load(screens[0]);
+        DungeonCrawlerScene dcs = new DungeonCrawlerScene(assetManager, atlasManager);
+
+        loadingScreen.load(dcs);
     }
 }

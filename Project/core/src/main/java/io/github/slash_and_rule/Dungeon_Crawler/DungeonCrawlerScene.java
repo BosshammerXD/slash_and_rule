@@ -6,9 +6,10 @@ import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Systems.DoorSystem;
 import io.github.slash_and_rule.Ashley.Systems.DungeonRoomSystem;
-import io.github.slash_and_rule.Ashley.Systems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
+import io.github.slash_and_rule.Ashley.Systems.EnemySystems.EnemySystem;
+import io.github.slash_and_rule.Ashley.Systems.EnemySystems.JumperSystem;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.DungeonGenerationData;
@@ -49,6 +50,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         addToEngine(loader, dungeonRoomSystem = new DungeonRoomSystem(physCompBuilder, dungeonManager,
                 Globals.DungeonRoomSystemPriority, gameCamera));
         addToEngine(loader, new DoorSystem(dungeonManager::move, Globals.DoorSystemPriority));
+        addToEngine(loader, new JumperSystem(Globals.JumperSystemPriority));
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);

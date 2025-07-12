@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
+import io.github.slash_and_rule.Ashley.Components.InvulnerableComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Utils.Mappers;
@@ -22,10 +23,12 @@ public class HealthSystem extends IteratingSystem {
         // TODO: Implement something to handle what to do when entity dead
 
         HealthComponent health = Mappers.healthMapper.get(entity);
-        if (health.time >= 0f) {
-            health.time += deltaTime;
-            if (health.time >= health.invulnerabilityTime) {
-                health.time = -1f;
+        InvulnerableComponent invuln = Mappers.invulnerableMapper.get(entity);
+        if (invuln != null) {
+            if (invuln.duration > 0) {
+                invuln.duration -= deltaTime;
+            } else {
+                entity.remove(InvulnerableComponent.class);
             }
             return;
         }
@@ -42,7 +45,7 @@ public class HealthSystem extends IteratingSystem {
             if (otherWeapon == null) {
                 return;
             }
-            health.time = 0f;
+            entity.add(new InvulnerableComponent(health.invulnerabilityTime));
             health.health -= otherWeapon.damage;
         }
         // else if (health.appliedDamage > 0) {

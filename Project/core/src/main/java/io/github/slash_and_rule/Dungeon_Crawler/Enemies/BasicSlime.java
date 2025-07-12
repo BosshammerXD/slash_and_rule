@@ -62,7 +62,7 @@ public class BasicSlime extends BaseEnemy {
         frames[0] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
                 new String[] { "Idle", "Idle", "Idle", "Idle" }, 0.1f);
         frames[1] = FrameData.createMultiple(new int[] { 6, 4, 6, 4 },
-                new String[] { "Move_Left", "Move_Down", "Move_Right", "Move_Up" }, 0.1f);
+                new String[] { "MoveLeft", "MoveDown", "MoveRight", "MoveUp" }, 0.1f);
         frames[2] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
                 new String[] { "AtkLeft", "AtkLeft", "AtkRight", "AtkRight" },
                 0.1f);

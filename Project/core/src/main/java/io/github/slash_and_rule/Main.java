@@ -28,9 +28,9 @@ public class Main extends Game {
 
         CityBuilderScene cbs = new CityBuilderScene(assetManager, atlasManager);
 
-        loadingScreen = new LoadingScreen(cbs, assetManager, atlasManager, this::setScreen);
-
         DungeonCrawlerScene dcs = new DungeonCrawlerScene(assetManager, atlasManager);
+
+        loadingScreen = new LoadingScreen(cbs, assetManager, atlasManager, this::setScreen);
 
         loadingScreen.load(dcs);
     }

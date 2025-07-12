@@ -36,6 +36,7 @@ public class Globals {
          * System priorities for the Ashley framework.
          * These priorities determine the order in which systems are updated.
          */
+        public static final int HealthbarSystemPriority = 125;
         public static final int MFRenderSystemPriority = 120;
         public static final int BGRenderSystemPriority = 100;
         public static final int RenderSystemPriority = 100;

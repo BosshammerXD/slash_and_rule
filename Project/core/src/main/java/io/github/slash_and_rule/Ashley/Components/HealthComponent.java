@@ -3,6 +3,7 @@ package io.github.slash_and_rule.Ashley.Components;
 import com.badlogic.ashley.core.Component;
 
 public class HealthComponent implements Component {
+    public float offsetY = 1f;
     public int health;
     public int maxHealth;
     public float invulnerabilityTime = 0.1f; // Time during which the entity is invulnerable after taking damage

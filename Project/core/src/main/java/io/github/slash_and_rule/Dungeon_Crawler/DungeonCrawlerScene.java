@@ -7,6 +7,7 @@ import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Systems.DoorSystem;
 import io.github.slash_and_rule.Ashley.Systems.DungeonRoomSystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
+import io.github.slash_and_rule.Ashley.Systems.HealthbarSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.JumperSystem;
@@ -51,6 +52,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
                 Globals.DungeonRoomSystemPriority, gameCamera));
         addToEngine(loader, new DoorSystem(dungeonManager::move, Globals.DoorSystemPriority));
         addToEngine(loader, new JumperSystem(Globals.JumperSystemPriority));
+        addToEngine(loader, new HealthbarSystem(gameCamera, Globals.HealthbarSystemPriority));
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);

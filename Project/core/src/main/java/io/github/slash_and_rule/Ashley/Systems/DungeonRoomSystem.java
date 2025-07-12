@@ -21,7 +21,6 @@ import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.ChasePlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;

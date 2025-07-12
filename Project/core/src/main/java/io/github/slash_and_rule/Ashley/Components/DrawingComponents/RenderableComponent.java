@@ -11,11 +11,12 @@ public class RenderableComponent implements Component {
 
         private int priority;
 
-        public float width;
-        public float height;
-        public float offsetX;
-        public float offsetY;
+        public float width = Float.NaN;
+        public float height = Float.NaN;
+        public float offsetX = Float.NaN;
+        public float offsetY = Float.NaN;
         public float angle = 0f;
+        public float scale = 1 / 32f;
 
         public TextureData(int priority) {
             this.priority = priority;

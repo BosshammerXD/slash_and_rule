@@ -40,6 +40,15 @@ public class RenderBuilder<T extends RenderableComponent> extends BaseCompBuilde
         return add(atlasPath, null, priority, width, height, offsetX, offsetY);
     }
 
+    public TextureData add(String atlasPath, int priority, float scale) {
+        TextureData textureData = comp.new TextureData(priority);
+        textureData.atlasPath = atlasPath;
+        textureData.scale = scale;
+
+        textureDataQueue.add(textureData);
+        return textureData;
+    }
+
     @Override
     protected void finish() {
         comp.textures = textureDataQueue.toArray(new TextureData[0]);

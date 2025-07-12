@@ -1,4 +1,4 @@
-package io.github.slash_and_rule.Ashley.Systems;
+package io.github.slash_and_rule.Ashley.Systems.EnemySystems;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -16,7 +16,7 @@ import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -66,7 +66,7 @@ public class EnemySystem extends EntitySystem {
 
             physComp.body.setAwake(true);
 
-            moveTo(enemyComp, moveComp, getVecToClosestPlayer(enemy));
+            moveTo(enemyComp, moveComp, enemy);
 
             HealthComponent health = Mappers.healthMapper.get(enemy);
             if (health.health <= 0) {
@@ -75,7 +75,12 @@ public class EnemySystem extends EntitySystem {
         }
     }
 
-    private void moveTo(EnemyComponent enemyComp, MovementComponent moveComp, Vector2 direction) {
+    private void moveTo(EnemyComponent enemyComp, MovementComponent moveComp, Entity enemy) {
+        if (enemyComp.state == EnemyComponent.EnemyState.ATTACKING) {
+            moveComp.velocity.setZero();
+            return;
+        }
+        Vector2 direction = getVecToClosestPlayer(enemy);
         float distance = direction.len();
 
         if (distance == 0) {
@@ -83,10 +88,13 @@ public class EnemySystem extends EntitySystem {
             enemyComp.state = EnemyComponent.EnemyState.IDLE;
         } else if (Math.abs(distance - enemyComp.attackRange) < 0.1) {
             enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
+            enemyComp.atkComponent.targetPosition.set(direction);
+            enemy.add(enemyComp.atkComponent);
             moveComp.velocity.setZero();
         } else if (distance < enemyComp.attackRange) {
             moveComp.velocity.set(direction.nor().scl(-moveComp.max_speed));
             enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
+            enemy.add(enemyComp.atkComponent);
         } else {
             moveComp.velocity.set(direction.nor().scl(moveComp.max_speed));
             enemyComp.state = EnemyComponent.EnemyState.CHASING;

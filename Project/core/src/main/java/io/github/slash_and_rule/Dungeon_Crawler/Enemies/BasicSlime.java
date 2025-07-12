@@ -12,7 +12,7 @@ import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent.EnemyType;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.JumperComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
@@ -29,8 +29,10 @@ public class BasicSlime extends BaseEnemy {
         data.max_speed = 2f;
 
         data.attackRange = 2f;
-
-        data.type = EnemyType.JUMPER;
+        JumperComponent jumperComponent = new JumperComponent();
+        jumperComponent.jumpTime = 0.5f;
+        data.atkComponent = jumperComponent;
+        data.attackCooldown = 1.5f;
 
         return data;
     }
@@ -41,7 +43,7 @@ public class BasicSlime extends BaseEnemy {
 
         Shape hitbox = ShapeBuilder.circ(0.5f);
 
-        weaponBuilder.addHitbox(0.1f, 0.2f, hitbox);
+        weaponBuilder.addHitbox(0.5f, 0.6f, hitbox);
 
         return weaponBuilder.end();
     }

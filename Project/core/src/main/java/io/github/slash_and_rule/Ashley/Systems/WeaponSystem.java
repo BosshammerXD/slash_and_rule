@@ -51,7 +51,9 @@ public class WeaponSystem extends IteratingSystem {
     }
 
     private void attack(WeaponComponent weapon) {
-        weapon.animData.trigger();
+        if (weapon.animData != null) {
+            weapon.animData.trigger();
+        }
         weapon.index = 0; // Reset index für neue Hitboxes
     }
 

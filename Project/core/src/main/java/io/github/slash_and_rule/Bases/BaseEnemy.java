@@ -10,8 +10,9 @@ import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyAtkComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
@@ -21,11 +22,11 @@ public abstract class BaseEnemy {
         public int health = 100;
         public float max_speed = 5f;
         public float attackRange = 0.5f;
-        public EnemyComponent.EnemyType type = EnemyComponent.EnemyType.MEELE;
 
         public int damage = 10;
         public float weight = 1f;
         public float attackCooldown = 1f;
+        public EnemyAtkComponent atkComponent = new EnemyAtkComponent();
 
         public EnemyData() {
         }
@@ -61,7 +62,9 @@ public abstract class BaseEnemy {
 
         WeaponComponent weaponComponent = makeWeapon();
 
-        EnemyComponent enemyComponent = new EnemyComponent(data.attackRange, data.type);
+        EnemyComponent enemyComponent = new EnemyComponent();
+        enemyComponent.attackRange = data.attackRange;
+        enemyComponent.atkComponent = data.atkComponent;
 
         entityManager.build(
                 transformComponent,

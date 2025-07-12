@@ -144,6 +144,10 @@ public class PhysicsSystem extends EntitySystem {
         }
         Vector2 direction = new Vector2(physComp.body.getPosition());
         direction.sub(otherPhysComp.body.getPosition()).nor().scl(weaponComp.weight);
+        if (direction.isZero()) {
+            direction.set(1, 0);
+            direction.rotateDeg(Globals.random.nextFloat() * 360f);
+        }
         moveComp.knockback.add(direction);
     }
 }

@@ -4,184 +4,324 @@ size: 512, 256
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-AtkLeft
+Move_Down
   rotate: false
-  xy: 2, 168
+  xy: 2, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+Move_Down
+  rotate: false
+  xy: 332, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+Move_Down
+  rotate: false
+  xy: 332, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+Move_Down
+  rotate: false
+  xy: 398, 136
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+Move_Left
+  rotate: false
+  xy: 464, 202
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+Move_Left
+  rotate: false
+  xy: 36, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+Move_Left
+  rotate: false
+  xy: 70, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+Move_Left
+  rotate: false
+  xy: 70, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+Move_Left
+  rotate: false
+  xy: 104, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+Move_Left
+  rotate: false
+  xy: 138, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+Move_Right
+  rotate: false
+  xy: 172, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+Move_Right
+  rotate: false
+  xy: 206, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+Move_Right
+  rotate: false
+  xy: 240, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+Move_Right
+  rotate: false
+  xy: 240, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+Move_Right
+  rotate: false
+  xy: 274, 4
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+Move_Right
+  rotate: false
+  xy: 332, 36
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+Move_Up
+  rotate: false
+  xy: 366, 70
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+Move_Up
+  rotate: false
+  xy: 366, 36
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+Move_Up
+  rotate: false
+  xy: 366, 36
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+Move_Up
+  rotate: false
+  xy: 432, 136
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+Slime_Attack_Left
+  rotate: false
+  xy: 2, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 2, 102
+  xy: 2, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 68, 168
+  xy: 68, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 2, 36
+  xy: 2, 38
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 3
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 68, 102
+  xy: 68, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 4
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 134, 168
+  xy: 134, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 5
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 68, 36
+  xy: 68, 38
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 6
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 134, 102
+  xy: 134, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 7
-AtkLeft
+Slime_Attack_Left
   rotate: false
-  xy: 200, 168
+  xy: 200, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 8
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 134, 36
+  xy: 134, 38
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 0
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 200, 102
+  xy: 200, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 1
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 266, 168
+  xy: 266, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 2
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 200, 36
+  xy: 200, 38
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 3
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 266, 102
+  xy: 266, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 4
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 332, 168
+  xy: 332, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 5
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 266, 36
+  xy: 266, 38
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 6
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 332, 102
+  xy: 332, 104
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 7
-AtkRight
+Slime_Attack_Right
   rotate: false
-  xy: 398, 168
+  xy: 398, 170
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: 8
-Idle
+Slime_Idle
   rotate: false
-  xy: 2, 2
+  xy: 308, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-Idle
+Slime_Idle
   rotate: false
-  xy: 2, 2
+  xy: 308, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-Idle
+Slime_Idle
   rotate: false
-  xy: 332, 68
+  xy: 342, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-Idle
+Slime_Idle
   rotate: false
-  xy: 398, 134
+  xy: 376, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-Idle
+Slime_Idle
   rotate: false
-  xy: 464, 200
+  xy: 400, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
-Idle
+Slime_Idle
   rotate: false
-  xy: 464, 200
+  xy: 400, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
-Idle
+Slime_Idle
   rotate: false
-  xy: 36, 2
+  xy: 400, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
-Idle
+Slime_Idle
   rotate: false
-  xy: 70, 2
+  xy: 434, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

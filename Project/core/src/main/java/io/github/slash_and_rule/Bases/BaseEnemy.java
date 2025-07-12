@@ -61,7 +61,7 @@ public abstract class BaseEnemy {
 
         AnimatedComponent animComp = new AnimatedComponent();
 
-        renderBuilder.begin(MidfieldComponent.class);
+        renderBuilder.begin(new MidfieldComponent());
         addTextures(renderBuilder, animComp.animations);
         renderBuilder.end(entity);
 

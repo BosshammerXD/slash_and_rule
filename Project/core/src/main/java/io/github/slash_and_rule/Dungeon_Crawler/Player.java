@@ -57,7 +57,7 @@ public class Player {
 
         String atlasPath = UtilFuncs.getEnAtlas("Player");
 
-        renderBuilder.begin(MidfieldComponent.class);
+        renderBuilder.begin(new MidfieldComponent());
         TextureData moveTextureData = renderBuilder.add(atlasPath, 1, 2f, 2f, -1f, -0.5f);
         this.capeTextureData = renderBuilder.add(atlasPath, 2, 2f, 2f, -1f, -0.5f);
         renderBuilder.end(entity);

@@ -36,9 +36,9 @@ public class JumperSystem extends IteratingSystem {
 
                 jumper.jumpStart.set(physics.body.getPosition());
 
-                weapon.state = WeaponStates.ATTACKING;
+                physics.fixtures.get("Collider").setSensor(true);
 
-                physics.body.setActive(false);
+                weapon.state = WeaponStates.ATTACKING;
             }
 
             @Override
@@ -61,9 +61,9 @@ public class JumperSystem extends IteratingSystem {
 
         if (jumper.time < jumper.jumpTime) {
             float t = jumper.time / jumper.jumpTime;
-            Vector2 newPosition = jumper.jumpStart.cpy()
-                    .add(jumper.targetPosition.cpy().scl(jumper.time / jumper.jumpTime));
-            newPosition.y += jumper.targetPosition.len() * (-2 * t * (t - 1));
+            Vector2 newPosition = physics.body.getPosition()
+                    .add(jumper.targetPosition.cpy().scl(deltaTime / jumper.jumpTime));
+            newPosition.y += jumper.targetPosition.len() * (-1 * (t - 0.5f) * (t - 0.5f) * (t - 0.5f));
             physics.body.setTransform(newPosition, physics.body.getAngle());
             transform.z = jumper.targetPosition.len() * (-2 * t * (t - 1));
         }
@@ -73,6 +73,7 @@ public class JumperSystem extends IteratingSystem {
         }
 
         if (weapon.state == WeaponStates.IDLE) {
+            physics.fixtures.get("Collider").setSensor(false);
             jumper.targetPosition.setZero();
             entity.remove(JumperComponent.class);
         }

@@ -77,7 +77,7 @@ public class BasicSlime extends BaseEnemy {
         HashMap<String, Fixture> fixtureMap = fixtures.fixtures;
 
         CircleShape colliderShape = new CircleShape();
-        colliderShape.setRadius(0.5f);
+        colliderShape.setRadius(0.4f);
 
         fixtureMap.put("Collider",
                 physicsBuilder.addFixture(body, colliderShape, Globals.EnemyCategory, Globals.ColEnemyMask, false));

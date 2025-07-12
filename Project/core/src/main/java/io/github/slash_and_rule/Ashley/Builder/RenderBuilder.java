@@ -10,13 +10,8 @@ import io.github.slash_and_rule.Bases.BaseCompBuilder;
 public class RenderBuilder<T extends RenderableComponent> extends BaseCompBuilder<T> {
     private ArrayDeque<TextureData> textureDataQueue = new ArrayDeque<>();
 
-    public void begin(Class<T> comp) {
-        try {
-            T instance = comp.getDeclaredConstructor().newInstance();
-            begin(instance);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not instantiate component: " + comp.getSimpleName(), e);
-        }
+    public void begin(T comp) {
+        super.begin(comp);
     }
 
     public TextureData add(String atlasPath, String name, int priority, float width, float height,
@@ -41,8 +36,13 @@ public class RenderBuilder<T extends RenderableComponent> extends BaseCompBuilde
     }
 
     public TextureData add(String atlasPath, int priority, float scale) {
+        return add(atlasPath, null, priority, scale);
+    }
+
+    public TextureData add(String atlasPath, String name, int priority, float scale) {
         TextureData textureData = comp.new TextureData(priority);
         textureData.atlasPath = atlasPath;
+        textureData.name = name;
         textureData.scale = scale;
 
         textureDataQueue.add(textureData);

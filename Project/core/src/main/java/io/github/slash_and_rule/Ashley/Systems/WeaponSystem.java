@@ -6,9 +6,11 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
+import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.timedActions;
+import io.github.slash_and_rule.Utils.Mappers;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem(int priority) {
@@ -22,7 +24,8 @@ public class WeaponSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        WeaponComponent weapon = entity.getComponent(WeaponComponent.class);
+        WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+        MovementComponent movement = Mappers.movementMapper.get(entity);
         if (weapon.state == WeaponStates.CHARGING && weapon.time <= weapon.chargetime) {
             weapon.chargetime += deltaTime;
         }
@@ -31,6 +34,7 @@ public class WeaponSystem extends IteratingSystem {
         }
 
         if (weapon.state == WeaponStates.ATTACKING) {
+            movement.max_speed *= 0.5f;
             weapon.time = 0f;
             weapon.state = WeaponStates.COOLDOWN;
             rotateWeapon(weapon);
@@ -41,6 +45,7 @@ public class WeaponSystem extends IteratingSystem {
             handleHitboxes(weapon);
 
             if (weapon.time >= weapon.cooldown) {
+                movement.max_speed *= 2f;
                 weapon.state = WeaponStates.IDLE;
                 weapon.time = 0f;
                 weapon.index = 0; // Reset index when returning to IDLE

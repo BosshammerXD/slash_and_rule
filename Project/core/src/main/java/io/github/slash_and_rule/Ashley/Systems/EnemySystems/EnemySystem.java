@@ -90,12 +90,10 @@ public class EnemySystem extends EntitySystem {
             enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
             enemyComp.atkComponent.targetPosition.set(direction);
             enemy.add(enemyComp.atkComponent);
-            // moveComp.velocity.setZero();
         } else if (distance < enemyComp.attackRange) {
             enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
             enemyComp.atkComponent.targetPosition.set(direction);
             enemy.add(enemyComp.atkComponent);
-            // moveComp.velocity.set(direction.nor().scl(-moveComp.max_speed));
         } else {
             moveComp.velocity.set(direction.nor().scl(moveComp.max_speed));
             enemyComp.state = EnemyComponent.EnemyState.CHASING;

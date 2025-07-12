@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.CompBuilders;
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
@@ -53,7 +54,7 @@ public class DungeonBuilder {
             buildWall(wall, physicsComponent, index);
         }
 
-        renderBuilder.begin(BackgroundComponent.class);
+        renderBuilder.begin(new BackgroundComponent());
         for (DoorData door : data.doors) {
             makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, -2, null);
         }
@@ -109,7 +110,7 @@ public class DungeonBuilder {
         }
 
         schedule.add(() -> {
-            renderBuilder.begin(BackgroundComponent.class);
+            renderBuilder.begin(new BackgroundComponent());
             for (DoorData door : data.doors) {
                 makeDoor(door, neighbours, physicsComponent, index, spawnPoints, children, direction, origin);
             }
@@ -246,6 +247,7 @@ public class DungeonBuilder {
 
     private Entity makeEntry(UtilData entry) {
         // TODO
+        Entity entity = new Entity();
         Shape shape = ShapeBuilder.circ(entry.x + entry.width, entry.y + entry.height, entry.width);
 
         physicsCompBuilder.begin(BodyType.StaticBody, 0f, false);
@@ -254,8 +256,15 @@ public class DungeonBuilder {
         StateComponent stateComp = new StateComponent();
         stateComp.state = StateComponent.State.INACTIVE;
 
-        Entity entity = new Entity();
-        EntityManager.build(entity, physicsCompBuilder.end(), stateComp, new InactiveComponent());
+        renderBuilder.begin(new BackgroundComponent());
+        renderBuilder.add("levels/" + Globals.level + "/levelSprites.atlas", "Dungeon_Portal", 0, 1 / 16f);
+        renderBuilder.end(entity);
+
+        TransformComponent transComp = CompBuilders
+                .buildTransform(new Vector2(entry.x + entry.width, entry.y + entry.height), 0).get();
+
+        EntityManager.build(entity, transComp, physicsCompBuilder.end(), stateComp,
+                new InactiveComponent());
 
         return entity;
     }

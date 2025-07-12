@@ -11,6 +11,7 @@ import io.github.slash_and_rule.Utils.Mappers;
 
 public class MovingEntityAnimData extends DirectionalAnimData {
     private Vector2 lastPos = new Vector2(0f, 0f);
+    private Vector2 moveVec = new Vector2(0f, 0f);
 
     private enum States {
         IDLE(0), WALKING(1), ATTACKING(2);
@@ -37,11 +38,7 @@ public class MovingEntityAnimData extends DirectionalAnimData {
         Vector2 retVec = new Vector2(0, 0);
         switch (state) {
             case States.ATTACKING:
-                WeaponComponent weapon = Mappers.weaponMapper.get(entity);
-                if (weapon == null) {
-                    break;
-                }
-                retVec.set(weapon.target);
+                retVec.set(moveVec);
                 break;
             default:
                 MovementComponent movement = Mappers.movementMapper.get(entity);
@@ -54,14 +51,15 @@ public class MovingEntityAnimData extends DirectionalAnimData {
     }
 
     private void calcState(Entity entity) {
-        if (state == States.ATTACKING && !looped) {
-            return;
-        }
         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
 
         if (weapon != null && weapon.time == 0f && weapon.state == WeaponComponent.WeaponStates.COOLDOWN) {
             looped = false;
+            moveVec.set(weapon.target);
             state = States.ATTACKING;
+            return;
+        }
+        if (state == States.ATTACKING && !looped) {
             return;
         }
         MovementComponent movement = Mappers.movementMapper.get(entity);

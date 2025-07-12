@@ -9,7 +9,7 @@ public abstract class BaseCompBuilder<T extends Component> {
 
     protected void begin(T component) {
         if (building) {
-            throw new IllegalStateException("You can't only call begin() while building.");
+            throw new IllegalStateException("You can't call begin() while building.");
         }
         this.comp = component;
         building = true;

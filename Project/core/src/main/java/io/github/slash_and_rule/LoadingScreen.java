@@ -150,4 +150,9 @@ public class LoadingScreen extends BaseScreen {
     public void schedule(Runnable runnable) {
         schedule("", runnable);
     }
+
+    public void load(GameScreen screen) {
+        this.nextScreen = screen;
+        changeScreen.accept(this);
+    }
 }

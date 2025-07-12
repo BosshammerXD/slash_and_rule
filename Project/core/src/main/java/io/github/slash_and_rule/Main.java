@@ -27,10 +27,8 @@ public class Main extends Game {
 
         screens[0] = new DungeonCrawlerScene(assetManager, atlasManager);
 
-        loadingScreen = new LoadingScreen(screens[0], assetManager, atlasManager, screen -> setScreen(screen));
+        loadingScreen = new LoadingScreen(screens[0], assetManager, atlasManager, this::setScreen);
 
-        loadingScreen.nextScreen = screens[0];
-
-        setScreen(loadingScreen);
+        loadingScreen.load(screens[0]);
     }
 }

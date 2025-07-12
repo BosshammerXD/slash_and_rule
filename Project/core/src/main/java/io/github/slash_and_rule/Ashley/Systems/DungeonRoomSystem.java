@@ -109,6 +109,7 @@ public class DungeonRoomSystem extends EntitySystem {
 
         if (!dungeonComp.cleared && spawnEnemies(dungeonComp, deltaTime) && enemyEntities.size() == 0) {
             dungeonComp.cleared = true;
+            dungeonManager.getRoom().cleared = true;
             Signals.roomOpenSignal.dispatch(new Signals.RoomOpenEvent(entity));
         }
     }

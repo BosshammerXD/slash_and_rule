@@ -62,43 +62,34 @@ public class EnemySystem extends EntitySystem {
         for (Entity enemy : enemies) {
             EnemyComponent enemyComp = Mappers.enemyMapper.get(enemy);
             PhysicsComponent physComp = Mappers.physicsMapper.get(enemy);
+            MovementComponent moveComp = Mappers.movementMapper.get(enemy);
 
-            moveTo(enemy, getVecToClosestPlayer(enemy));
+            physComp.body.setAwake(true);
+
+            moveTo(enemyComp, moveComp, getVecToClosestPlayer(enemy));
 
             HealthComponent health = Mappers.healthMapper.get(enemy);
             if (health.health <= 0) {
                 getEngine().removeEntity(enemy);
             }
-
-            if (enemyComp.startPos != null) {
-                physComp.body.setTransform(enemyComp.startPos, 0);
-                enemyComp.startPos = null;
-            }
         }
     }
 
-    private void moveTo(Entity enemy, Vector2 direction) {
-        if (enemy == null) {
-            return;
-        }
-        EnemyComponent enemyComponent = Mappers.enemyMapper.get(enemy);
-        MovementComponent movement = Mappers.movementMapper.get(enemy);
-
-        Mappers.physicsMapper.get(enemy).body.setAwake(true);
+    private void moveTo(EnemyComponent enemyComp, MovementComponent moveComp, Vector2 direction) {
         float distance = direction.len();
 
         if (distance == 0) {
-            movement.velocity.setZero();
-            enemyComponent.state = EnemyComponent.EnemyState.IDLE;
-        } else if (Math.abs(distance - enemyComponent.attackRange) < 0.1) {
-            enemyComponent.state = EnemyComponent.EnemyState.ATTACKING;
-            movement.velocity.setZero();
-        } else if (distance < enemyComponent.attackRange) {
-            movement.velocity.set(direction.nor().scl(-movement.max_speed));
-            enemyComponent.state = EnemyComponent.EnemyState.ATTACKING;
+            moveComp.velocity.setZero();
+            enemyComp.state = EnemyComponent.EnemyState.IDLE;
+        } else if (Math.abs(distance - enemyComp.attackRange) < 0.1) {
+            enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
+            moveComp.velocity.setZero();
+        } else if (distance < enemyComp.attackRange) {
+            moveComp.velocity.set(direction.nor().scl(-moveComp.max_speed));
+            enemyComp.state = EnemyComponent.EnemyState.ATTACKING;
         } else {
-            movement.velocity.set(direction.nor().scl(movement.max_speed));
-            enemyComponent.state = EnemyComponent.EnemyState.CHASING;
+            moveComp.velocity.set(direction.nor().scl(moveComp.max_speed));
+            enemyComp.state = EnemyComponent.EnemyState.CHASING;
         }
     }
 

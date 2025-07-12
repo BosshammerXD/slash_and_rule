@@ -55,13 +55,12 @@ public abstract class BaseEnemy {
         addTextures(renderableComponent);
 
         PhysicsComponent physicsComponent = new PhysicsComponent();
-        physicsComponent.body = physicsBuilder.makeBody(BodyType.DynamicBody, 6f, true);
+        physicsComponent.body = physicsBuilder.makeBody(pos, BodyType.DynamicBody, 6f, true);
         addFixtures(physicsComponent);
 
         WeaponComponent weaponComponent = makeWeapon();
 
         EnemyComponent enemyComponent = new EnemyComponent(data.attackRange);
-        enemyComponent.startPos = position.cpy();
 
         entityManager.build(
                 transformComponent,

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.math.Vector2;
 
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
@@ -36,9 +37,6 @@ public class JumperSystem extends IteratingSystem {
 
                 weapon.state = WeaponStates.ATTACKING;
 
-                physics.body.setTransform(physics.body.getPosition().add(jumper.targetPosition),
-                        physics.body.getAngle());
-
                 physics.body.setActive(false);
             }
 
@@ -58,6 +56,14 @@ public class JumperSystem extends IteratingSystem {
         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
 
         jumper.time += deltaTime;
+
+        if (jumper.time < jumper.jumpTime) {
+            System.out.println("JumperSystem: " + jumper.time + " / " + jumper.jumpTime);
+            System.out.println("Target Position: " + jumper.targetPosition);
+            Vector2 newPosition = jumper.jumpStart.cpy()
+                    .add(jumper.targetPosition.cpy().scl(jumper.time / jumper.jumpTime));
+            physics.body.setTransform(newPosition, physics.body.getAngle());
+        }
 
         if (jumper.time >= jumper.jumpTime) {
             physics.body.setActive(true);

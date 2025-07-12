@@ -8,9 +8,14 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.Animations.AnimData;
+import io.github.slash_and_rule.Animations.FrameData;
+import io.github.slash_and_rule.Animations.MovingEntityAnimData;
 import io.github.slash_and_rule.Ashley.EntityManager;
+import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.JumperComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
@@ -28,7 +33,7 @@ public class BasicSlime extends BaseEnemy {
         data.health = 30;
         data.max_speed = 2f;
 
-        data.attackRange = 2f;
+        data.attackRange = 3f;
         JumperComponent jumperComponent = new JumperComponent();
         jumperComponent.jumpTime = 0.5f;
         data.atkComponent = jumperComponent;
@@ -49,8 +54,21 @@ public class BasicSlime extends BaseEnemy {
     }
 
     @Override
-    protected void addTextures(MidfieldComponent renderableComponent) {
+    protected void addTextures(RenderBuilder<MidfieldComponent> renderBuilder,
+            HashMap<String, AnimData> animations) {
+        TextureData data = renderBuilder.add("entities/BasicSlime/BasicSlime.atlas", 0, 1 / 32f);
 
+        FrameData[][] frames = new FrameData[3][];
+        frames[0] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
+                new String[] { "Slime_Idle", "Slime_Idle", "Slime_Idle", "Slime_Idle" }, 0.1f);
+        frames[1] = FrameData.createMultiple(new int[] { 6, 4, 6, 4 },
+                new String[] { "Move_Left", "Move_Down", "Move_Right", "Move_Up" }, 0.1f);
+        frames[2] = FrameData.createMultiple(new int[] { 8, 8, 8, 8 },
+                new String[] { "Slime_Attack_Left", "Slime_Attack_Left", "Slime_Attack_Right", "Slime_Attack_Right" },
+                0.1f);
+
+        MovingEntityAnimData animData = new MovingEntityAnimData("entities/BasicSlime/BasicSlime.atlas", frames, data);
+        animations.put("Move", animData);
     }
 
     @Override

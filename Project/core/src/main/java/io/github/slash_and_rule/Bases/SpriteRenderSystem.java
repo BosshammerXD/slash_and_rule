@@ -60,12 +60,17 @@ public abstract class SpriteRenderSystem<T extends RenderableComponent> extends 
                 textureData.texture = atlasManager.getTexture(textureData.atlasPath, textureData.name);
             }
 
+            float width = (Float.isNaN(textureData.width)) ? textureData.texture.getRegionWidth() * textureData.scale
+                    : textureData.width;
+            float height = (Float.isNaN(textureData.height)) ? textureData.texture.getRegionHeight() * textureData.scale
+                    : textureData.height;
+            float offsetX = (Float.isNaN(textureData.offsetX)) ? -width / 2f : textureData.offsetX;
+            float offsetY = (Float.isNaN(textureData.offsetY)) ? -height / 2f : textureData.offsetY;
+
             Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
                     .preTranslate(transform.position.x, transform.position.y)
-                    .translate(textureData.offsetX, textureData.offsetY);
-            batch.draw(textureData.texture,
-                    textureData.width, textureData.height,
-                    transformMatrix);
+                    .translate(offsetX, offsetY);
+            batch.draw(textureData.texture, width, height, transformMatrix);
         }
     }
 }

@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import com.badlogic.gdx.utils.async.AsyncResult;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public abstract class BaseScreen implements Screen {
 
@@ -27,24 +27,24 @@ public abstract class BaseScreen implements Screen {
 
     public boolean halt = false;
 
-    public OrthographicCamera camera = new OrthographicCamera();
-    protected Viewport viewport;
+    public OrthographicCamera uiCamera = new OrthographicCamera();
+    protected ScreenViewport uiViewport;
 
     protected AtlasManager atlasManager;
 
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
+        this.uiViewport = new ScreenViewport(uiCamera);
     }
 
     @Override
     public void show() {
         // This method is called when the screen is shown.
         // Initialize your screen here, such as loading assets or setting up the camera.
-        this.viewport.apply();
-        camera.update();
+        this.uiViewport.apply();
+        uiCamera.update();
     }
-    // Prepare your screen here.
 
     @Override
     public void render(float delta) {
@@ -79,7 +79,7 @@ public abstract class BaseScreen implements Screen {
             return; // Skip rendering if the screen is halted
         }
 
-        this.viewport.apply();
+        this.uiViewport.apply();
         ScreenUtils.clear(0, 0, 0, 1, true);
     }
 
@@ -91,8 +91,8 @@ public abstract class BaseScreen implements Screen {
         // normal size before updating.
         if (width <= 0 || height <= 0)
             return;
-        this.viewport.update(width, height);
-        camera.update();
+        this.uiViewport.update(width, height);
+        this.uiCamera.update();
         // Resize your screen here. The parameters represent the new window size.
     }
 

@@ -73,4 +73,7 @@ public class Globals {
         public static String level = "level_1";
         public static String equippedWeapon = "BasicSword";
         public static final Random random = new Random();
+
+        public static final int GameWidth = 16;
+        public static final int GameHeight = 9;
 }

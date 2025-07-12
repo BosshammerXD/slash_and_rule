@@ -33,8 +33,8 @@ public abstract class PhysicsScreen extends GameScreen {
             return; // Skip rendering if the screen is halted
         }
         // Update the Box2D world
-        camera.update();
-        debugRenderer.render(world, camera.combined);
+        gameCamera.update();
+        debugRenderer.render(world, gameCamera.combined);
     }
 
     public World getWorld() {

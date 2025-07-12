@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
-import io.github.slash_and_rule.Bases.GameScreen;
+import io.github.slash_and_rule.Bases.EntityScreen;
 import io.github.slash_and_rule.Utils.AtlasManager;
 
 public class LoadingScreen extends BaseScreen {
@@ -64,20 +64,20 @@ public class LoadingScreen extends BaseScreen {
     public ArrayDeque<ThreadData> threads;
     private ArrayDeque<MsgRunnable> schedule = new ArrayDeque<>();
 
-    public GameScreen nextScreen;
-    private GameScreen defaultScreen;
+    public EntityScreen nextScreen;
+    private EntityScreen defaultScreen;
     private String msg = "";
 
     private Consumer<Screen> changeScreen;
     private boolean done = true;
 
-    public LoadingScreen(GameScreen defaultScreen, AssetManager assetManager, AtlasManager atlasManager,
+    public LoadingScreen(EntityScreen defaultScreen, AssetManager assetManager, AtlasManager atlasManager,
             Consumer<Screen> changeScreen) {
         super(assetManager, atlasManager);
         this.nextScreen = null; // Initially, there is no next screen set.
         this.defaultScreen = defaultScreen;
         this.changeScreen = changeScreen; // Set the consumer for changing screens.
-        this.viewport = new ExtendViewport(16, 9);
+        this.uiViewport = new ScreenViewport();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class LoadingScreen extends BaseScreen {
         schedule("", runnable);
     }
 
-    public void load(GameScreen screen) {
+    public void load(EntityScreen screen) {
         this.nextScreen = screen;
         changeScreen.accept(this);
     }

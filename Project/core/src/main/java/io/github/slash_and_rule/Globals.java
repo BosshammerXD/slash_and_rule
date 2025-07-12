@@ -25,7 +25,7 @@ public class Globals {
 
         public static final short WallMask = PlayerCategory | EnemyCategory | ItemCategory | HitboxCategory;
 
-        public static final short ColEnemyMask = PlayerCategory | WallCategory;
+        public static final short ColEnemyMask = PlayerCategory | WallCategory | EnemyCategory;
 
         // endregion
         //

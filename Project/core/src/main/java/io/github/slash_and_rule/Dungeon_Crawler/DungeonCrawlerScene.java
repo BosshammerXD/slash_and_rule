@@ -1,6 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
@@ -34,15 +33,11 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
         this.dungeonData = new DungeonData(physicsBuilder, weaponBuilder, entityManager, atlasManager, assetManager);
 
-        engine.addSystem(new WeaponSystem(Globals.WeaponSystemPriority));
-
         // Add player and other game objects here
         player = new Player(physCompBuilder, weaponBuilder, gameCamera, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
         // dungeonSystem = new DungeonSystem(Globals.DungeonRoomSystemPriority,
         // dungeonManager, physCompBuilder, camera, 1 / 32f);
-
-        System.out.println(Gdx.input.getInputProcessor());
     }
 
     @Override

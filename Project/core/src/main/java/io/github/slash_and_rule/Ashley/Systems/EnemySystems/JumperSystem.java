@@ -8,6 +8,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
+import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.JumperComponent;
@@ -54,15 +55,17 @@ public class JumperSystem extends IteratingSystem {
         JumperComponent jumper = Mappers.jumperMapper.get(entity);
         PhysicsComponent physics = Mappers.physicsMapper.get(entity);
         WeaponComponent weapon = Mappers.weaponMapper.get(entity);
+        TransformComponent transform = Mappers.transformMapper.get(entity);
 
         jumper.time += deltaTime;
 
         if (jumper.time < jumper.jumpTime) {
-            System.out.println("JumperSystem: " + jumper.time + " / " + jumper.jumpTime);
-            System.out.println("Target Position: " + jumper.targetPosition);
+            float t = jumper.time / jumper.jumpTime;
             Vector2 newPosition = jumper.jumpStart.cpy()
                     .add(jumper.targetPosition.cpy().scl(jumper.time / jumper.jumpTime));
+            newPosition.y += jumper.targetPosition.len() * (-2 * t * (t - 1));
             physics.body.setTransform(newPosition, physics.body.getAngle());
+            transform.z = jumper.targetPosition.len() * (-2 * t * (t - 1));
         }
 
         if (jumper.time >= jumper.jumpTime) {

@@ -16,6 +16,6 @@ public class MFRenderSystem extends SpriteRenderSystem<MidfieldComponent> {
 
     @Override
     protected float zFunction(Entity entity) {
-        return Mappers.transformMapper.get(entity).z;
+        return Mappers.transformMapper.get(entity).z - Mappers.transformMapper.get(entity).position.y;
     }
 }

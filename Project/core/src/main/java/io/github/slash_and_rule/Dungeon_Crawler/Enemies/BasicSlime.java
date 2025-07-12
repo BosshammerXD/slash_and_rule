@@ -37,7 +37,7 @@ public class BasicSlime extends BaseEnemy {
         JumperComponent jumperComponent = new JumperComponent();
         jumperComponent.jumpTime = 0.5f;
         data.atkComponent = jumperComponent;
-        data.attackCooldown = 1.5f;
+        data.attackCooldown = 2.5f;
 
         return data;
     }

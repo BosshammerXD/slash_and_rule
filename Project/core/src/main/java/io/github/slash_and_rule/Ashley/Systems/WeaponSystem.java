@@ -33,7 +33,7 @@ public class WeaponSystem extends IteratingSystem {
         if (weapon.state == WeaponStates.ATTACKING) {
             weapon.time = 0f;
             weapon.state = WeaponStates.COOLDOWN;
-
+            rotateWeapon(weapon);
             attack(weapon);
         } else if (weapon.state == WeaponStates.COOLDOWN) {
             weapon.time += deltaTime;
@@ -46,8 +46,6 @@ public class WeaponSystem extends IteratingSystem {
                 weapon.index = 0; // Reset index when returning to IDLE
             }
         }
-
-        rotateWeapon(weapon);
     }
 
     private void attack(WeaponComponent weapon) {

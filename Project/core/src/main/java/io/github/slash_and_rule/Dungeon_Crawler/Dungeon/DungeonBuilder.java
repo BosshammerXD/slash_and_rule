@@ -19,6 +19,7 @@ import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent.DoorType;
@@ -256,12 +257,15 @@ public class DungeonBuilder {
         StateComponent stateComp = new StateComponent();
         stateComp.state = StateComponent.State.INACTIVE;
 
-        renderBuilder.begin(new BackgroundComponent());
+        RenderBuilder<MidfieldComponent> renderBuilder = new RenderBuilder<>();
+
+        renderBuilder.begin(new MidfieldComponent());
         renderBuilder.add("levels/" + Globals.level + "/levelSprites.atlas", "Dungeon_Portal", 0, 1 / 16f);
         renderBuilder.end(entity);
 
         TransformComponent transComp = CompBuilders
                 .buildTransform(new Vector2(entry.x + entry.width, entry.y + entry.height), 0).get();
+        transComp.z = 0.5f;
 
         EntityManager.build(entity, transComp, physicsCompBuilder.end(), stateComp,
                 new InactiveComponent());

@@ -21,6 +21,7 @@ public abstract class BaseEnemy {
         public int health = 100;
         public float max_speed = 5f;
         public float attackRange = 0.5f;
+        public EnemyComponent.EnemyType type = EnemyComponent.EnemyType.MEELE;
 
         public int damage = 10;
         public float weight = 1f;
@@ -60,7 +61,7 @@ public abstract class BaseEnemy {
 
         WeaponComponent weaponComponent = makeWeapon();
 
-        EnemyComponent enemyComponent = new EnemyComponent(data.attackRange);
+        EnemyComponent enemyComponent = new EnemyComponent(data.attackRange, data.type);
 
         entityManager.build(
                 transformComponent,

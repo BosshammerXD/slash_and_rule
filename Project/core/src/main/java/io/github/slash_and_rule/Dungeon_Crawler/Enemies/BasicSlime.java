@@ -12,6 +12,7 @@ import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EnemyComponent.EnemyType;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Bases.BaseEnemy;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
@@ -28,6 +29,8 @@ public class BasicSlime extends BaseEnemy {
         data.max_speed = 2f;
 
         data.attackRange = 2f;
+
+        data.type = EnemyType.JUMPER;
 
         return data;
     }

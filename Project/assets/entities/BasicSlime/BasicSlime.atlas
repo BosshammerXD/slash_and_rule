@@ -144,7 +144,7 @@ Idle
   orig: 32, 32
   offset: 0, 0
   index: 3
-Move_Down
+MoveDown
   rotate: false
   xy: 2, 4
   size: 32, 32
@@ -193,133 +193,133 @@ Idle
   orig: 32, 32
   offset: 0, 0
   index: 6
-Move_Down
+MoveDown
   rotate: false
   xy: 104, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-Move_Down
+MoveDown
   rotate: false
   xy: 104, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-Move_Down
+MoveDown
   rotate: false
   xy: 138, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-Move_Left
+MoveLeft
   rotate: false
   xy: 172, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-Move_Left
+MoveLeft
   rotate: false
   xy: 206, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-Move_Left
+MoveLeft
   rotate: false
   xy: 240, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-Move_Left
+MoveLeft
   rotate: false
   xy: 240, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
-Move_Left
+MoveLeft
   rotate: false
   xy: 274, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-Move_Left
+MoveLeft
   rotate: false
   xy: 332, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
-Move_Right
+MoveRight
   rotate: false
   xy: 366, 70
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-Move_Right
+MoveRight
   rotate: false
   xy: 366, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-Move_Right
+MoveRight
   rotate: false
   xy: 432, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-Move_Right
+MoveRight
   rotate: false
   xy: 432, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
-Move_Right
+MoveRight
   rotate: false
   xy: 308, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-Move_Right
+MoveRight
   rotate: false
   xy: 342, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
-Move_Up
+MoveUp
   rotate: false
   xy: 376, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
-Move_Up
+MoveUp
   rotate: false
   xy: 400, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
-Move_Up
+MoveUp
   rotate: false
   xy: 400, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-Move_Up
+MoveUp
   rotate: false
   xy: 400, 68
   size: 32, 32

@@ -31,14 +31,18 @@ public class Ressources {
 
     public static final HashMap<String, ItemData> items = new HashMap<>();
 
-    public static void addItem(String itemName, int amount) {
+    public static final void addItem(String itemName, int amount) {
         collectedItems.computeIfAbsent(itemName, k -> new ItemData(itemName)).add(amount);
     }
 
-    public static void DungeonLeft() {
+    public static final void DungeonLeft() {
         collectedItems.forEach((name, itemData) -> {
             items.computeIfAbsent(name, k -> new ItemData(name)).add(itemData.amount);
         });
+        collectedItems.clear();
+    }
+
+    public static final void playerDied() {
         collectedItems.clear();
     }
 }

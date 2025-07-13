@@ -41,6 +41,7 @@ public class Globals {
         public static final int MFRenderSystemPriority = 120;
         public static final int BGRenderSystemPriority = 100;
         public static final int RenderSystemPriority = 100;
+        public static final int ItemSystemPriority = 100;
         public static final int AnimationSystemPriority = 90;
         public static final int MovementSystemPriority = 70;
         public static final int JumperSystemPriority = 91;

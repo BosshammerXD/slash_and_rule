@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
 import io.github.slash_and_rule.LoadingScreen;
+import io.github.slash_and_rule.Ressources;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
@@ -47,6 +48,7 @@ public class CityBuilderScene extends GameScreen {
 
     @Override
     public void init(LoadingScreen loader) {
+        Ressources.DungeonLeft();
         super.init(loader);
         loader.schedule(() -> {
             assetManager.load("city/Grass.png", Texture.class);

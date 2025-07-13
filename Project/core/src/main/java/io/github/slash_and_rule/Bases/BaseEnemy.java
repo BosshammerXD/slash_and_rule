@@ -31,6 +31,7 @@ public abstract class BaseEnemy {
         public int damage = 10;
         public float weight = 1f;
         public float attackCooldown = 1f;
+        public HashMap<Float, String> drops = new HashMap<>();
         public EnemyAtkComponent atkComponent = new EnemyAtkComponent();
 
         public EnemyData() {
@@ -74,6 +75,11 @@ public abstract class BaseEnemy {
         EnemyComponent enemyComponent = new EnemyComponent();
         enemyComponent.attackRange = data.attackRange;
         enemyComponent.atkComponent = data.atkComponent;
+        enemyComponent.drops = new EnemyComponent.Drop[data.drops.size()];
+        int i = 0;
+        for (Float chance : data.drops.keySet()) {
+            enemyComponent.drops[i++] = new EnemyComponent.Drop(data.drops.get(chance), chance);
+        }
 
         System.out.println(animComp.animations);
 

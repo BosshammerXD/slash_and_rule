@@ -61,9 +61,9 @@ public class JumperSystem extends IteratingSystem {
 
         if (jumper.time < jumper.jumpTime) {
             float t = jumper.time / jumper.jumpTime;
-            Vector2 newPosition = physics.body.getPosition()
-                    .add(jumper.targetPosition.cpy().scl(deltaTime / jumper.jumpTime));
-            newPosition.y += jumper.targetPosition.len() * (-1 * (t - 0.5f) * (t - 0.5f) * (t - 0.5f));
+            Vector2 newPosition = jumper.jumpStart.cpy()
+                    .add(jumper.targetPosition.cpy().scl(t / jumper.jumpTime / 2f));
+            newPosition.y += jumper.targetPosition.len() * (-2 * t * (t - 1));
             physics.body.setTransform(newPosition, physics.body.getAngle());
             transform.z = jumper.targetPosition.len() * (-2 * t * (t - 1));
         }

@@ -51,6 +51,7 @@ public class Globals {
         public static final int CollisionSystemPriority = 50;
         public static final int PhysicsSystemPriority = 40;
         public static final int WeaponSystemPriority = 30;
+        public static final int PlayerSystemPriority = 20;
         public static final int InputSystemPriority = 10;
         public static final int StateSystemPriority = 0;
 

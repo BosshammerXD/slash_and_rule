@@ -1,4 +1,4 @@
-package io.github.slash_and_rule.Ashley.Systems;
+package io.github.slash_and_rule.Ashley.Systems.DungeonSystems;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;

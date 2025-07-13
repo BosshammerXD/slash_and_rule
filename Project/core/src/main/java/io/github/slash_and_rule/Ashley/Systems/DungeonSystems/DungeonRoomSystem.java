@@ -1,4 +1,4 @@
-package io.github.slash_and_rule.Ashley.Systems;
+package io.github.slash_and_rule.Ashley.Systems.DungeonSystems;
 
 import java.util.ArrayDeque;
 

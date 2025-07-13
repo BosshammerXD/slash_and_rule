@@ -4,12 +4,13 @@ import com.badlogic.gdx.assets.AssetManager;
 
 import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
-import io.github.slash_and_rule.Ashley.Systems.DoorSystem;
-import io.github.slash_and_rule.Ashley.Systems.DungeonRoomSystem;
-import io.github.slash_and_rule.Ashley.Systems.EntrySystem;
-import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
-import io.github.slash_and_rule.Ashley.Systems.HealthbarSystem;
-import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.DoorSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.DungeonRoomSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.EntrySystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.HealthSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.HealthbarSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.PlayerSystem;
+import io.github.slash_and_rule.Ashley.Systems.DungeonSystems.WeaponSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.JumperSystem;
 import io.github.slash_and_rule.Bases.GameScreen;
@@ -39,7 +40,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         this.dungeonData = new DungeonData(physicsBuilder, weaponBuilder, entityManager, atlasManager, assetManager);
 
         // Add player and other game objects here
-        player = new Player(physCompBuilder, weaponBuilder, gameCamera, entityManager);
+        player = new Player(physCompBuilder, weaponBuilder, entityManager);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
         // dungeonSystem = new DungeonSystem(Globals.DungeonRoomSystemPriority,
         // dungeonManager, physCompBuilder, camera, 1 / 32f);
@@ -60,6 +61,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
                 new EntrySystem(textCamera, textViewport, gameCamera, Globals.EntrySystemPriority, () -> {
                     this.switchScreen = cityBuild;
                 }));
+        addToEngine(loader, new PlayerSystem(gameCamera, Globals.PlayerSystemPriority));
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);

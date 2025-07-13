@@ -12,7 +12,9 @@ import com.badlogic.gdx.InputProcessor;
 
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
-import io.github.slash_and_rule.Bases.Inputhandler;
+import io.github.slash_and_rule.Ashley.Components.ControllableComponent.KeyData;
+import io.github.slash_and_rule.Ashley.Components.ControllableComponent.MouseData;
+import io.github.slash_and_rule.Ashley.Components.ControllableComponent.ScrollData;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class InputSystem extends EntitySystem {
@@ -21,6 +23,11 @@ public class InputSystem extends EntitySystem {
     }
 
     private ImmutableArray<Entity> controllables;
+
+    private ArrayDeque<MouseData> mouseQueue = new ArrayDeque<>();
+    private ArrayDeque<KeyData> keyQueue = new ArrayDeque<>();
+    private ArrayDeque<Character> keyTypedQueue = new ArrayDeque<>();
+    private ArrayDeque<ScrollData> scrollQueue = new ArrayDeque<>();
 
     private Inputcollector inputcollector = new Inputcollector();
 
@@ -42,77 +49,26 @@ public class InputSystem extends EntitySystem {
     public void update(float deltaTime) {
         for (Entity entity : controllables) {
             ControllableComponent controllable = Mappers.controllableMapper.get(entity);
-            controllable.inputhandler.setDelta(deltaTime);
-            controllable.inputhandler.preEvents(entity);
-            sendEvents(controllable.inputhandler);
-            controllable.inputhandler.finishSchedule(entity);
+            controllable.delta = deltaTime;
+
+            setList(controllable.mouseQueue, mouseQueue);
+            setList(controllable.keyQueue, keyQueue);
+            setList(controllable.keyTypedQueue, keyTypedQueue);
+            setList(controllable.scrollQueue, scrollQueue);
         }
 
-        inputcollector.mouseQueue.clear();
-        inputcollector.keyQueue.clear();
-        inputcollector.keyTypedQueue.clear();
-        inputcollector.scrollQueue.clear();
+        mouseQueue.clear();
+        keyQueue.clear();
+        keyTypedQueue.clear();
+        scrollQueue.clear();
     }
 
-    private void sendEvents(Inputhandler inputhandler) {
-        for (Inputcollector.MouseData data : inputcollector.mouseQueue) {
-            inputhandler.mouseEvent(data.type, data.screenX, data.screenY, data.button);
-        }
-        for (Inputcollector.KeyData data : inputcollector.keyQueue) {
-            inputhandler.keyEvent(data.keycode, data.pressed);
-        }
-        for (Character character : inputcollector.keyTypedQueue) {
-            inputhandler.keyTypedEvent(character);
-        }
-        for (Inputcollector.ScrollData data : inputcollector.scrollQueue) {
-            inputhandler.scrollEvent(data.amountX, data.amountY);
-        }
-        inputhandler.pollevent();
+    private <T> void setList(ArrayDeque<T> list, ArrayDeque<T> newList) {
+        list.clear();
+        list.addAll(newList);
     }
 
     private class Inputcollector implements InputProcessor {
-        ArrayDeque<MouseData> mouseQueue = new ArrayDeque<>();
-
-        public static class MouseData {
-            public MouseInputType type;
-            public int screenX;
-            public int screenY;
-            public int button; // -1 for no button
-
-            public MouseData(MouseInputType type, int screenX, int screenY, int button) {
-                this.type = type;
-                this.screenX = screenX;
-                this.screenY = screenY;
-                this.button = button;
-            }
-        }
-
-        ArrayDeque<KeyData> keyQueue = new ArrayDeque<>();
-
-        public static class KeyData {
-            public int keycode;
-            public boolean pressed;
-
-            public KeyData(int keycode, boolean pressed) {
-                this.keycode = keycode;
-                this.pressed = pressed;
-            }
-        }
-
-        ArrayDeque<Character> keyTypedQueue = new ArrayDeque<>();
-
-        ArrayDeque<ScrollData> scrollQueue = new ArrayDeque<>();
-
-        public static class ScrollData {
-            public float amountX;
-            public float amountY;
-
-            public ScrollData(float amountX, float amountY) {
-                this.amountX = amountX;
-                this.amountY = amountY;
-            }
-        }
-
         @Override
         public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
             mouseQueue.add(new MouseData(MouseInputType.CANCELLED, screenX, screenY, button));

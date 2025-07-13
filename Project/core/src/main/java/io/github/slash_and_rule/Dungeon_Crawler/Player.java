@@ -1,6 +1,5 @@
 package io.github.slash_and_rule.Dungeon_Crawler;
 
-import io.github.slash_and_rule.Bases.Inputhandler;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.FrameData;
 import io.github.slash_and_rule.Animations.MovingEntityAnimData;
@@ -15,18 +14,13 @@ import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.RenderableComponent.TextureData;
-import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
-import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Utils.Mappers;
 import io.github.slash_and_rule.Utils.ShapeBuilder;
 import io.github.slash_and_rule.Utils.UtilFuncs;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -39,13 +33,11 @@ public class Player {
     private PhysCompBuilder physCompBuilder;
     private WeaponBuilder weaponBuilder;
     private RenderBuilder<MidfieldComponent> renderBuilder = new RenderBuilder<MidfieldComponent>();
-    private OrthographicCamera camera;
     private EntityManager entityManager;
 
-    public Player(PhysCompBuilder physCompBuilder, WeaponBuilder weaponBuilder, OrthographicCamera camera,
+    public Player(PhysCompBuilder physCompBuilder, WeaponBuilder weaponBuilder,
             EntityManager entityManager) {
         this.physCompBuilder = physCompBuilder;
-        this.camera = camera;
         this.entityManager = entityManager;
         this.weaponBuilder = weaponBuilder;
     }
@@ -69,8 +61,6 @@ public class Player {
         aC.animations.put("CapeMove",
                 new MovingEntityAnimData(atlasPath, capeFrameDatas(), capeTextureData));
 
-        ControllableComponent cC = new ControllableComponent(new PlayerInput());
-
         makePhysComp(entity, tC);
 
         makeWeapon(entity);
@@ -78,7 +68,7 @@ public class Player {
         CompBuilders.buildMovement(10f).add(entity);
         CompBuilders.buildHealth(100).add(entity);
 
-        entityManager.build(new PlayerComponent(), new SensorComponent(), tC, cC, aC);
+        entityManager.build(new PlayerComponent(), new SensorComponent(), tC, new ControllableComponent(), aC);
         entityManager.finish();
         System.out.println(entity.getComponents().toString());
     }
@@ -150,86 +140,5 @@ public class Player {
         frameDatas[2][1].mult(2);
         frameDatas[2][3].mult(2);
         return frameDatas;
-    }
-
-    private class PlayerInput extends Inputhandler {
-        @Override
-        public void mouseEvent(MouseInputType type, int screenX, int screenY, int button) {
-            if (type == MouseInputType.MOVED || type == MouseInputType.DRAGGED) {
-                mouseMoved(screenX, screenY);
-            } else if (type == MouseInputType.DOWN && button == Globals.AttackButton) {
-                mousePressed();
-            } else if (type == MouseInputType.UP && button == Globals.AttackButton) {
-                mouseReleased();
-            }
-        }
-
-        private void mouseMoved(int x, int y) {
-            // Convert screen coordinates to world coordinates
-            Vector3 worldCoords = camera.unproject(new Vector3(x, y, 0));
-            apply(Mappers.weaponMapper, comp1 -> apply(Mappers.physicsMapper, comp2 -> {
-                Vector2 pos = comp2.body.getPosition();
-                comp1.target.set(worldCoords.x - pos.x, worldCoords.y - pos.y);
-            }));
-        }
-
-        private void mousePressed() {
-            apply(Mappers.weaponMapper, comp -> {
-                if (comp.state != WeaponStates.IDLE) {
-                    return;
-                }
-                if (comp.chargetime != 0f) {
-                    comp.time = 0f;
-                    comp.state = WeaponStates.CHARGING;
-                } else {
-                    comp.state = WeaponStates.ATTACKING;
-                }
-            });
-        }
-
-        private void mouseReleased() {
-            apply(Mappers.weaponMapper, comp -> {
-                if (comp.state == WeaponStates.CHARGING) {
-                    comp.state = WeaponStates.ATTACKING;
-                }
-            });
-        }
-
-        @Override
-        public void pollevent() {
-            movement();
-            apply(Mappers.transformMapper, comp -> {
-                camera.position.set(comp.position.x, comp.position.y, 0);
-            });
-            apply(Mappers.midfieldMapper, this::animation);
-        }
-
-        private void movement() {
-            Vector2 velocity = new Vector2(0, 0);
-            if (Gdx.input.isKeyPressed(Globals.MoveUpKey)) {
-                velocity.y += 1;
-            }
-            if (Gdx.input.isKeyPressed(Globals.MoveDownKey)) {
-                velocity.y -= 1;
-            }
-            if (Gdx.input.isKeyPressed(Globals.MoveLeftKey)) {
-                velocity.x -= 1;
-            }
-            if (Gdx.input.isKeyPressed(Globals.MoveRightKey)) {
-                velocity.x += 1;
-            }
-            velocity.nor(); // Normalize the velocity vector
-            apply(Mappers.movementMapper, comp -> {
-                comp.velocity.set(velocity).scl(comp.max_speed);
-            });
-        }
-
-        private void animation(MidfieldComponent comp) {
-            if (moveAnimData.getName().equals("MoveUp")) {
-                capeTextureData.setPriority(2);
-            } else {
-                capeTextureData.setPriority(0);
-            }
-        }
     }
 }

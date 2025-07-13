@@ -55,6 +55,12 @@ public class AnimData {
         }
     }
 
+    public void setPriority(int priority) {
+        if (textureData != null) {
+            textureData.setPriority(priority);
+        }
+    }
+
     public void overflow() {
         animIndex = 0;
         stateTime = 0f;

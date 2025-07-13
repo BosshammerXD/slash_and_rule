@@ -65,10 +65,10 @@ public class PlayerSystem extends IteratingSystem {
         camera.position.set(transComp.position.x, transComp.position.y, 0);
 
         AnimData data = animComp.animations.get("CapeMove");
-        if (data.getName().equals("CapeMoveUp")) {
-            data.setPriority(2);
-        } else {
+        if (data.getName().equals("CapeMoveDown") || data.getName().equals("CapeAtkDown")) {
             data.setPriority(0);
+        } else {
+            data.setPriority(2);
         }
     }
 

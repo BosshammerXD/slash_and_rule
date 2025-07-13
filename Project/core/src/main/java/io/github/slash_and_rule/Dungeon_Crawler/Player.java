@@ -50,8 +50,14 @@ public class Player {
         String atlasPath = UtilFuncs.getEnAtlas("Player");
 
         renderBuilder.begin(new MidfieldComponent());
-        TextureData moveTextureData = renderBuilder.add(atlasPath, 1, 2f, 2f, -1f, -0.5f);
-        this.capeTextureData = renderBuilder.add(atlasPath, 2, 2f, 2f, -1f, -0.5f);
+        TextureData moveTextureData = renderBuilder.add(atlasPath, 1, 1f, 1f, 0, 0.5f);
+        moveTextureData.width = Float.NaN;
+        moveTextureData.height = Float.NaN;
+        moveTextureData.scale = 1 / 16f;
+        this.capeTextureData = renderBuilder.add(atlasPath, 2, 2f, 2f, 0, 0.5f);
+        capeTextureData.width = Float.NaN;
+        capeTextureData.height = Float.NaN;
+        capeTextureData.scale = 1 / 16f;
         renderBuilder.end(entity);
 
         this.moveAnimData = new MovingEntityAnimData(atlasPath, playerFrameDatas(), moveTextureData);
@@ -122,7 +128,7 @@ public class Player {
         frameDatas[1] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("Move"), 0.1f);
         frameDatas[1][1].mult(2);
         frameDatas[1][3].mult(2);
-        frameDatas[2] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("Move"), 0.1f);
+        frameDatas[2] = FrameData.createMultiple(new int[] { 4, 4, 4, 4 }, UtilFuncs.getDirs("Atk"), 0.1f);
         frameDatas[2][1].mult(2);
         frameDatas[2][3].mult(2);
         return frameDatas;
@@ -136,7 +142,7 @@ public class Player {
         frameDatas[1] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("CapeMove"), 0.1f);
         frameDatas[1][1].mult(2);
         frameDatas[1][3].mult(2);
-        frameDatas[2] = FrameData.createMultiple(new int[] { 10, 4, 10, 4 }, UtilFuncs.getDirs("CapeMove"), 0.1f);
+        frameDatas[2] = FrameData.createMultiple(new int[] { 4, 4, 4, 4 }, UtilFuncs.getDirs("CapeAtk"), 0.1f);
         frameDatas[2][1].mult(2);
         frameDatas[2][3].mult(2);
         return frameDatas;

@@ -66,10 +66,10 @@ public class RoomData implements AsyncLoadable {
                 y = rect.y + rect.height;
             } else if (type.equals("top")) {
                 x = rect.x + rect.width;
-                y = rect.y - rect.height * 2;
+                y = rect.y - rect.height * 2 + 0.5f;
             } else if (type.equals("bottom")) {
                 x = rect.x + rect.width;
-                y = rect.y + rect.height * 2 + 1f;
+                y = rect.y + rect.height * 2 + 1.5f;
             } else {
                 x = 0;
                 y = 0;

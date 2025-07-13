@@ -60,12 +60,38 @@ public abstract class SpriteRenderSystem<T extends RenderableComponent> extends 
                 textureData.texture = atlasManager.getTexture(textureData.atlasPath, textureData.name);
             }
 
-            float width = (Float.isNaN(textureData.width)) ? textureData.texture.getRegionWidth() * textureData.scale
-                    : textureData.width;
-            float height = (Float.isNaN(textureData.height)) ? textureData.texture.getRegionHeight() * textureData.scale
-                    : textureData.height;
-            float offsetX = (Float.isNaN(textureData.offsetX)) ? -width / 2f : textureData.offsetX;
-            float offsetY = (Float.isNaN(textureData.offsetY)) ? -height / 2f : textureData.offsetY;
+            boolean hasNaN = Float.isNaN(textureData.width) || Float.isNaN(textureData.height)
+                    || Float.isNaN(textureData.offsetX)
+                    || Float.isNaN(textureData.offsetY);
+            float width;
+            if (Float.isNaN(textureData.width) || hasNaN) {
+                width = textureData.texture.getRegionWidth() * textureData.scale;
+            } else {
+                width = textureData.width;
+            }
+            float height;
+            if (Float.isNaN(textureData.height) || hasNaN) {
+                height = textureData.texture.getRegionHeight() * textureData.scale;
+            } else {
+                height = textureData.height;
+            }
+            float offsetX;
+            if (Float.isNaN(textureData.offsetX)) {
+                offsetX = -width / 2f;
+            } else if (hasNaN) {
+                offsetX = -width / 2f + textureData.offsetX;
+            } else {
+                offsetX = textureData.offsetX;
+            }
+
+            float offsetY;
+            if (Float.isNaN(textureData.offsetY)) {
+                offsetY = -height / 2f;
+            } else if (hasNaN) {
+                offsetY = -height / 2f + textureData.offsetY;
+            } else {
+                offsetY = textureData.offsetY;
+            }
 
             Affine2 transformMatrix = new Affine2().rotate(textureData.angle)
                     .preTranslate(transform.position.x, transform.position.y)

@@ -32,7 +32,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     public GameScreen cityBuild;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
-        super(assetManager, atlasManager, true);
+        super(assetManager, atlasManager, false);
 
         this.physCompBuilder = new PhysCompBuilder(physicsBuilder);
 

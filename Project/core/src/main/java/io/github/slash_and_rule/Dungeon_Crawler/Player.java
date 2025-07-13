@@ -9,6 +9,7 @@ import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.RenderBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
+import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
@@ -72,9 +73,10 @@ public class Player {
         makeWeapon(entity);
 
         CompBuilders.buildMovement(10f).add(entity);
-        CompBuilders.buildHealth(100).add(entity);
+        HealthComponent HC = CompBuilders.buildHealth(100).get();
+        HC.offsetY = 1.5f;
 
-        entityManager.build(new PlayerComponent(), new SensorComponent(), tC, new ControllableComponent(), aC);
+        entityManager.build(new PlayerComponent(), new SensorComponent(), tC, new ControllableComponent(), aC, HC);
         entityManager.finish();
         System.out.println(entity.getComponents().toString());
     }

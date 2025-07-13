@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Ashley.Systems.CollisionSystem;
 import io.github.slash_and_rule.Ashley.Systems.PhysicsSystem;
 import io.github.slash_and_rule.Utils.AtlasManager;
@@ -21,14 +22,20 @@ public abstract class PhysicsScreen extends GameScreen {
         // Initialize the Box2D world and debug renderer
         // world.setContactListener(contactListener);
         debugRenderer.setDrawBodies(debug);
-
-        engine.addSystem(new PhysicsSystem(Globals.PhysicsSystemPriority, world));
-        engine.addSystem(new CollisionSystem(Globals.CollisionSystemPriority, world));
     }
 
     @Override
-    public void render(float delta) {
-        super.render(delta);
+    public void init(LoadingScreen loader) {
+        // world = new World(new Vector2(0, 0), true);
+        // physicsBuilder.setWorld(world);
+        addToEngine(loader, new PhysicsSystem(Globals.PhysicsSystemPriority, world));
+        addToEngine(loader, new CollisionSystem(Globals.CollisionSystemPriority, world));
+        super.init(loader);
+    }
+
+    @Override
+    protected void step(float delta) {
+        // TODO Auto-generated method stub
         if (halt) {
             return; // Skip rendering if the screen is halted
         }
@@ -48,6 +55,8 @@ public abstract class PhysicsScreen extends GameScreen {
     @Override
     public void hide() {
         super.hide();
-        world.dispose();
+        // world.dispose();
+        // world = null;
+        // physicsBuilder.setWorld(null);
     }
 }

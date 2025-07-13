@@ -80,6 +80,7 @@ public abstract class EntityScreen extends BaseScreen {
         engine.removeAllEntities();
         engine.removeAllSystems();
         assetManager.clear();
+        atlasManager.clear();
         Gdx.input.setInputProcessor(null);
     }
 

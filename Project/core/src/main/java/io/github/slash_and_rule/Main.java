@@ -32,6 +32,12 @@ public class Main extends Game {
 
         loadingScreen = new LoadingScreen(cbs, assetManager, atlasManager, this::setScreen);
 
+        cbs.setLoadfunc(loadingScreen::load);
+        dcs.setLoadfunc(loadingScreen::load);
+
+        dcs.cityBuild = cbs;
+        cbs.dungeonCrawlerScene = dcs;
+
         loadingScreen.load(dcs);
     }
 }

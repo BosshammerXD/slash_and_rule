@@ -6,11 +6,13 @@ import io.github.slash_and_rule.Ashley.Builder.PhysCompBuilder;
 import io.github.slash_and_rule.Ashley.Builder.WeaponBuilder;
 import io.github.slash_and_rule.Ashley.Systems.DoorSystem;
 import io.github.slash_and_rule.Ashley.Systems.DungeonRoomSystem;
+import io.github.slash_and_rule.Ashley.Systems.EntrySystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthSystem;
 import io.github.slash_and_rule.Ashley.Systems.HealthbarSystem;
 import io.github.slash_and_rule.Ashley.Systems.WeaponSystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.EnemySystem;
 import io.github.slash_and_rule.Ashley.Systems.EnemySystems.JumperSystem;
+import io.github.slash_and_rule.Bases.GameScreen;
 import io.github.slash_and_rule.Bases.PhysicsScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager;
 import io.github.slash_and_rule.Dungeon_Crawler.Dungeon.DungeonManager.DungeonGenerationData;
@@ -25,6 +27,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     private WeaponBuilder weaponBuilder;
     private PhysCompBuilder physCompBuilder;
     private DungeonRoomSystem dungeonRoomSystem;
+    public GameScreen cityBuild;
 
     public DungeonCrawlerScene(AssetManager assetManager, AtlasManager atlasManager) {
         super(assetManager, atlasManager, true);
@@ -44,7 +47,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
 
     @Override
     public void init(LoadingScreen loader) {
-        // addToEngine(loader, dungeonSystem);
+        super.init(loader);
         addToEngine(loader, new EnemySystem(world, Globals.EnemySystemPriority));
         addToEngine(loader, new HealthSystem(Globals.HealthSystemPriority));
         addToEngine(loader, new WeaponSystem(Globals.WeaponSystemPriority));
@@ -53,6 +56,10 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         addToEngine(loader, new DoorSystem(dungeonManager::move, Globals.DoorSystemPriority));
         addToEngine(loader, new JumperSystem(Globals.JumperSystemPriority));
         addToEngine(loader, new HealthbarSystem(gameCamera, Globals.HealthbarSystemPriority));
+        addToEngine(loader,
+                new EntrySystem(textCamera, textViewport, gameCamera, Globals.EntrySystemPriority, () -> {
+                    this.switchScreen = cityBuild;
+                }));
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);
@@ -61,7 +68,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         loader.schedule("loading player", () -> {
             player.init();
         });
-        super.init(loader);
     }
 
     @Override

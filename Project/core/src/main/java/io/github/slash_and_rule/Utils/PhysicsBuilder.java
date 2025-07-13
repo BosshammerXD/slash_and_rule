@@ -14,6 +14,10 @@ import com.badlogic.gdx.physics.box2d.World;
 public class PhysicsBuilder {
     private World world;
 
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
     public PhysicsBuilder(World world) {
         this.world = world;
     }

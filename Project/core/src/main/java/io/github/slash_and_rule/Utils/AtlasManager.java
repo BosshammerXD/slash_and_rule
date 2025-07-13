@@ -75,4 +75,14 @@ public class AtlasManager {
         }
         return frames;
     }
+
+    public void clear() {
+        for (TextureAtlas atlas : atlases.values()) {
+            if (atlas != null) {
+                atlas.dispose();
+            }
+        }
+        atlases.clear();
+        isLoaded = true;
+    }
 }

@@ -16,6 +16,7 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComp
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EntryComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.JumperComponent;
@@ -43,6 +44,7 @@ public class Mappers {
         public static ComponentMapper<ParentComponent> parentMapper = get(ParentComponent.class);
         public static ComponentMapper<ChildComponent> childMapper = get(ChildComponent.class);
         public static ComponentMapper<DoorComponent> doorMapper = get(DoorComponent.class);
+        public static ComponentMapper<EntryComponent> entryMapper = get(EntryComponent.class);
         public static ComponentMapper<JumperComponent> jumperMapper = get(JumperComponent.class);
 
         public static ComponentMapper<MidfieldComponent> midfieldMapper = get(MidfieldComponent.class);

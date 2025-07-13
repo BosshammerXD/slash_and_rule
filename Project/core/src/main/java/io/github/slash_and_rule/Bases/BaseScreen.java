@@ -92,7 +92,7 @@ public abstract class BaseScreen implements Screen {
         if (width <= 0 || height <= 0)
             return;
         this.uiViewport.update(width, height);
-        this.uiCamera.update();
+        uiCamera.update();
         // Resize your screen here. The parameters represent the new window size.
     }
 

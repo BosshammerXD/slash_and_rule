@@ -49,6 +49,7 @@ public class PhysicsSystem extends EntitySystem {
                         jointDef.initialize(weapon.body, physics.body, physics.body.getPosition());
                         jointDef.collideConnected = false;
                         jointDef.enableMotor = false;
+
                         weapon.joint = (RevoluteJoint) world.createJoint(jointDef);
                     }
 

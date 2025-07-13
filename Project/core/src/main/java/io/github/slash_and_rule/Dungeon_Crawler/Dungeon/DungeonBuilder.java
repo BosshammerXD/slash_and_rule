@@ -22,6 +22,7 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.BackgroundCo
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
+import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EntryComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent.DoorType;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
@@ -267,7 +268,8 @@ public class DungeonBuilder {
                 .buildTransform(new Vector2(entry.x + entry.width, entry.y + entry.height), 0).get();
         transComp.z = 0.5f;
 
-        EntityManager.build(entity, transComp, physicsCompBuilder.end(), stateComp,
+        EntityManager.build(entity, transComp, physicsCompBuilder.end(), stateComp, new EntryComponent(),
+                new SensorComponent(),
                 new InactiveComponent());
 
         return entity;

@@ -93,6 +93,7 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
         this.maskBits = maskBits;
 
         begin(new WeaponComponent());
+        System.out.println("making weapon");
         comp.body = physicsBuilder.makeBody(BodyType.DynamicBody, 0, true);
 
         comp.damage = damage;

@@ -5,5 +5,7 @@ import java.util.ArrayDeque;
 import com.badlogic.ashley.core.Entity;
 
 public class CityData {
-    static ArrayDeque<Entity> buildings = new ArrayDeque<>();
+    public static Entity heldEntity = null;
+
+    public static ArrayDeque<Entity> buildings = new ArrayDeque<>();
 }

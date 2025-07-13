@@ -27,7 +27,7 @@ public abstract class EntityScreen extends BaseScreen {
 
     protected Engine engine = new Engine();
 
-    private InputSystem inputSystem = new InputSystem(Globals.InputSystemPriority);
+    private InputSystem inputSystem;
 
     protected EntityManager entityManager = new EntityManager(engine);
 
@@ -85,8 +85,9 @@ public abstract class EntityScreen extends BaseScreen {
     }
 
     public void init(LoadingScreen loader) {
+        this.inputSystem = new InputSystem(Globals.InputSystemPriority);
         addToEngine(loader, new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
-        addToEngine(loader, inputSystem);
+        addToEngine(loader, this.inputSystem);
         addToEngine(loader, new MovementSystem(Globals.MovementSystemPriority));
         addToEngine(loader, new StateSystem(Globals.StateSystemPriority));
         for (Initalizable data : loadableObjects) {

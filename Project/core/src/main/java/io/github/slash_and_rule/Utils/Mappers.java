@@ -12,7 +12,10 @@ import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
+import io.github.slash_and_rule.Ashley.Components.CityComponents.BuildingComponent;
+import io.github.slash_and_rule.Ashley.Components.CityComponents.BuyableComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
+import io.github.slash_and_rule.Ashley.Components.DrawingComponents.ForegroundComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
@@ -48,4 +51,8 @@ public class Mappers {
         public static ComponentMapper<JumperComponent> jumperMapper = get(JumperComponent.class);
 
         public static ComponentMapper<MidfieldComponent> midfieldMapper = get(MidfieldComponent.class);
+        public static ComponentMapper<ForegroundComponent> foregroundMapper = get(ForegroundComponent.class);
+
+        public static ComponentMapper<BuyableComponent> buyableMapper = get(BuyableComponent.class);
+        public static ComponentMapper<BuildingComponent> buildingMapper = get(BuildingComponent.class);
 }

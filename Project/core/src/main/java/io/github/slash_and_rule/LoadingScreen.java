@@ -77,7 +77,6 @@ public class LoadingScreen extends BaseScreen {
         this.nextScreen = null; // Initially, there is no next screen set.
         this.defaultScreen = defaultScreen;
         this.changeScreen = changeScreen; // Set the consumer for changing screens.
-        this.uiViewport = new ScreenViewport();
     }
 
     @Override

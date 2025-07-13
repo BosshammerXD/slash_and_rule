@@ -9,8 +9,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import io.github.slash_and_rule.Globals;
+import io.github.slash_and_rule.Ressources;
 import io.github.slash_and_rule.Animations.AnimData;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
+import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.MovementComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
@@ -24,13 +26,16 @@ import io.github.slash_and_rule.Utils.Mappers;
 
 public class PlayerSystem extends IteratingSystem {
     private Camera camera;
+    private Runnable func;
 
-    public PlayerSystem(Camera camera, int priority) {
+    public PlayerSystem(Camera camera, Runnable func, int priority) {
         super(Family.all(PlayerComponent.class, ControllableComponent.class,
-                TransformComponent.class, WeaponComponent.class, MovementComponent.class, AnimatedComponent.class)
+                TransformComponent.class, WeaponComponent.class, MovementComponent.class, AnimatedComponent.class,
+                HealthComponent.class)
                 .exclude(InactiveComponent.class).get(),
                 priority); // Set the priority of this system, 0 is default
         this.camera = camera;
+        this.func = func;
     }
 
     @Override
@@ -44,6 +49,13 @@ public class PlayerSystem extends IteratingSystem {
         TransformComponent transComp = Mappers.transformMapper.get(entity);
         MovementComponent moveComp = Mappers.movementMapper.get(entity);
         AnimatedComponent animComp = Mappers.animatedMapper.get(entity);
+        HealthComponent healthComp = Mappers.healthMapper.get(entity);
+
+        if (healthComp.health <= 0) {
+            Ressources.playerDied();
+            func.run();
+            return;
+        }
 
         for (MouseData data : controllable.mouseQueue) {
             mouseEvent(data.type, data.screenX, data.screenY, data.button, transComp, weaponComp);

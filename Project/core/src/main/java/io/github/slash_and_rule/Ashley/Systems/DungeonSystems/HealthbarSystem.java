@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
+import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Utils.Mappers;
@@ -16,7 +17,7 @@ public class HealthbarSystem extends IteratingSystem {
     private OrthographicCamera camera;
 
     public HealthbarSystem(OrthographicCamera camera, int priority) {
-        super(Family.all(HealthComponent.class, TransformComponent.class).exclude(PlayerComponent.class).get(),
+        super(Family.all(HealthComponent.class, TransformComponent.class).exclude(InactiveComponent.class).get(),
                 priority);
         this.renderer = new ShapeRenderer();
         this.camera = camera;

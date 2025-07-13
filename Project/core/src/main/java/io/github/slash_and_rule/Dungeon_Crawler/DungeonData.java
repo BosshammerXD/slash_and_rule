@@ -117,6 +117,7 @@ public class DungeonData {
         loadEntity("Player");
         this.atlasManager.add("weapons/" + Globals.equippedWeapon + "/" + Globals.equippedWeapon + ".atlas");
         this.atlasManager.add("levels/" + level + "/levelSprites.atlas");
+        this.atlasManager.add("ressources/ressources.atlas");
         loadTileMaps(data);
 
         for (BaseEnemy enemy : levelData.enemies) {

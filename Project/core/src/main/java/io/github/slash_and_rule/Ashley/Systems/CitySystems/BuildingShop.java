@@ -205,6 +205,16 @@ public class BuildingShop extends EntitySystem {
         }
         TransformComponent transform = Mappers.transformMapper.get(CityData.heldEntity);
         if (transform != null) {
+            if (mouse.x < -16) {
+                mouse.x = -16;
+            } else if (mouse.x > 15) {
+                mouse.x = 15;
+            }
+            if (mouse.y < -8) {
+                mouse.y = -8;
+            } else if (mouse.y > 7) {
+                mouse.y = 7;
+            }
             transform.position.set((int) mouse.x, (int) mouse.y);
         } else {
             System.out.println("No TransformComponent found for the held entity.");

@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.signals.Signal;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
@@ -97,11 +96,7 @@ public class BuildingSystem extends EntitySystem {
         getEngine().removeEntity(buildingEntity);
         CityData.heldEntity = null;
 
-        // Hier kann die Logik zum Platzieren des Gebäudes implementiert werden
-        // z.B. Hinzufügen von Komponenten, Initialisierung usw.
-        // Beispiel:
-        // buildingEntity.add(new BuildingComponent("Name des Gebäudes"));
-        // buildingEntity.add(new BuyableComponent());
+        CityData.buildings.add(entity);
 
         System.out.println("Gebäude platziert: " + buildingEntity);
     }
@@ -117,7 +112,7 @@ public class BuildingSystem extends EntitySystem {
     public void update(float deltaTime) {
         for (Entity player : input) {
             ControllableComponent controllable = player.getComponent(ControllableComponent.class);
-            if (controllable == null)
+            if (controllable == null || CityData.heldEntity != null)
                 continue;
 
             for (ControllableComponent.MouseData data : controllable.mouseQueue) {

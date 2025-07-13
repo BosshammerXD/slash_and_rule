@@ -18,6 +18,7 @@ import io.github.slash_and_rule.Ashley.Components.DrawingComponents.MidfieldComp
 import io.github.slash_and_rule.Ashley.Systems.CitySystems.BuildingShop;
 import io.github.slash_and_rule.Ashley.Systems.CitySystems.BuildingSystem;
 import io.github.slash_and_rule.Ashley.Systems.CitySystems.CityBGSystem;
+import io.github.slash_and_rule.Ashley.Systems.CitySystems.ResourceSystem;
 import io.github.slash_and_rule.Bases.GameScreen;
 import io.github.slash_and_rule.Dungeon_Crawler.DungeonCrawlerScene;
 import io.github.slash_and_rule.Utils.AtlasManager;
@@ -54,12 +55,13 @@ public class CityBuilderScene extends GameScreen {
             assetManager.load("city/Grass.png", Texture.class);
         });
         atlasManager.add("city/Buildings.atlas");
+        atlasManager.add("ressources/ressources.atlas");
         addToEngine(loader, cityBGSystem = new CityBGSystem(gameCamera, 11));
         addToEngine(loader, new BuildingShop(uiCamera, gameCamera, atlasManager, 120));
         addToEngine(loader, new BuildingSystem(gameCamera, () -> {
             this.switchScreen = dungeonCrawlerScene;
         }, 67));
-
+        addToEngine(loader, new ResourceSystem(uiCamera, atlasManager, 130));
         loader.schedule(() -> {
             for (Entity entity : CityData.buildings) {
                 MidfieldComponent midComp = Mappers.midfieldMapper.get(entity);

@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 public class Ressources {
     public static final String[] ALL_RESSOURCES = {
-            Ressources.GOLD
+            Ressources.COIN, Ressources.SLIME_GEM
     };
 
-    public static final String GOLD = "Gold";
+    public static final String COIN = "Coin";
+    public static final String SLIME_GEM = "SlimeGem";
 
     public static class ItemData {
         public String name;

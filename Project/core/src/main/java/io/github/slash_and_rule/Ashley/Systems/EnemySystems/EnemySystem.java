@@ -165,7 +165,7 @@ public class EnemySystem extends EntitySystem {
                 (short) (Globals.PlayerCategory | Globals.WallCategory), false);
         physCompBuilder.end(itemEntity);
         renderBuilder.begin(new MidfieldComponent());
-        renderBuilder.add("ressorces/ressources.atlas", name, 0, 1 / 32f);
+        renderBuilder.add("ressources/ressources.atlas", name, 0, 1 / 32f);
         renderBuilder.end(itemEntity);
 
         ItemComponent itemComponent = new ItemComponent();

@@ -39,7 +39,8 @@ public class BasicSlime extends BaseEnemy {
         data.atkComponent = jumperComponent;
         data.attackCooldown = 2.5f;
 
-        data.drops.put(1f, "Gold");
+        data.drops.put(0.1f, "Coin");
+        data.drops.put(0.25f, "SlimeGem");
 
         return data;
     }

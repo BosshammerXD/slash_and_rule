@@ -1,397 +1,621 @@
 
 Player.png
-size: 1024, 128
+size: 1024, 256
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
+AtkDown
+  rotate: false
+  xy: 2, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+AtkDown
+  rotate: false
+  xy: 2, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+AtkDown
+  rotate: false
+  xy: 68, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+AtkDown
+  rotate: false
+  xy: 2, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+AtkLeft
+  rotate: false
+  xy: 68, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+AtkLeft
+  rotate: false
+  xy: 134, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+AtkLeft
+  rotate: false
+  xy: 68, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+AtkLeft
+  rotate: false
+  xy: 134, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+AtkRight
+  rotate: false
+  xy: 200, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+AtkRight
+  rotate: false
+  xy: 134, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+AtkRight
+  rotate: false
+  xy: 200, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+AtkRight
+  rotate: false
+  xy: 266, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+AtkUp
+  rotate: false
+  xy: 200, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+AtkUp
+  rotate: false
+  xy: 266, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+AtkUp
+  rotate: false
+  xy: 332, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+AtkUp
+  rotate: false
+  xy: 266, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+CapeAtkDown
+  rotate: false
+  xy: 332, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+CapeAtkDown
+  rotate: false
+  xy: 398, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+CapeAtkDown
+  rotate: false
+  xy: 332, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+CapeAtkDown
+  rotate: false
+  xy: 398, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+CapeAtkLeft
+  rotate: false
+  xy: 464, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+CapeAtkLeft
+  rotate: false
+  xy: 464, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+CapeAtkLeft
+  rotate: false
+  xy: 398, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+CapeAtkLeft
+  rotate: false
+  xy: 464, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+CapeAtkRight
+  rotate: false
+  xy: 530, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+CapeAtkRight
+  rotate: false
+  xy: 530, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+CapeAtkRight
+  rotate: false
+  xy: 464, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+CapeAtkRight
+  rotate: false
+  xy: 530, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+CapeAtkUp
+  rotate: false
+  xy: 596, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 0
+CapeAtkUp
+  rotate: false
+  xy: 530, 38
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+CapeAtkUp
+  rotate: false
+  xy: 596, 104
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 2
+CapeAtkUp
+  rotate: false
+  xy: 662, 170
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
 CapeMoveDown
   rotate: false
-  xy: 2, 70
+  xy: 2, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 CapeMoveDown
   rotate: false
-  xy: 2, 70
+  xy: 2, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 CapeMoveDown
   rotate: false
-  xy: 2, 36
+  xy: 596, 70
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 CapeMoveDown
   rotate: false
-  xy: 36, 70
+  xy: 662, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 CapeMoveLeft
   rotate: false
-  xy: 2, 2
+  xy: 728, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 CapeMoveLeft
   rotate: false
-  xy: 36, 36
+  xy: 36, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 CapeMoveLeft
   rotate: false
-  xy: 70, 70
+  xy: 762, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 CapeMoveLeft
   rotate: false
-  xy: 36, 2
+  xy: 70, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 CapeMoveLeft
   rotate: false
-  xy: 70, 36
+  xy: 796, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 CapeMoveLeft
   rotate: false
-  xy: 104, 70
+  xy: 104, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 CapeMoveLeft
   rotate: false
-  xy: 70, 2
+  xy: 830, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 CapeMoveLeft
   rotate: false
-  xy: 104, 36
+  xy: 138, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
 CapeMoveLeft
   rotate: false
-  xy: 138, 70
+  xy: 864, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 8
 CapeMoveLeft
   rotate: false
-  xy: 104, 2
+  xy: 172, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 9
 CapeMoveRight
   rotate: false
-  xy: 138, 36
+  xy: 898, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 CapeMoveRight
   rotate: false
-  xy: 172, 70
+  xy: 206, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 CapeMoveRight
   rotate: false
-  xy: 138, 2
+  xy: 932, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 CapeMoveRight
   rotate: false
-  xy: 172, 36
+  xy: 240, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 CapeMoveRight
   rotate: false
-  xy: 206, 70
+  xy: 966, 202
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 CapeMoveRight
   rotate: false
-  xy: 172, 2
+  xy: 274, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 CapeMoveRight
   rotate: false
-  xy: 206, 36
+  xy: 308, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 CapeMoveRight
   rotate: false
-  xy: 240, 70
+  xy: 342, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
 CapeMoveRight
   rotate: false
-  xy: 206, 2
+  xy: 376, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 8
 CapeMoveRight
   rotate: false
-  xy: 240, 36
+  xy: 410, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 9
 CapeMoveUp
   rotate: false
-  xy: 274, 70
+  xy: 444, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 CapeMoveUp
   rotate: false
-  xy: 274, 70
+  xy: 444, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 CapeMoveUp
   rotate: false
-  xy: 240, 2
+  xy: 478, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 CapeMoveUp
   rotate: false
-  xy: 274, 36
+  xy: 512, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 MoveDown
   rotate: false
-  xy: 308, 70
+  xy: 546, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 MoveDown
   rotate: false
-  xy: 308, 70
+  xy: 546, 4
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 MoveDown
   rotate: false
-  xy: 274, 2
+  xy: 596, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 MoveDown
   rotate: false
-  xy: 308, 36
+  xy: 630, 70
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 MoveLeft
   rotate: false
-  xy: 342, 70
+  xy: 630, 36
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 MoveLeft
   rotate: false
-  xy: 308, 2
+  xy: 696, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 MoveLeft
   rotate: false
-  xy: 342, 36
+  xy: 580, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 MoveLeft
   rotate: false
-  xy: 376, 70
+  xy: 614, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 MoveLeft
   rotate: false
-  xy: 342, 2
+  xy: 648, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 MoveLeft
   rotate: false
-  xy: 376, 36
+  xy: 730, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 MoveLeft
   rotate: false
-  xy: 410, 70
+  xy: 764, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 MoveLeft
   rotate: false
-  xy: 376, 2
+  xy: 798, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
 MoveLeft
   rotate: false
-  xy: 410, 36
+  xy: 832, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 8
 MoveLeft
   rotate: false
-  xy: 444, 70
+  xy: 866, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 9
 MoveRight
   rotate: false
-  xy: 410, 2
+  xy: 900, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 MoveRight
   rotate: false
-  xy: 444, 36
+  xy: 934, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 MoveRight
   rotate: false
-  xy: 478, 70
+  xy: 730, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 MoveRight
   rotate: false
-  xy: 444, 2
+  xy: 764, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 MoveRight
   rotate: false
-  xy: 478, 36
+  xy: 798, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 MoveRight
   rotate: false
-  xy: 512, 70
+  xy: 832, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 MoveRight
   rotate: false
-  xy: 478, 2
+  xy: 866, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 MoveRight
   rotate: false
-  xy: 512, 36
+  xy: 900, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
 MoveRight
   rotate: false
-  xy: 546, 70
+  xy: 934, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 8
 MoveRight
   rotate: false
-  xy: 512, 2
+  xy: 968, 168
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 9
 MoveUp
   rotate: false
-  xy: 546, 36
+  xy: 968, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 0
 MoveUp
   rotate: false
-  xy: 546, 36
+  xy: 968, 134
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 MoveUp
   rotate: false
-  xy: 580, 70
+  xy: 664, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 MoveUp
   rotate: false
-  xy: 546, 2
+  xy: 664, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

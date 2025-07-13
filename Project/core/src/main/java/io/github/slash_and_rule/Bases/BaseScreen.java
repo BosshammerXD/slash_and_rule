@@ -1,6 +1,7 @@
 package io.github.slash_and_rule.Bases;
 
 import io.github.slash_and_rule.Utils.AtlasManager;
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Interfaces.AsyncLoadable;
 
 import java.util.ArrayDeque;
@@ -13,7 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.async.AsyncExecutor;
 import com.badlogic.gdx.utils.async.AsyncResult;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public abstract class BaseScreen implements Screen {
 
@@ -28,14 +29,14 @@ public abstract class BaseScreen implements Screen {
     public boolean halt = false;
 
     public OrthographicCamera uiCamera = new OrthographicCamera();
-    protected ScreenViewport uiViewport;
+    protected ExtendViewport uiViewport;
 
     protected AtlasManager atlasManager;
 
     public BaseScreen(AssetManager assetManager, AtlasManager atlasManager) {
         this.assetManager = assetManager;
         this.atlasManager = atlasManager;
-        this.uiViewport = new ScreenViewport(uiCamera);
+        this.uiViewport = new ExtendViewport(Globals.GameWidth * 32, Globals.GameHeight * 32, uiCamera);
     }
 
     @Override

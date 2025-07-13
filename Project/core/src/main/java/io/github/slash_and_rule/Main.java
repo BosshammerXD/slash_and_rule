@@ -38,6 +38,6 @@ public class Main extends Game {
         dcs.cityBuild = cbs;
         cbs.dungeonCrawlerScene = dcs;
 
-        loadingScreen.load(dcs);
+        loadingScreen.load(cbs);
     }
 }

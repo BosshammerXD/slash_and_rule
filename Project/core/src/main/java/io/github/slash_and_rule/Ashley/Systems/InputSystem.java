@@ -47,6 +47,7 @@ public class InputSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
+
         for (Entity entity : controllables) {
             ControllableComponent controllable = Mappers.controllableMapper.get(entity);
             controllable.delta = deltaTime;

@@ -30,6 +30,10 @@ public class RenderBuilder<T extends RenderableComponent> extends BaseCompBuilde
         return textureData;
     }
 
+    public void add(TextureData textureData) {
+        textureDataQueue.add(textureData);
+    }
+
     public TextureData add(String atlasPath, int priority, float width, float height,
             float offsetX, float offsetY) {
         return add(atlasPath, null, priority, width, height, offsetX, offsetY);

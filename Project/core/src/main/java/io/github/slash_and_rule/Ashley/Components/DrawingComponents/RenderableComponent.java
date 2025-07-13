@@ -35,6 +35,20 @@ public class RenderableComponent implements Component {
             this.priority = priority;
             dirty = true;
         }
+
+        public TextureData copy() {
+            TextureData copy = new TextureData(this.priority);
+            copy.texture = this.texture;
+            copy.atlasPath = this.atlasPath;
+            copy.name = this.name;
+            copy.width = this.width;
+            copy.height = this.height;
+            copy.offsetX = this.offsetX;
+            copy.offsetY = this.offsetY;
+            copy.angle = this.angle;
+            copy.scale = this.scale;
+            return copy;
+        }
     }
 
     public boolean dirty = false;

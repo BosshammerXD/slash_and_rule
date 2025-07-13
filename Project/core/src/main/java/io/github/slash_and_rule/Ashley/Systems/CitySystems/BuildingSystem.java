@@ -36,13 +36,16 @@ public class BuildingSystem extends EntitySystem {
         super(priority);
         this.camera = camera;
         this.func = func;
-
-        Signals.placeBuildingSignal.add(this::onPlaceBuilding);
     }
 
     private RenderBuilder<MidfieldComponent> renderBuilder = new RenderBuilder<>();
 
     private void onPlaceBuilding(Signal<Signals.PlaceBuildingEvent> signal, Signals.PlaceBuildingEvent event) {
+        if (getEngine() == null) {
+            System.out.println("BuildingSystem not added to engine yet.");
+            return;
+        }
+
         Entity buildingEntity = event.buildingEntity;
 
         TransformComponent transform = Mappers.transformMapper.get(buildingEntity);
@@ -50,6 +53,7 @@ public class BuildingSystem extends EntitySystem {
         Vector3 position = new Vector3(transform.position.x + 0.5f, transform.position.y + 0.5f, 0);
 
         if (getBuilding(position) != null) {
+            CityData.heldEntity = null;
             return;
         }
 
@@ -69,6 +73,7 @@ public class BuildingSystem extends EntitySystem {
         });
         if (!canAfford[0]) {
             System.out.println("Nicht genug Ressourcen, um das Gebäude zu platzieren.");
+            CityData.heldEntity = null;
             return;
         }
         buyable.cost.forEach((resource, amount) -> {
@@ -103,9 +108,17 @@ public class BuildingSystem extends EntitySystem {
 
     @Override
     public void addedToEngine(Engine engine) {
+        System.out.println("BuildingSystem added to engine" + this.getEngine());
+        Signals.placeBuildingSignal.add(this::onPlaceBuilding);
         buildings = engine.getEntitiesFor(
                 Family.all(BuildingComponent.class, TransformComponent.class, MidfieldComponent.class).get());
         input = engine.getEntitiesFor(Family.all(PlayerComponent.class, ControllableComponent.class).get());
+    }
+
+    @Override
+    public void removedFromEngine(Engine engine) {
+        System.out.println("BuildingSystem removed from engine");
+        Signals.placeBuildingSignal.remove(this::onPlaceBuilding);
     }
 
     @Override

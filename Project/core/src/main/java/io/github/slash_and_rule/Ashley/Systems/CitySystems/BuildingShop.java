@@ -9,6 +9,8 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -87,10 +89,13 @@ public class BuildingShop extends EntitySystem {
         x = -numBuildings * 32 / 2;
         for (Entity building : buildings) {
             ForegroundComponent renderableComponent = Mappers.foregroundMapper.get(building);
+            BuyableComponent buyableComponent = Mappers.buyableMapper.get(building);
 
             drawBuildingUI(renderableComponent, x, y);
+            renderPrice(x, y + 64, buyableComponent);
             x += 64; // Move to the next building position
         }
+        batch.setProjectionMatrix(gameCamera.combined);
         drawBuildingGame();
         batch.end();
 
@@ -143,7 +148,7 @@ public class BuildingShop extends EntitySystem {
             Arrays.sort(renderComp.textures);
             renderComp.dirty = false;
         }
-        batch.setProjectionMatrix(gameCamera.combined);
+
         for (TextureData data : renderComp.textures) {
             if (data.texture == null) {
                 if (data.atlasPath == null || data.name == null) {
@@ -245,7 +250,31 @@ public class BuildingShop extends EntitySystem {
             TextureData copy = data.copy();
             renderBuilder.add(copy);
         }
+
+        BuyableComponent buyableComp = new BuyableComponent();
+        Mappers.buyableMapper.get(building).cost.forEach((resource, amount) -> {
+            buyableComp.cost.put(resource, amount);
+        });
         renderBuilder.end(CityData.heldEntity);
-        EntityManager.build(CityData.heldEntity, transform, buildComp, new BuyableComponent());
+        EntityManager.build(CityData.heldEntity, transform, buildComp, buyableComp);
+    }
+
+    GlyphLayout layout = new GlyphLayout();
+    BitmapFont font = new BitmapFont();
+
+    private void renderPrice(float x, float y, BuyableComponent buyable) {
+        if (buyable == null || buyable.cost.isEmpty()) {
+            return; // No cost to display
+        }
+        for (String resource : buyable.cost.keySet()) {
+            TextureRegion texture = atlasManager.getTexture("ressources/ressources.atlas", resource);
+            if (texture != null) {
+                batch.draw(texture, x, y);
+                x += texture.getRegionWidth(); // Add some space after the icon
+                layout.setText(font, buyable.cost.get(resource).toString());
+                font.draw(batch, layout, x, y + texture.getRegionHeight() / 2f);
+                x += layout.width + 4; // Add some space after the text
+            }
+        }
     }
 }

@@ -53,6 +53,6 @@ public class Mappers {
         public static ComponentMapper<MidfieldComponent> midfieldMapper = get(MidfieldComponent.class);
         public static ComponentMapper<ForegroundComponent> foregroundMapper = get(ForegroundComponent.class);
 
-        public static ComponentMapper<BuyableComponent> BuyableMapper = get(BuyableComponent.class);
+        public static ComponentMapper<BuyableComponent> buyableMapper = get(BuyableComponent.class);
         public static ComponentMapper<BuildingComponent> buildingMapper = get(BuildingComponent.class);
 }

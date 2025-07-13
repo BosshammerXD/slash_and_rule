@@ -1,5 +1,7 @@
 package io.github.slash_and_rule.CityBuilder;
 
+import java.util.HashMap;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -74,9 +76,10 @@ public class CityBuilderScene extends GameScreen {
         });
 
         loader.schedule(() -> {
-            addBuildingSell("BowBuilding");
-            addBuildingSell("DaggerBuilding");
-            addBuildingSell("SpearBuilding");
+            HashMap<String, Integer> cost = new HashMap<>();
+            cost.put(Ressources.COIN, 2);
+            cost.put(Ressources.SLIME_GEM, 5);
+            addBuildingSell("SpearBuilding", cost);
         });
     }
 
@@ -93,7 +96,7 @@ public class CityBuilderScene extends GameScreen {
     protected void step(float delta) {
     }
 
-    private void addBuildingSell(String name) {
+    private void addBuildingSell(String name, HashMap<String, Integer> cost) {
         Entity entity = new Entity();
         renderBuilder.begin(new ForegroundComponent());
         renderBuilder.add("city/Buildings.atlas", name, 0, 1, 1, 0, 0);
@@ -101,7 +104,11 @@ public class CityBuilderScene extends GameScreen {
 
         BuildingComponent buildComp = new BuildingComponent();
         buildComp.name = name;
-        EntityManager.build(entity, buildComp, new BuyableComponent());
+
+        BuyableComponent buyableComp = new BuyableComponent();
+        buyableComp.cost = cost;
+
+        EntityManager.build(entity, buildComp, buyableComp);
         engine.addEntity(entity);
     }
 }

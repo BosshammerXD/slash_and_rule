@@ -125,13 +125,13 @@ public class CityBGSystem extends EntitySystem {
 
         float uStart = cameraX % size;
         uStart += size - ((width / 2) % size);
-        uStart /= 2;
+        uStart /= size;
         float vStart = cameraY % size;
         vStart += size - ((height / 2) % size);
-        vStart /= 2;
+        vStart /= size;
 
-        float uEnd = uStart + width * 0.5f;
-        float vEnd = vStart + height * 0.5f;
+        float uEnd = uStart + width / size;
+        float vEnd = vStart + height / size;
 
         // Zeichne die Textur mit korrekt berechneten UV-Koordinaten (V-Koordinaten
         // vertauscht um Flipping zu korrigieren)

@@ -44,36 +44,6 @@ public class CityBGSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        batch.setProjectionMatrix(gameCamera.combined);
-        batch.begin();
-
-        // Berechne die tatsächliche Viewport-Größe unter Berücksichtigung des Zooms
-        float viewportWidth = gameCamera.viewportWidth * gameCamera.zoom;
-        float viewportHeight = gameCamera.viewportHeight * gameCamera.zoom;
-
-        // Positioniere die Textur so, dass sie den sichtbaren Bereich abdeckt
-        float x = gameCamera.position.x - viewportWidth / 2;
-        float y = gameCamera.position.y - viewportHeight / 2;
-        float width = viewportWidth;
-        float height = viewportHeight;
-        float cameraX = gameCamera.position.x / 2;
-        float cameraY = gameCamera.position.y / 2;
-
-        float uStart = (cameraX < 0) ? 1 + (cameraX % 1) : cameraX % 1;
-        uStart += (gameCamera.zoom);
-        float vStart = (cameraY < 0) ? -(cameraY % 1) : 1 - cameraY % 1;
-        vStart += (gameCamera.zoom) * 2;
-
-        float uEnd = uStart + 8f * gameCamera.zoom;
-        float vEnd = vStart + 6f * gameCamera.zoom;
-
-        // Zeichne die Textur mit korrekt berechneten UV-Koordinaten (V-Koordinaten
-        // vertauscht um Flipping zu korrigieren)
-        batch.draw(grassTexture, x, y, width, height,
-                uStart, vEnd, uEnd, vStart);
-
-        batch.end();
-
         for (Entity player : players) {
             ControllableComponent controllable = Mappers.controllableMapper.get(player);
             if (controllable == null) {
@@ -137,6 +107,38 @@ public class CityBGSystem extends EntitySystem {
                 yAcc = 0;
             }
         }
+
+        batch.setProjectionMatrix(gameCamera.combined);
+        batch.begin();
+
+        // Berechne die tatsächliche Viewport-Größe unter Berücksichtigung des Zooms
+        float width = gameCamera.viewportWidth * gameCamera.zoom;
+        float height = gameCamera.viewportHeight * gameCamera.zoom;
+
+        // Positioniere die Textur so, dass sie den sichtbaren Bereich abdeckt
+        float x = gameCamera.position.x - width / 2;
+        float y = gameCamera.position.y + height / 2;
+        float cameraX = gameCamera.position.x;
+        float cameraY = -gameCamera.position.y;
+
+        float size = grassTexture.getWidth() / 16f; // Größe der Textur in Weltkoordinaten
+
+        float uStart = cameraX % size;
+        uStart += size - ((width / 2) % size);
+        uStart /= 2;
+        float vStart = cameraY % size;
+        vStart += size - ((height / 2) % size);
+        vStart /= 2;
+
+        float uEnd = uStart + width * 0.5f;
+        float vEnd = vStart + height * 0.5f;
+
+        // Zeichne die Textur mit korrekt berechneten UV-Koordinaten (V-Koordinaten
+        // vertauscht um Flipping zu korrigieren)
+        batch.draw(grassTexture, x, y, width, -height,
+                uStart, vStart, uEnd, vEnd);
+
+        batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setProjectionMatrix(gameCamera.combined);

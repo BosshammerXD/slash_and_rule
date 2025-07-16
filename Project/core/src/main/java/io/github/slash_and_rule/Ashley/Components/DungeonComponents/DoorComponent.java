@@ -18,12 +18,11 @@ public class DoorComponent implements Component {
         ClOSED, CLOSING, OPEN, OPENING
     }
 
-    public DoorType type;
+    public DoorType type = DoorType.NOTSET;
     public DoorState open = DoorState.ClOSED;
     public Entity neighbour = null;
 
     public DoorComponent() {
-        this.type = DoorType.NOTSET;
     }
 
     public DoorComponent(DoorType type) {

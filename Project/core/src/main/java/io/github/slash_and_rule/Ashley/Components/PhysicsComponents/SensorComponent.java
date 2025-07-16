@@ -21,4 +21,14 @@ public class SensorComponent implements Component {
 
     public ArrayDeque<CollisionData> contactsStarted = new ArrayDeque<>();
     public ArrayDeque<CollisionData> contactsEnded = new ArrayDeque<>();
+
+    public Fixture[] sensors;
+
+    public SensorComponent() {
+        sensors = new Fixture[0];
+    }
+
+    public SensorComponent(Fixture... sensors) {
+        this.sensors = sensors;
+    }
 }

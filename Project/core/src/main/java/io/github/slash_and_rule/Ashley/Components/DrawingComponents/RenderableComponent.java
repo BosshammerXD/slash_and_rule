@@ -3,7 +3,7 @@ package io.github.slash_and_rule.Ashley.Components.DrawingComponents;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class RenderableComponent implements Component {
+public abstract class RenderableComponent implements Component {
     public class TextureData implements Comparable<TextureData> {
         public TextureRegion texture;
         public String atlasPath = null;

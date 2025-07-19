@@ -47,7 +47,7 @@ public class BasicSlime extends BaseEnemy {
 
     @Override
     protected WeaponComponent makeWeapon() {
-        weaponBuilder.begin(5, 10f, 1f, Globals.PlayerCategory);
+        weaponBuilder.begin(5, 10f, 1f, Globals.Categories.Player);
 
         Shape hitbox = ShapeBuilder.circ(0.5f);
 
@@ -83,13 +83,15 @@ public class BasicSlime extends BaseEnemy {
         colliderShape.setRadius(0.4f);
 
         fixtureMap.put("Collider",
-                physicsBuilder.addFixture(body, colliderShape, Globals.EnemyCategory, Globals.ColEnemyMask, false));
+                physicsBuilder.addFixture(body, colliderShape, Globals.Categories.Enemy, Globals.Masks.EnemyCollider,
+                        false));
 
         CircleShape hurtBoxShape = new CircleShape();
         hurtBoxShape.setRadius(0.5f);
 
         fixtureMap.put("HurtBox",
-                physicsBuilder.addFixture(body, hurtBoxShape, Globals.EnemyCategory, Globals.HitboxCategory, true));
+                physicsBuilder.addFixture(body, hurtBoxShape, Globals.Categories.Enemy, Globals.Categories.Hitbox,
+                        true));
     }
 
     @Override

@@ -19,6 +19,7 @@ import io.github.slash_and_rule.Dungeon_Crawler.Enemies.BasicSlime;
 import io.github.slash_and_rule.Utils.AtlasManager;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 import io.github.slash_and_rule.Utils.RandomCollection;
+import io.github.slash_and_rule.Utils.UtilFuncs;
 
 public class DungeonData {
     private static class JsonData {
@@ -115,7 +116,7 @@ public class DungeonData {
         LevelData levelData = new LevelData(data, directory);
 
         loadEntity("Player");
-        this.atlasManager.add("weapons/" + Globals.equippedWeapon + "/" + Globals.equippedWeapon + ".atlas");
+        this.atlasManager.add(UtilFuncs.getWeaponAtlas(Globals.Dungeon.weapon));
         this.atlasManager.add("levels/" + level + "/levelSprites.atlas");
         this.atlasManager.add("ressources/ressources.atlas");
         loadTileMaps(data);

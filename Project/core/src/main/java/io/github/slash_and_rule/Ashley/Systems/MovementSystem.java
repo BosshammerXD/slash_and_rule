@@ -15,7 +15,7 @@ public class MovementSystem extends IteratingSystem {
     public MovementSystem() {
         super(
                 Family.all(MovementComponent.class, TransformComponent.class).exclude(InactiveComponent.class).get(),
-                Globals.MovementSystemPriority);
+                Globals.Priorities.Systems.Transform.Movement);
     }
 
     @Override

@@ -97,7 +97,7 @@ public class CollisionSystem extends EntitySystem {
     private ImmutableArray<Entity> sensors;
 
     public CollisionSystem(World world) {
-        super(Globals.CollisionSystemPriority);
+        super(Globals.Priorities.Systems.Physics.Collision);
         world.setContactListener(contactListener);
     }
 

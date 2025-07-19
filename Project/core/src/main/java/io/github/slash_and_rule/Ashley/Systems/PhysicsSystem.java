@@ -25,7 +25,7 @@ public class PhysicsSystem extends EntitySystem {
     private ImmutableArray<Entity> moveables;
 
     public PhysicsSystem(World world) {
-        super(Globals.PhysicsSystemPriority);
+        super(Globals.Priorities.Systems.Physics.Physic);
 
         this.world = world;
     }
@@ -133,7 +133,7 @@ public class PhysicsSystem extends EntitySystem {
 
     private void applyKnockback(SensorComponent.CollisionData data, MovementComponent moveComp,
             PhysicsComponent physComp) {
-        if (data.otherFixture.getFilterData().categoryBits != Globals.HitboxCategory) {
+        if (data.otherFixture.getFilterData().categoryBits != Globals.Categories.Hitbox) {
             return;
         }
         Entity other = data.entity;

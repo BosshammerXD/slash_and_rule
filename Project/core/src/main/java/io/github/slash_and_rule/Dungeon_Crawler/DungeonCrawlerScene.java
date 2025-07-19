@@ -43,8 +43,6 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         // Add player and other game objects here
         player = new Player(physCompBuilder, weaponBuilder);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
-        // dungeonSystem = new DungeonSystem(Globals.DungeonRoomSystemPriority,
-        // dungeonManager, physCompBuilder, camera, 1 / 32f);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         });
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
-            dungeonManager.level = dungeonData.load(Globals.level);
+            dungeonManager.level = dungeonData.load(Globals.Dungeon.Level);
             dungeonManager.init(loader);
         });
     }

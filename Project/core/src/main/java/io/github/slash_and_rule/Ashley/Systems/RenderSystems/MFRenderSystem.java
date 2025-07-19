@@ -12,7 +12,7 @@ import io.github.slash_and_rule.Utils.Mappers;
 public class MFRenderSystem extends SpriteRenderSystem<MidfieldComponent> {
 
     public MFRenderSystem(OrthographicCamera camera, AtlasManager atlasManager) {
-        super(camera, atlasManager, MidfieldComponent.class, Globals.MFRenderSystemPriority);
+        super(camera, atlasManager, MidfieldComponent.class, Globals.Priorities.Systems.Draw.Midfield);
     }
 
     @Override

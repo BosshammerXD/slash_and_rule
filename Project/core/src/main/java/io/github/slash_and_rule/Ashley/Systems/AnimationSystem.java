@@ -19,7 +19,7 @@ public class AnimationSystem extends IteratingSystem {
     public AnimationSystem(AtlasManager atlasManager) {
         super(
                 Family.all(AnimatedComponent.class).exclude(InactiveComponent.class).get(),
-                Globals.AnimationSystemPriority);
+                Globals.Priorities.Systems.Draw.Animation);
 
         this.atlasManager = atlasManager;
     }

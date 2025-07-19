@@ -37,7 +37,7 @@ public class InputSystem extends EntitySystem {
     }
 
     public InputSystem() {
-        super(Globals.InputSystemPriority);
+        super(Globals.Priorities.Systems.Input);
     }
 
     @Override

@@ -88,16 +88,16 @@ public class Player {
         physCompBuilder.begin(traC.position, BodyType.DynamicBody, friction);
         physCompBuilder.getBody().setFixedRotation(true);
         physCompBuilder.add("Collider", colliderShape, density,
-                Globals.PlayerCategory, Globals.ColPlayerMask, PhysCompBuilder.NotSensor);
+                Globals.Categories.Player, Globals.Masks.PlayerCollider, PhysCompBuilder.NotSensor);
         physCompBuilder.add("HurtBox", hurtBoxShape,
-                Globals.PlayerCategory, Globals.HitboxCategory, PhysCompBuilder.IsSensor);
+                Globals.Categories.Player, Globals.Categories.Hitbox, PhysCompBuilder.IsSensor);
         physCompBuilder.end(player);
         // endregion
         //
         //
         //
         // region: WeaponComp
-        weaponBuilder.begin(10, 10, 0.5f, Globals.EnemyCategory);
+        weaponBuilder.begin(10, 10, 0.5f, Globals.Categories.Enemy);
 
         Shape hitbox = ShapeBuilder.poly(
                 new float[] { 0.5f, 0f, 1.2f, 1f, 1.7f, 0f, 1.2f, -1f });

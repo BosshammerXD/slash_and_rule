@@ -49,7 +49,7 @@ public class DungeonRoomSystem extends EntitySystem {
 
     public DungeonRoomSystem(PhysCompBuilder physCompBuilder, DungeonManager dungeonManager,
             OrthographicCamera camera) {
-        super(Globals.DungeonRoomSystemPriority);
+        super(Globals.Priorities.Systems.Dungeon.DungeonRoom);
         this.dungeonBuilder = new DungeonBuilder(physCompBuilder);
         this.dungeonManager = dungeonManager;
         this.mapRenderer = new OrthogonalTiledMapRenderer(null, 1 / 32f);
@@ -93,7 +93,7 @@ public class DungeonRoomSystem extends EntitySystem {
                         dungeonComp.cleared = true;
                     } else {
                         this.enemies = enemyPicker.pickEnemies(dungeonManager.getRoom().difficulty * 10);
-                        this.timeSinceLastSpawn = Globals.spawnInterval;
+                        this.timeSinceLastSpawn = Globals.Dungeon.Spawner.interval;
                     }
                     break;
                 case StateComponent.State.INACTIVE:
@@ -187,7 +187,7 @@ public class DungeonRoomSystem extends EntitySystem {
         if (enemies.isEmpty()) {
             return true;
         }
-        if (timeSinceLastSpawn < Globals.spawnInterval) {
+        if (timeSinceLastSpawn < Globals.Dungeon.Spawner.interval) {
             timeSinceLastSpawn += deltaTime;
             return false;
         }
@@ -219,7 +219,7 @@ public class DungeonRoomSystem extends EntitySystem {
                 continue;
             }
             Vector2 entityPosition = Mappers.physicsMapper.get(entity).body.getPosition();
-            if (entityPosition.dst2(position) < Globals.spawnDistance2) {
+            if (entityPosition.dst2(position) < Globals.Dungeon.Spawner.distance2) {
                 return true;
             }
         }

@@ -112,7 +112,7 @@ public class WeaponBuilder extends BaseCompBuilder<WeaponComponent> {
         }
         Fixture fixture = physicsBuilder.addFixture(comp.body, shape, 1f, (short) 0, maskBits, true);
         applyCategory(fixture, end, maskBits);
-        applyCategory(fixture, start, Globals.HitboxCategory);
+        applyCategory(fixture, start, Globals.Categories.Hitbox);
     }
 
     public void setAnimation(String atlasPath, FrameData frames, int priority, float width,

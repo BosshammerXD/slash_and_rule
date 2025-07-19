@@ -19,7 +19,7 @@ public class HealthbarSystem extends IteratingSystem {
 
     public HealthbarSystem(OrthographicCamera camera) {
         super(Family.all(HealthComponent.class, TransformComponent.class).exclude(InactiveComponent.class).get(),
-                Globals.HealthbarSystemPriority);
+                Globals.Priorities.Systems.Healthbar);
         this.renderer = new ShapeRenderer();
         this.camera = camera;
     }

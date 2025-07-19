@@ -81,8 +81,6 @@ public abstract class BaseEnemy {
             enemyComponent.drops[i++] = new EnemyComponent.Drop(data.drops.get(chance), chance);
         }
 
-        System.out.println(animComp.animations);
-
         entityManager.build(
                 transformComponent,
                 movementComponent,

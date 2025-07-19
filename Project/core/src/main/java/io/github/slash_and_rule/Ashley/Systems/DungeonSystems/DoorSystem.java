@@ -27,7 +27,7 @@ public class DoorSystem extends EntitySystem {
     private ImmutableArray<Entity> doors;
 
     public DoorSystem(Consumer<Integer> moveFunc) {
-        super(Globals.DoorSystemPriority);
+        super(Globals.Priorities.Systems.Dungeon.Door);
 
         this.moveFunc = moveFunc;
 
@@ -66,14 +66,14 @@ public class DoorSystem extends EntitySystem {
             }
             switch (doorComp.open) {
                 case DoorComponent.DoorState.CLOSING:
-                    setDoor(physComp, (short) 0, Globals.WallMask);
+                    setDoor(physComp, (short) 0, Globals.Masks.Wall);
                     doorComp.open = DoorComponent.DoorState.ClOSED;
                     break;
                 case DoorComponent.DoorState.OPENING:
                     if (doorComp.neighbour == null) {
                         continue;
                     }
-                    setDoor(physComp, Globals.PlayerCategory, (short) 0);
+                    setDoor(physComp, Globals.Categories.Player, (short) 0);
                     doorComp.open = DoorComponent.DoorState.OPEN;
                     break;
                 default:

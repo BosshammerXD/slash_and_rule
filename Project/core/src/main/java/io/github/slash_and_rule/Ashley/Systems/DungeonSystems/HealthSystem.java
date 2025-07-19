@@ -15,7 +15,7 @@ import io.github.slash_and_rule.Utils.Mappers;
 public class HealthSystem extends IteratingSystem {
     public HealthSystem() {
         super(Family.all(HealthComponent.class, SensorComponent.class).exclude(InactiveComponent.class).get(),
-                Globals.HealthSystemPriority);
+                Globals.Priorities.Systems.Health);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class HealthSystem extends IteratingSystem {
 
         for (SensorComponent.CollisionData data : sensComp.contactsStarted) {
             if (!data.myFixture.isSensor()
-                    || data.otherFixture.getFilterData().categoryBits != Globals.HitboxCategory) {
+                    || data.otherFixture.getFilterData().categoryBits != Globals.Categories.Hitbox) {
                 continue;
             }
             Entity otherEntity = data.entity;

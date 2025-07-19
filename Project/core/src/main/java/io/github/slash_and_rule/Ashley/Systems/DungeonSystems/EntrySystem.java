@@ -31,7 +31,7 @@ public class EntrySystem extends IteratingSystem {
     public EntrySystem(OrthographicCamera camera, ExtendViewport viewport, OrthographicCamera gCamera,
             Runnable loader) {
         super(Family.all(EntryComponent.class, SensorComponent.class, TransformComponent.class)
-                .exclude(InactiveComponent.class).get(), Globals.EntrySystemPriority);
+                .exclude(InactiveComponent.class).get(), Globals.Priorities.Systems.Dungeon.Entry);
         this.camera = camera;
         this.viewport = viewport;
         this.gCamera = gCamera;

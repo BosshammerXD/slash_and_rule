@@ -15,7 +15,9 @@ import io.github.slash_and_rule.Utils.Mappers;
 
 public class WeaponSystem extends IteratingSystem {
     public WeaponSystem() {
-        super(Family.all(WeaponComponent.class).exclude(InactiveComponent.class).get(), Globals.WeaponSystemPriority);
+        super(
+                Family.all(WeaponComponent.class).exclude(InactiveComponent.class).get(),
+                Globals.Priorities.Systems.Dungeon.Weapon);
     }
 
     @Override

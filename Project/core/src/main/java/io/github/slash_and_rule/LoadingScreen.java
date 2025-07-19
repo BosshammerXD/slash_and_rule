@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.slash_and_rule.Bases.BaseScreen;
 import io.github.slash_and_rule.Bases.EntityScreen;

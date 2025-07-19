@@ -14,7 +14,7 @@ public class BGRenderSystem extends SpriteRenderSystem<BackgroundComponent> {
     private ExtendViewport viewport;
 
     public BGRenderSystem(ExtendViewport viewport, OrthographicCamera camera, AtlasManager atlasManager) {
-        super(camera, atlasManager, BackgroundComponent.class, Globals.BGRenderSystemPriority);
+        super(camera, atlasManager, BackgroundComponent.class, Globals.Priorities.Systems.Draw.Background);
         this.viewport = viewport;
     }
 

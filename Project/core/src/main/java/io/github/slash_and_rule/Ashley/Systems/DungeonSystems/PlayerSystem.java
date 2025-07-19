@@ -35,7 +35,7 @@ public class PlayerSystem extends IteratingSystem {
                 TransformComponent.class, WeaponComponent.class, MovementComponent.class, AnimatedComponent.class,
                 HealthComponent.class, PhysicsComponent.class)
                 .exclude(InactiveComponent.class).get(),
-                Globals.PlayerSystemPriority); // Set the priority of this system, 0 is default
+                Globals.Priorities.Systems.Dungeon.Player); // Set the priority of this system, 0 is default
         this.camera = camera;
         this.func = func;
         Signals.playerTeleportSignal.add((signal, event) -> {
@@ -88,9 +88,9 @@ public class PlayerSystem extends IteratingSystem {
             WeaponComponent weaponComp) {
         if (type == MouseInputType.MOVED || type == MouseInputType.DRAGGED) {
             mouseMoved(screenX, screenY, transComp, weaponComp);
-        } else if (type == MouseInputType.DOWN && button == Globals.AttackButton) {
+        } else if (type == MouseInputType.DOWN && button == Globals.Controls.Attack) {
             mousePressed(weaponComp);
-        } else if (type == MouseInputType.UP && button == Globals.AttackButton) {
+        } else if (type == MouseInputType.UP && button == Globals.Controls.Attack) {
             mouseReleased(weaponComp);
         }
     }
@@ -123,16 +123,16 @@ public class PlayerSystem extends IteratingSystem {
 
     private void movement(MovementComponent moveComp) {
         Vector2 velocity = new Vector2(0, 0);
-        if (Gdx.input.isKeyPressed(Globals.MoveUpKey)) {
+        if (Gdx.input.isKeyPressed(Globals.Controls.MoveUp)) {
             velocity.y += 1;
         }
-        if (Gdx.input.isKeyPressed(Globals.MoveDownKey)) {
+        if (Gdx.input.isKeyPressed(Globals.Controls.MoveDown)) {
             velocity.y -= 1;
         }
-        if (Gdx.input.isKeyPressed(Globals.MoveLeftKey)) {
+        if (Gdx.input.isKeyPressed(Globals.Controls.MoveLeft)) {
             velocity.x -= 1;
         }
-        if (Gdx.input.isKeyPressed(Globals.MoveRightKey)) {
+        if (Gdx.input.isKeyPressed(Globals.Controls.MoveRight)) {
             velocity.x += 1;
         }
         velocity.nor(); // Normalize the velocity vector

@@ -40,11 +40,11 @@ public class EnemySystem extends EntitySystem {
 
         @Override
         public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-            if (fixture.getFilterData().categoryBits == Globals.PlayerCategory) {
+            if (fixture.getFilterData().categoryBits == Globals.Categories.Player) {
                 canSee = true;
                 return 0;
             }
-            if (fixture.getFilterData().categoryBits != Globals.WallCategory) {
+            if (fixture.getFilterData().categoryBits != Globals.Categories.Wall) {
                 return 1;
             }
             return 0;
@@ -54,7 +54,7 @@ public class EnemySystem extends EntitySystem {
     RayCast callback = new RayCast();
 
     public EnemySystem(World world, PhysCompBuilder physCompBuilder) {
-        super(Globals.EnemySystemPriority);
+        super(Globals.Priorities.Systems.Dungeon.Enemy);
         this.world = world;
         this.physCompBuilder = physCompBuilder;
     }
@@ -161,8 +161,8 @@ public class EnemySystem extends EntitySystem {
         itemEntity.add(CompBuilders.buildTransform(pos, 0).get());
         physCompBuilder.begin(pos, BodyType.DynamicBody, 0.5f, true);
         Shape shape = ShapeBuilder.circ(0.2f);
-        physCompBuilder.add("item", shape, Globals.ItemCategory,
-                (short) (Globals.PlayerCategory | Globals.WallCategory), false);
+        physCompBuilder.add("item", shape, Globals.Categories.Item,
+                (short) (Globals.Categories.Player | Globals.Categories.Wall), false);
         physCompBuilder.end(itemEntity);
         renderBuilder.begin(new MidfieldComponent());
         renderBuilder.add("ressources/ressources.atlas", name, 0, 1 / 32f);

@@ -20,7 +20,8 @@ import io.github.slash_and_rule.Utils.Mappers;
 public class JumperSystem extends IteratingSystem {
     public JumperSystem() {
         super(Family.all(JumperComponent.class, WeaponComponent.class, PhysicsComponent.class, EnemyComponent.class)
-                .exclude(InactiveComponent.class).get(), Globals.JumperSystemPriority);
+                .exclude(InactiveComponent.class).get(),
+                Globals.Priorities.Systems.Dungeon.EnemyTypes.Jumper);
     }
 
     @Override

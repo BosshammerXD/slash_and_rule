@@ -14,7 +14,7 @@ import io.github.slash_and_rule.Utils.Mappers;
 
 public class StateSystem extends IteratingSystem {
     public StateSystem() {
-        super(Family.all(StateComponent.class).get(), Globals.StateSystemPriority);
+        super(Family.all(StateComponent.class).get(), Globals.Priorities.Systems.State);
     }
 
     @Override

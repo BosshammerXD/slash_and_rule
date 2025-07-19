@@ -174,7 +174,8 @@ public class DungeonBuilder {
 
     private Fixture buildWall(ColliderData wall, PhysicsComponent comp, int[] index) {
         Shape shape = ShapeBuilder.rect(wall.x, wall.y, wall.width * 2f, wall.height * 2f);
-        return physicsCompBuilder.asyncAdd(comp, "wall_" + index[0]++, shape, Globals.WallCategory, Globals.WallMask,
+        return physicsCompBuilder.asyncAdd(comp, "wall_" + index[0]++, shape, Globals.Categories.Wall,
+                Globals.Masks.Wall,
                 false);
     }
 
@@ -201,7 +202,8 @@ public class DungeonBuilder {
             default:
                 return;
         }
-        renderBuilder.add("levels/" + Globals.level + "/levelSprites.atlas", spriteName, 0, width, height, x, y);
+        renderBuilder.add("levels/" + Globals.Dungeon.Level + "/levelSprites.atlas", spriteName, 0, width, height, x,
+                y);
     }
 
     private void makeDoor(DoorData door, QuadData<?> neighbours, PhysicsComponent comp, int[] i,
@@ -227,11 +229,11 @@ public class DungeonBuilder {
 
         ColliderData wall = door.collider;
         Shape shape = ShapeBuilder.rect(wall.x, wall.y, wall.width * 2f, wall.height * 2f);
-        physicsCompBuilder.asyncAdd(physComp, "Wall", shape, Globals.WallCategory, Globals.WallMask, false);
+        physicsCompBuilder.asyncAdd(physComp, "Wall", shape, Globals.Categories.Wall, Globals.Masks.Wall, false);
 
         ColliderData doorSensor = door.sensor;
         Shape doorShape = ShapeBuilder.rect(doorSensor.x, doorSensor.y, doorSensor.width * 2f, doorSensor.height * 2f);
-        physicsCompBuilder.asyncAdd(physComp, "Sensor", doorShape, Globals.SensorCategory, (short) 0, true);
+        physicsCompBuilder.asyncAdd(physComp, "Sensor", doorShape, Globals.Categories.Sensor, (short) 0, true);
 
         StateComponent stateComp = new StateComponent();
         stateComp.state = StateComponent.State.INACTIVE;
@@ -253,7 +255,7 @@ public class DungeonBuilder {
         Shape shape = ShapeBuilder.circ(entry.x + entry.width, entry.y + entry.height, entry.width);
 
         physicsCompBuilder.begin(BodyType.StaticBody, 0f, false);
-        physicsCompBuilder.add("Sensor", shape, Globals.SensorCategory, Globals.PlayerCategory, true);
+        physicsCompBuilder.add("Sensor", shape, Globals.Categories.Sensor, Globals.Categories.Player, true);
 
         StateComponent stateComp = new StateComponent();
         stateComp.state = StateComponent.State.INACTIVE;
@@ -261,7 +263,7 @@ public class DungeonBuilder {
         RenderBuilder<MidfieldComponent> renderBuilder = new RenderBuilder<>();
 
         renderBuilder.begin(new MidfieldComponent());
-        renderBuilder.add("levels/" + Globals.level + "/levelSprites.atlas", "Dungeon_Portal", 0, 1 / 16f);
+        renderBuilder.add("levels/" + Globals.Dungeon.Level + "/levelSprites.atlas", "Dungeon_Portal", 0, 1 / 16f);
         renderBuilder.end(entity);
 
         TransformComponent transComp = CompBuilders
@@ -280,7 +282,7 @@ public class DungeonBuilder {
         Shape shape = ShapeBuilder.circ(treasure.x + treasure.width, treasure.y + treasure.height, treasure.width);
 
         physicsCompBuilder.begin(BodyType.StaticBody, 0f, false);
-        physicsCompBuilder.add("Sensor", shape, Globals.SensorCategory, Globals.PlayerCategory, true);
+        physicsCompBuilder.add("Sensor", shape, Globals.Categories.Sensor, Globals.Categories.Player, true);
 
         StateComponent stateComp = new StateComponent();
         stateComp.state = StateComponent.State.INACTIVE;

@@ -10,7 +10,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
-import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Ashley.EntityManager;
 import io.github.slash_and_rule.Ashley.Components.ChildComponent;
@@ -85,11 +84,11 @@ public abstract class EntityScreen extends BaseScreen {
     }
 
     public void init(LoadingScreen loader) {
-        this.inputSystem = new InputSystem(Globals.InputSystemPriority);
-        addToEngine(loader, new AnimationSystem(Globals.AnimationSystemPriority, atlasManager));
+        this.inputSystem = new InputSystem();
+        addToEngine(loader, new AnimationSystem(atlasManager));
         addToEngine(loader, this.inputSystem);
-        addToEngine(loader, new MovementSystem(Globals.MovementSystemPriority));
-        addToEngine(loader, new StateSystem(Globals.StateSystemPriority));
+        addToEngine(loader, new MovementSystem());
+        addToEngine(loader, new StateSystem());
         for (Initalizable data : loadableObjects) {
             data.init(loader);
         }

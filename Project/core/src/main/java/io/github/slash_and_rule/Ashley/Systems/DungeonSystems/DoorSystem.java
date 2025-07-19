@@ -26,8 +26,8 @@ public class DoorSystem extends EntitySystem {
     private Consumer<Integer> moveFunc;
     private ImmutableArray<Entity> doors;
 
-    public DoorSystem(Consumer<Integer> moveFunc, int priority) {
-        super(priority);
+    public DoorSystem(Consumer<Integer> moveFunc) {
+        super(Globals.DoorSystemPriority);
 
         this.moveFunc = moveFunc;
 

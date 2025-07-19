@@ -10,8 +10,8 @@ import io.github.slash_and_rule.Ashley.Components.DungeonComponents.ItemComponen
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 
 public class ItemSystem extends IteratingSystem {
-    public ItemSystem(int priority) {
-        super(Family.all(ItemComponent.class, SensorComponent.class).get(), priority);
+    public ItemSystem() {
+        super(Family.all(ItemComponent.class, SensorComponent.class).get(), Globals.ItemSystemPriority);
     }
 
     @Override

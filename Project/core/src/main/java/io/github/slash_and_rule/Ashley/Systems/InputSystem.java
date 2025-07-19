@@ -10,6 +10,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent.KeyData;
@@ -35,8 +36,8 @@ public class InputSystem extends EntitySystem {
         Gdx.input.setInputProcessor(inputcollector);
     }
 
-    public InputSystem(int priority) {
-        super(priority);
+    public InputSystem() {
+        super(Globals.InputSystemPriority);
     }
 
     @Override

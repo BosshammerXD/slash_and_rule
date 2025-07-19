@@ -24,8 +24,8 @@ public class PhysicsSystem extends EntitySystem {
 
     private ImmutableArray<Entity> moveables;
 
-    public PhysicsSystem(int priority, World world) {
-        super(priority);
+    public PhysicsSystem(World world) {
+        super(Globals.PhysicsSystemPriority);
 
         this.world = world;
     }

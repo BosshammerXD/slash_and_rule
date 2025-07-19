@@ -34,8 +34,8 @@ public abstract class GameScreen extends EntityScreen {
 
     @Override
     public void init(LoadingScreen loader) {
-        addToEngine(loader, new BGRenderSystem(gameViewport, gameCamera, atlasManager, Globals.BGRenderSystemPriority));
-        addToEngine(loader, new MFRenderSystem(gameCamera, atlasManager, Globals.MFRenderSystemPriority));
+        addToEngine(loader, new BGRenderSystem(gameViewport, gameCamera, atlasManager));
+        addToEngine(loader, new MFRenderSystem(gameCamera, atlasManager));
         super.init(loader);
     }
 

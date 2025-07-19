@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent;
 import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorComponent.CollisionData;
@@ -95,8 +96,8 @@ public class CollisionSystem extends EntitySystem {
     private final GameContactListener contactListener = new GameContactListener();
     private ImmutableArray<Entity> sensors;
 
-    public CollisionSystem(int priority, World world) {
-        super(priority);
+    public CollisionSystem(World world) {
+        super(Globals.CollisionSystemPriority);
         world.setContactListener(contactListener);
     }
 

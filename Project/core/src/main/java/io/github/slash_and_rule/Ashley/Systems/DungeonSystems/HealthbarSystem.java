@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
@@ -16,9 +17,9 @@ public class HealthbarSystem extends IteratingSystem {
     private ShapeRenderer renderer;
     private OrthographicCamera camera;
 
-    public HealthbarSystem(OrthographicCamera camera, int priority) {
+    public HealthbarSystem(OrthographicCamera camera) {
         super(Family.all(HealthComponent.class, TransformComponent.class).exclude(InactiveComponent.class).get(),
-                priority);
+                Globals.HealthbarSystemPriority);
         this.renderer = new ShapeRenderer();
         this.camera = camera;
     }

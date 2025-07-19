@@ -19,6 +19,7 @@ import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Components.PlayerComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
+import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DoorComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.DungeonComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.Enemies.EnemyComponent;
@@ -46,9 +47,9 @@ public class DungeonRoomSystem extends EntitySystem {
     private ImmutableArray<Entity> players;
     private ImmutableArray<Entity> enemyEntities;
 
-    public DungeonRoomSystem(PhysCompBuilder physCompBuilder, DungeonManager dungeonManager, int priority,
+    public DungeonRoomSystem(PhysCompBuilder physCompBuilder, DungeonManager dungeonManager,
             OrthographicCamera camera) {
-        super(priority);
+        super(Globals.DungeonRoomSystemPriority);
         this.dungeonBuilder = new DungeonBuilder(physCompBuilder);
         this.dungeonManager = dungeonManager;
         this.mapRenderer = new OrthogonalTiledMapRenderer(null, 1 / 32f);
@@ -166,6 +167,19 @@ public class DungeonRoomSystem extends EntitySystem {
             StateComponent stateComp = Mappers.stateMapper.get(mainRoom);
             stateComp.state = StateComponent.State.ACTIVATE;
             getEngine().addEntity(mainRoom);
+
+            ParentComponent parentComp = Mappers.parentMapper.get(mainRoom);
+            for (Entity child : parentComp.children) {
+                System.out.println(child.getComponents());
+                if (!Mappers.entryMapper.has(child)) {
+                    continue;
+                }
+                System.out.println("Entry found in room: " + mainRoom);
+                TransformComponent transComp = Mappers.transformMapper.get(child);
+                Signals.playerTeleportSignal.dispatch(
+                        new Signals.PlayerTeleportEvent(new Vector2(0, -1).add(transComp.position)));
+                break;
+            }
         });
     }
 

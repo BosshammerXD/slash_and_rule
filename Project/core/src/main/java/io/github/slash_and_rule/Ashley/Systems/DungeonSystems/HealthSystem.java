@@ -13,9 +13,9 @@ import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.SensorCompon
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class HealthSystem extends IteratingSystem {
-    public HealthSystem(int priority) {
+    public HealthSystem() {
         super(Family.all(HealthComponent.class, SensorComponent.class).exclude(InactiveComponent.class).get(),
-                priority);
+                Globals.HealthSystemPriority);
     }
 
     @Override

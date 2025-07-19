@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
-import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.LoadingScreen;
 import io.github.slash_and_rule.Ashley.Systems.CollisionSystem;
 import io.github.slash_and_rule.Ashley.Systems.PhysicsSystem;
@@ -28,8 +27,8 @@ public abstract class PhysicsScreen extends GameScreen {
     public void init(LoadingScreen loader) {
         // world = new World(new Vector2(0, 0), true);
         // physicsBuilder.setWorld(world);
-        addToEngine(loader, new PhysicsSystem(Globals.PhysicsSystemPriority, world));
-        addToEngine(loader, new CollisionSystem(Globals.CollisionSystemPriority, world));
+        addToEngine(loader, new PhysicsSystem(world));
+        addToEngine(loader, new CollisionSystem(world));
         super.init(loader);
     }
 

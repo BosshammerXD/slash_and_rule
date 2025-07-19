@@ -41,7 +41,7 @@ public class DungeonCrawlerScene extends PhysicsScreen {
         this.dungeonData = new DungeonData(physicsBuilder, weaponBuilder, entityManager, atlasManager, assetManager);
 
         // Add player and other game objects here
-        player = new Player(physCompBuilder, weaponBuilder, entityManager);
+        player = new Player(physCompBuilder, weaponBuilder);
         dungeonManager = new DungeonManager(this, new DungeonGenerationData(3, 6, 1, 0.5f), 1 / 32f);
         // dungeonSystem = new DungeonSystem(Globals.DungeonRoomSystemPriority,
         // dungeonManager, physCompBuilder, camera, 1 / 32f);
@@ -50,29 +50,28 @@ public class DungeonCrawlerScene extends PhysicsScreen {
     @Override
     public void init(LoadingScreen loader) {
         super.init(loader);
-        addToEngine(loader, new EnemySystem(world, physCompBuilder, Globals.EnemySystemPriority));
-        addToEngine(loader, new HealthSystem(Globals.HealthSystemPriority));
-        addToEngine(loader, new WeaponSystem(Globals.WeaponSystemPriority));
-        addToEngine(loader, dungeonRoomSystem = new DungeonRoomSystem(physCompBuilder, dungeonManager,
-                Globals.DungeonRoomSystemPriority, gameCamera));
-        addToEngine(loader, new DoorSystem(dungeonManager::move, Globals.DoorSystemPriority));
-        addToEngine(loader, new JumperSystem(Globals.JumperSystemPriority));
-        addToEngine(loader, new HealthbarSystem(gameCamera, Globals.HealthbarSystemPriority));
+        addToEngine(loader, new EnemySystem(world, physCompBuilder));
+        addToEngine(loader, new HealthSystem());
+        addToEngine(loader, new WeaponSystem());
+        addToEngine(loader, dungeonRoomSystem = new DungeonRoomSystem(physCompBuilder, dungeonManager, gameCamera));
+        addToEngine(loader, new DoorSystem(dungeonManager::move));
+        addToEngine(loader, new JumperSystem());
+        addToEngine(loader, new HealthbarSystem(gameCamera));
         addToEngine(loader,
-                new EntrySystem(textCamera, textViewport, gameCamera, Globals.EntrySystemPriority, () -> {
+                new EntrySystem(textCamera, textViewport, gameCamera, () -> {
                     this.switchScreen = cityBuild;
                 }));
         addToEngine(loader, new PlayerSystem(gameCamera, () -> {
             this.switchScreen = cityBuild;
-        }, Globals.PlayerSystemPriority));
-        addToEngine(loader, new ItemSystem(Globals.ItemSystemPriority));
+        }));
+        addToEngine(loader, new ItemSystem());
+        loader.schedule("loading player", () -> {
+            engine.addEntity(player.init());
+        });
         loader.schedule("loading level", () -> {
             dungeonManager.setOnDungeonGenerated(dungeonRoomSystem::init);
             dungeonManager.level = dungeonData.load(Globals.level);
             dungeonManager.init(loader);
-        });
-        loader.schedule("loading player", () -> {
-            player.init();
         });
     }
 

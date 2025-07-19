@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Animations.AnimData;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
@@ -15,8 +16,10 @@ public class AnimationSystem extends IteratingSystem {
 
     private AtlasManager atlasManager;
 
-    public AnimationSystem(int priority, AtlasManager atlasManager) {
-        super(Family.all(AnimatedComponent.class).exclude(InactiveComponent.class).get(), priority);
+    public AnimationSystem(AtlasManager atlasManager) {
+        super(
+                Family.all(AnimatedComponent.class).exclude(InactiveComponent.class).get(),
+                Globals.AnimationSystemPriority);
 
         this.atlasManager = atlasManager;
     }

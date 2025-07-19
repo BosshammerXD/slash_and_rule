@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public abstract class RenderableComponent implements Component {
+    public static final float dynamicValue = Float.NaN;
+
     public class TextureData implements Comparable<TextureData> {
         public TextureRegion texture;
         public String atlasPath = null;

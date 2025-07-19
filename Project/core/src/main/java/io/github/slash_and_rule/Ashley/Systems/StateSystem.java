@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.ParentComponent;
 import io.github.slash_and_rule.Ashley.Components.StateComponent;
@@ -12,8 +13,8 @@ import io.github.slash_and_rule.Ashley.Components.StateComponent.State;
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class StateSystem extends IteratingSystem {
-    public StateSystem(int priority) {
-        super(Family.all(StateComponent.class).get(), priority);
+    public StateSystem() {
+        super(Family.all(StateComponent.class).get(), Globals.StateSystemPriority);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.EntryComponent;
@@ -27,10 +28,10 @@ public class EntrySystem extends IteratingSystem {
     private float halfTextWidth;
     private Runnable loader;
 
-    public EntrySystem(OrthographicCamera camera, ExtendViewport viewport, OrthographicCamera gCamera, int priority,
+    public EntrySystem(OrthographicCamera camera, ExtendViewport viewport, OrthographicCamera gCamera,
             Runnable loader) {
         super(Family.all(EntryComponent.class, SensorComponent.class, TransformComponent.class)
-                .exclude(InactiveComponent.class).get(), priority);
+                .exclude(InactiveComponent.class).get(), Globals.EntrySystemPriority);
         this.camera = camera;
         this.viewport = viewport;
         this.gCamera = gCamera;

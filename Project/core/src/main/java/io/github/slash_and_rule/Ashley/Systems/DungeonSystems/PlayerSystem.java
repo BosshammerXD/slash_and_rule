@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ressources;
 import io.github.slash_and_rule.Animations.AnimData;
+import io.github.slash_and_rule.Ashley.Signals;
 import io.github.slash_and_rule.Ashley.Components.ControllableComponent;
 import io.github.slash_and_rule.Ashley.Components.HealthComponent;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
@@ -21,6 +22,7 @@ import io.github.slash_and_rule.Ashley.Components.ControllableComponent.MouseDat
 import io.github.slash_and_rule.Ashley.Components.DrawingComponents.AnimatedComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent.WeaponStates;
+import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsComponent;
 import io.github.slash_and_rule.Ashley.Systems.InputSystem.MouseInputType;
 import io.github.slash_and_rule.Utils.Mappers;
 
@@ -28,14 +30,24 @@ public class PlayerSystem extends IteratingSystem {
     private Camera camera;
     private Runnable func;
 
-    public PlayerSystem(Camera camera, Runnable func, int priority) {
+    public PlayerSystem(Camera camera, Runnable func) {
         super(Family.all(PlayerComponent.class, ControllableComponent.class,
                 TransformComponent.class, WeaponComponent.class, MovementComponent.class, AnimatedComponent.class,
-                HealthComponent.class)
+                HealthComponent.class, PhysicsComponent.class)
                 .exclude(InactiveComponent.class).get(),
-                priority); // Set the priority of this system, 0 is default
+                Globals.PlayerSystemPriority); // Set the priority of this system, 0 is default
         this.camera = camera;
         this.func = func;
+        Signals.playerTeleportSignal.add((signal, event) -> {
+            Vector2 position = event.position;
+            for (Entity entity : getEntities()) {
+                PhysicsComponent physComp = Mappers.physicsMapper.get(entity);
+                physComp.body.setTransform(position, physComp.body.getAngle());
+                System.out.println("Player Teleported to: " + position);
+            }
+            camera.position.set(position.x, position.y, 0);
+            camera.update();
+        });
     }
 
     @Override

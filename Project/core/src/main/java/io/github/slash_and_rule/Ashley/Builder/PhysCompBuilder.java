@@ -11,6 +11,8 @@ import io.github.slash_and_rule.Bases.BaseCompBuilder;
 import io.github.slash_and_rule.Utils.PhysicsBuilder;
 
 public class PhysCompBuilder extends BaseCompBuilder<PhysicsComponent> {
+    public static final boolean NotSensor = false;
+    public static final boolean IsSensor = true;
     private PhysicsBuilder physicsBuilder;
 
     public PhysCompBuilder(PhysicsBuilder physicsBuilder) {
@@ -20,6 +22,10 @@ public class PhysCompBuilder extends BaseCompBuilder<PhysicsComponent> {
     public void begin(Vector2 position, BodyType bodyType, float friction, boolean isActive) {
         begin(new PhysicsComponent());
         comp.body = physicsBuilder.makeBody(position, bodyType, friction, isActive);
+    }
+
+    public void begin(Vector2 position, BodyType bodyType, float friction) {
+        this.begin(position, bodyType, friction, true);
     }
 
     public void begin(BodyType bodyType, float friction, boolean isActive) {

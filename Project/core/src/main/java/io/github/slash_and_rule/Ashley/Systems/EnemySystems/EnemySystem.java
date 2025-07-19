@@ -53,8 +53,8 @@ public class EnemySystem extends EntitySystem {
 
     RayCast callback = new RayCast();
 
-    public EnemySystem(World world, PhysCompBuilder physCompBuilder, int priority) {
-        super(priority);
+    public EnemySystem(World world, PhysCompBuilder physCompBuilder) {
+        super(Globals.EnemySystemPriority);
         this.world = world;
         this.physCompBuilder = physCompBuilder;
     }

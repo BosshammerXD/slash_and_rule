@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 
+import io.github.slash_and_rule.Globals;
 import io.github.slash_and_rule.Ashley.Components.InactiveComponent;
 import io.github.slash_and_rule.Ashley.Components.TransformComponent;
 import io.github.slash_and_rule.Ashley.Components.DungeonComponents.WeaponComponent;
@@ -17,9 +18,9 @@ import io.github.slash_and_rule.Ashley.Components.PhysicsComponents.PhysicsCompo
 import io.github.slash_and_rule.Utils.Mappers;
 
 public class JumperSystem extends IteratingSystem {
-    public JumperSystem(int priority) {
+    public JumperSystem() {
         super(Family.all(JumperComponent.class, WeaponComponent.class, PhysicsComponent.class, EnemyComponent.class)
-                .exclude(InactiveComponent.class).get(), priority);
+                .exclude(InactiveComponent.class).get(), Globals.JumperSystemPriority);
     }
 
     @Override
